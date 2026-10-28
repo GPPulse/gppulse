@@ -1,0 +1,34 @@
+# The scheduler. Builds the issue Sun–Thu evening, sends Mon–Fri morning.
+# Uses PIPELINE_SECRET (an x-pipeline-secret header) so the service-role key never leaves Supabase.
+# Both calls are idempotent on the function side: a second build won't stack drafts, a second send won't double-send.
+# GitHub cron is UTC and can lag by a few minutes; both times are set 10 minutes early to absorb that.
+name: Newsletter pipeline
+on:
+  schedule:
+    - cron: "50 21 * * 0-4"   # 4:50pm CDT / 5:50pm EDT — build tonight's draft
+    - cron: "50 10 * * 1-5"   # 5:50am EDT — morning send
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "full | send | full-send | scrape"
+        default: "full"
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Decide mode
+        id: mode
+        run: |
+          if [ -n "${{ github.event.inputs.mode }}" ]; then echo "mode=${{ github.event.inputs.mode }}" >> $GITHUB_OUTPUT
+          elif [ "$(date -u +%H)" -lt 15 ]; then echo "mode=send" >> $GITHUB_OUTPUT
+          else echo "mode=full" >> $GITHUB_OUTPUT; fi
+      - name: Call pipeline
+        run: |
+          code=$(curl -sS -o out.json -w '%{http_code}' --max-time 900 -X POST \
+            "https://${{ secrets.SUPABASE_PROJECT_REF }}.supabase.co/functions/v1/daily-newsletter-pipeline" \
+            -H "Content-Type: application/json" \
+            -H "x-pipeline-secret: ${{ secrets.PIPELINE_SECRET }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -d "{\"mode\":\"${{ steps.mode.outputs.mode }}\"}")
+          echo "HTTP $code"; cat out.json | head -c 4000; echo
+          [ "$code" = "200" ] && jq -e '.success == true' out.json > /dev/null

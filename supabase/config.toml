@@ -1,0 +1,37 @@
+project_id = "REPLACE_WITH_PROJECT_REF"
+
+[functions.scrape-pe-sources]
+verify_jwt = false
+
+[functions.process-content]
+verify_jwt = false
+
+[functions.generate-newsletter]
+verify_jwt = false
+
+[functions.send-newsletter]
+verify_jwt = false
+
+[functions.daily-newsletter-pipeline]
+verify_jwt = false
+
+[functions.manage-subscribers]
+verify_jwt = false
+
+[functions.fetch-market-data]
+verify_jwt = false
+
+[functions.scrape-people-moves]
+verify_jwt = false
+
+[functions.generate-gp-index]
+verify_jwt = false
+
+[functions.scrape-industry-news]
+verify_jwt = false
+
+[functions.resend-webhook]
+verify_jwt = false
+
+[functions.send-deal-alerts]
+verify_jwt = false
