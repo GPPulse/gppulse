@@ -10,6 +10,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
     "check:functions": "bash scripts/check-functions.sh",
+    "test:functions": "deno run --no-lock --allow-env --allow-net supabase/functions/_shared/tests/ai_failover_test.ts",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest"

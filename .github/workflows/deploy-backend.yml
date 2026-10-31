@@ -4,7 +4,7 @@
 #   SUPABASE_PROJECT_REF   e.g. abcdefghijklmnop
 #   SUPABASE_DB_PASSWORD   database password set when the project was created
 # Optional — set any of these and they are pushed as edge-function secrets:
-#   RESEND_API_KEY FIRECRAWL_API_KEY LOVABLE_API_KEY OPENAI_API_KEY FRED_API_KEY
+#   RESEND_API_KEY FIRECRAWL_API_KEY ANTHROPIC_API_KEY OPENAI_API_KEY OPENAI_BASE_URL AI_PROVIDER FRED_API_KEY
 #   NEWSLETTER_FROM NEWSLETTER_REPLY_TO NEWSLETTER_POSTAL_ADDRESS NEWSLETTER_EDITOR_NAME NEWSLETTER_EDITOR_TITLE
 #   SITE_URL RESEND_WEBHOOK_SECRET PIPELINE_SECRET AUTO_SEND
 name: Deploy backend
@@ -34,7 +34,7 @@ jobs:
       - name: Push secrets
         run: |
           : > .secrets.env
-          for k in RESEND_API_KEY FIRECRAWL_API_KEY LOVABLE_API_KEY OPENAI_API_KEY FRED_API_KEY \
+          for k in RESEND_API_KEY FIRECRAWL_API_KEY ANTHROPIC_API_KEY OPENAI_API_KEY OPENAI_BASE_URL AI_PROVIDER FRED_API_KEY \
                    NEWSLETTER_FROM NEWSLETTER_REPLY_TO NEWSLETTER_POSTAL_ADDRESS NEWSLETTER_EDITOR_NAME NEWSLETTER_EDITOR_TITLE \
                    SITE_URL RESEND_WEBHOOK_SECRET PIPELINE_SECRET AUTO_SEND; do
             v="${!k:-}"; [ -n "$v" ] && printf '%s=%s\n' "$k" "$v" >> .secrets.env
@@ -44,8 +44,10 @@ jobs:
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
-          LOVABLE_API_KEY: ${{ secrets.LOVABLE_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
+          AI_PROVIDER: ${{ secrets.AI_PROVIDER }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
           NEWSLETTER_FROM: ${{ secrets.NEWSLETTER_FROM }}
           NEWSLETTER_REPLY_TO: ${{ secrets.NEWSLETTER_REPLY_TO }}

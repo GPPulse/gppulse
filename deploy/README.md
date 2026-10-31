@@ -22,7 +22,10 @@ Settings → Secrets and variables → Actions. These drive `deploy-backend.yml`
 | `SUPABASE_DB_PASSWORD` | the one you set at creation |
 | `SUPABASE_ANON_KEY` | Project Settings → API |
 | `PIPELINE_SECRET` | any long random string — `openssl rand -hex 24` |
-| `ANTHROPIC_API_KEY`, `FIRECRAWL_API_KEY`, `RESEND_API_KEY` | from each service |
+| `ANTHROPIC_API_KEY` | primary writer. Sonnet for the Lede, Haiku for extraction |
+| `OPENAI_API_KEY` | **fallback** — used automatically if Anthropic errors, rate-limits or times out. Any OpenAI-compatible host works: set `OPENAI_BASE_URL` for OpenRouter/Groq/Together |
+| `AI_PROVIDER` | optional, `anthropic` (default) or `openai` to flip which is primary |
+| `FIRECRAWL_API_KEY`, `RESEND_API_KEY` | from each service |
 | `SITE_URL` | `https://thegppulse.com` (or the Vercel URL for now), no trailing slash |
 | `NEWSLETTER_FROM` | `The GP Pulse <pulse@mail.thegppulse.com>` |
 | `NEWSLETTER_REPLY_TO` | `cschlotman@littlejohncapital.com` or a dedicated inbox |

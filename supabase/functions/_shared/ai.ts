@@ -1,10 +1,17 @@
-// Provider-agnostic chat helper for the edge functions.
+// Provider-agnostic chat helper with automatic failover.
 //
-// Picks the provider from env, in this order:
-//   ANTHROPIC_API_KEY  → Anthropic Messages API (default: Sonnet for editorial, Haiku for extraction)
-//   OPENAI_API_KEY     → OpenAI-compatible /chat/completions (OpenAI, or any gateway via AI_GATEWAY_URL)
+// Providers (any OpenAI-compatible endpoint works for the second one):
+//   anthropic  ANTHROPIC_API_KEY                       Messages API. Default: Sonnet (editorial) / Haiku (fast).
+//   openai     OPENAI_API_KEY [+ OPENAI_BASE_URL]      /v1/chat/completions. Default: gpt-4o / gpt-4o-mini.
+//              OPENAI_BASE_URL lets you point at OpenRouter, Groq, Together, Azure, a local vLLM, etc.
 //
-// Optional overrides: AI_MODEL_EDITORIAL, AI_MODEL_FAST, AI_GATEWAY_URL.
+// Order: AI_PROVIDER="anthropic" (default) or "openai" picks the primary. If the primary fails after
+// retries (429/5xx/overloaded/timeout/network), the other provider is tried when its key is set.
+// If the primary returns a 4xx that isn't a rate limit (bad key, bad request) we also fail over, because
+// a dead key at 5pm should not stop the issue from being drafted.
+//
+// Model overrides: ANTHROPIC_MODEL_EDITORIAL / ANTHROPIC_MODEL_FAST / OPENAI_MODEL_EDITORIAL / OPENAI_MODEL_FAST.
+// (AI_MODEL_EDITORIAL / AI_MODEL_FAST still work and apply to whichever provider is primary.)
 // The `apiKey` argument is kept for backward compatibility and ignored; keys come from env.
 
 export interface AIOptions {
@@ -13,18 +20,96 @@ export interface AIOptions {
   maxTokens?: number;
   /** "editorial" = the writing model, "fast" = cheap extraction/classification. Default: fast. */
   tier?: "editorial" | "fast";
+  /** Per-call timeout in ms. Default 90s. */
+  timeoutMs?: number;
 }
 
-const DEFAULTS = {
+type Provider = "anthropic" | "openai";
+
+const DEFAULTS: Record<Provider, { editorial: string; fast: string }> = {
   anthropic: { editorial: "claude-sonnet-5-5", fast: "claude-haiku-5-5" },
   openai: { editorial: "gpt-4o", fast: "gpt-4o-mini" },
 };
 
-function pickModel(provider: "anthropic" | "openai", opts: AIOptions): string {
-  if (opts.model && !opts.model.startsWith("google/")) return opts.model; // legacy "google/gemini-…" values are ignored
+export class AIError extends Error {
+  constructor(public provider: Provider, public status: number, message: string) {
+    super(`${provider} ${status}: ${message}`);
+  }
+  get retryable(): boolean {
+    return this.status === 0 || this.status === 408 || this.status === 429 || this.status >= 500;
+  }
+}
+
+function keyFor(p: Provider): string | undefined {
+  return p === "anthropic" ? Deno.env.get("ANTHROPIC_API_KEY") : Deno.env.get("OPENAI_API_KEY");
+}
+
+function providerOrder(): Provider[] {
+  const pref = (Deno.env.get("AI_PROVIDER") ?? "anthropic").toLowerCase() as Provider;
+  const primary: Provider = pref === "openai" ? "openai" : "anthropic";
+  const secondary: Provider = primary === "anthropic" ? "openai" : "anthropic";
+  return [primary, secondary].filter((p) => Boolean(keyFor(p)));
+}
+
+function pickModel(provider: Provider, isPrimary: boolean, opts: AIOptions): string {
+  if (opts.model && !opts.model.startsWith("google/")) return opts.model; // legacy gateway model ids are ignored
   const tier = opts.tier ?? "fast";
-  const env = tier === "editorial" ? Deno.env.get("AI_MODEL_EDITORIAL") : Deno.env.get("AI_MODEL_FAST");
-  return env || DEFAULTS[provider][tier];
+  const specific = Deno.env.get(`${provider.toUpperCase()}_MODEL_${tier.toUpperCase()}`);
+  if (specific) return specific;
+  if (isPrimary) {
+    const generic = Deno.env.get(tier === "editorial" ? "AI_MODEL_EDITORIAL" : "AI_MODEL_FAST");
+    if (generic) return generic;
+  }
+  return DEFAULTS[provider][tier];
+}
+
+async function fetchWithTimeout(url: string, init: RequestInit, ms: number): Promise<Response> {
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), ms);
+  try {
+    return await fetch(url, { ...init, signal: ctl.signal });
+  } finally {
+    clearTimeout(t);
+  }
+}
+
+async function callAnthropic(system: string, user: string, model: string, temperature: number, maxTokens: number, timeoutMs: number): Promise<string> {
+  let r: Response;
+  try {
+    r = await fetchWithTimeout("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "x-api-key": keyFor("anthropic")!, "anthropic-version": "2023-06-01", "content-type": "application/json" },
+      body: JSON.stringify({ model, system, max_tokens: maxTokens, temperature, messages: [{ role: "user", content: user }] }),
+    }, timeoutMs);
+  } catch (e) {
+    throw new AIError("anthropic", 0, String(e));
+  }
+  if (!r.ok) throw new AIError("anthropic", r.status, (await r.text()).slice(0, 300));
+  const d = await r.json();
+  const text = (d.content ?? []).filter((b: { type: string }) => b.type === "text").map((b: { text: string }) => b.text).join("");
+  if (!text) throw new AIError("anthropic", 502, "empty completion");
+  return text;
+}
+
+async function callOpenAI(system: string, user: string, model: string, temperature: number, maxTokens: number, timeoutMs: number): Promise<string> {
+  const base = (Deno.env.get("OPENAI_BASE_URL") ?? Deno.env.get("AI_GATEWAY_URL") ?? "https://api.openai.com/v1").replace(/\/$/, "");
+  const headers: Record<string, string> = { Authorization: `Bearer ${keyFor("openai")}`, "Content-Type": "application/json" };
+  if (base.includes("openrouter.ai")) { headers["HTTP-Referer"] = Deno.env.get("SITE_URL") ?? "https://thegppulse.com"; headers["X-Title"] = "The GP Pulse"; }
+  // Newer OpenAI models reject max_tokens/temperature; send the modern field and drop temperature for o-series/gpt-5.
+  const modern = /^(o\d|gpt-5)/.test(model);
+  const body: Record<string, unknown> = { model, messages: [{ role: "system", content: system }, { role: "user", content: user }] };
+  if (modern) body.max_completion_tokens = maxTokens; else { body.max_tokens = maxTokens; body.temperature = temperature; }
+  let r: Response;
+  try {
+    r = await fetchWithTimeout(`${base}/chat/completions`, { method: "POST", headers, body: JSON.stringify(body) }, timeoutMs);
+  } catch (e) {
+    throw new AIError("openai", 0, String(e));
+  }
+  if (!r.ok) throw new AIError("openai", r.status, (await r.text()).slice(0, 300));
+  const d = await r.json();
+  const text: string = d.choices?.[0]?.message?.content ?? "";
+  if (!text) throw new AIError("openai", 502, "empty completion");
+  return text;
 }
 
 async function withRetry<T>(fn: () => Promise<T>, tries = 3): Promise<T> {
@@ -34,55 +119,46 @@ async function withRetry<T>(fn: () => Promise<T>, tries = 3): Promise<T> {
       return await fn();
     } catch (e) {
       last = e;
-      const msg = String(e);
-      if (!/429|5\d\d|overloaded|rate/i.test(msg)) throw e;
-      await new Promise((r) => setTimeout(r, 800 * (i + 1) ** 2));
+      if (!(e instanceof AIError) || !e.retryable || i === tries - 1) throw e;
+      await new Promise((res) => setTimeout(res, 800 * (i + 1) ** 2));
     }
   }
   throw last;
 }
 
+/** Which provider served the last successful call. Useful in logs and the pipeline step output. */
+export let lastProviderUsed: Provider | null = null;
+
 export async function chat(_apiKey: string, system: string, user: string, opts: AIOptions = {}): Promise<string> {
-  const anthropicKey = Deno.env.get("ANTHROPIC_API_KEY");
-  const openaiKey = Deno.env.get("OPENAI_API_KEY");
   const temperature = opts.temperature ?? 0.4;
   const maxTokens = opts.maxTokens ?? 2000;
+  const timeoutMs = opts.timeoutMs ?? 90_000;
+  const order = providerOrder();
+  if (!order.length) throw new Error("No AI provider configured: set ANTHROPIC_API_KEY and/or OPENAI_API_KEY");
 
-  if (anthropicKey) {
-    const model = pickModel("anthropic", opts);
-    return withRetry(async () => {
-      const r = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: { "x-api-key": anthropicKey, "anthropic-version": "2023-06-01", "content-type": "application/json" },
-        body: JSON.stringify({ model, system, max_tokens: maxTokens, temperature, messages: [{ role: "user", content: user }] }),
-      });
-      if (!r.ok) throw new Error(`Anthropic ${r.status}: ${(await r.text()).slice(0, 300)}`);
-      const d = await r.json();
-      return (d.content ?? []).filter((b: { type: string }) => b.type === "text").map((b: { text: string }) => b.text).join("");
-    });
+  const errors: string[] = [];
+  for (let i = 0; i < order.length; i++) {
+    const provider = order[i];
+    const model = pickModel(provider, i === 0, opts);
+    try {
+      const text = await withRetry(() =>
+        provider === "anthropic"
+          ? callAnthropic(system, user, model, temperature, maxTokens, timeoutMs)
+          : callOpenAI(system, user, model, temperature, maxTokens, timeoutMs));
+      if (i > 0) console.warn(`[ai] failed over to ${provider}/${model} after: ${errors.join(" | ")}`);
+      lastProviderUsed = provider;
+      return text;
+    } catch (e) {
+      errors.push(String(e));
+      console.error(`[ai] ${provider}/${model} failed: ${String(e).slice(0, 200)}`);
+    }
   }
-
-  if (openaiKey) {
-    const model = pickModel("openai", opts);
-    const url = (Deno.env.get("AI_GATEWAY_URL") ?? "https://api.openai.com/v1").replace(/\/$/, "") + "/chat/completions";
-    return withRetry(async () => {
-      const r = await fetch(url, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${openaiKey}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ model, temperature, max_tokens: maxTokens, messages: [{ role: "system", content: system }, { role: "user", content: user }] }),
-      });
-      if (!r.ok) throw new Error(`OpenAI ${r.status}: ${(await r.text()).slice(0, 300)}`);
-      const d = await r.json();
-      return d.choices?.[0]?.message?.content ?? "";
-    });
-  }
-
-  throw new Error("No AI provider configured: set ANTHROPIC_API_KEY (recommended) or OPENAI_API_KEY");
+  throw new Error(`All AI providers failed: ${errors.join(" | ")}`);
 }
 
-/** True when some provider key is present. Functions use this to skip AI steps gracefully. */
+/** True when at least one provider key is present. Functions use this to skip AI steps gracefully. */
 export function aiConfigured(): boolean {
-  return Boolean(Deno.env.get("ANTHROPIC_API_KEY") || Deno.env.get("OPENAI_API_KEY"));
+  return providerOrder().length > 0;
 }
 
 /** Extract the first JSON object or array from a model response. */
