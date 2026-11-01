@@ -157,7 +157,7 @@ function headlines(items: Article[]): string {
   return sectionLabel("The headlines") + body(rows);
 }
 
-function dealTracker(deals: DealRow[]): string {
+function dealTracker(deals: DealRow[], weekly = false): string {
   if (!deals?.length) return "";
   const rows = deals
     .map((d, i) => {
@@ -180,10 +180,10 @@ function dealTracker(deals: DealRow[]): string {
       </tr></table>`;
     })
     .join("");
-  return sectionLabel("Deal tracker", "disclosed figures only") + body(rows);
+  return sectionLabel(weekly ? "This week's deals" : "Deal tracker", weekly ? `${deals.length} tracked · ${deals.filter((d) => d.ev_ebitda_multiple).length} with disclosed multiples` : "disclosed figures only") + body(rows);
 }
 
-function fundTracker(funds: FundRow[]): string {
+function fundTracker(funds: FundRow[], weekly = false): string {
   if (!funds?.length) return "";
   const rows = funds
     .map((f) => {
@@ -204,7 +204,7 @@ function fundTracker(funds: FundRow[]): string {
       </tr>`;
     })
     .join("");
-  return sectionLabel("Fund tracker", "sub-$1B vehicles") + body(`<table width="100%" cellpadding="0" cellspacing="0" role="presentation">${rows}</table>`);
+  return sectionLabel(weekly ? "This week's funds" : "Fund tracker", "sub-$1B vehicles") + body(`<table width="100%" cellpadding="0" cellspacing="0" role="presentation">${rows}</table>`);
 }
 
 function peopleMoves(items: Article[]): string {
@@ -310,7 +310,7 @@ export function renderIssueEmail(c: NewsletterContentV2, o: IssueEmailOptions): 
       <table width="100%" cellpadding="0" cellspacing="0" role="presentation"><tr>
         <td valign="bottom">
           <div style="font-family:${SANS};font-size:22px;font-weight:800;letter-spacing:-0.02em;color:${INK};">THE GP PULSE</div>
-          <div style="font-family:${MONO};font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:${MUTED};margin-top:2px;">Lower middle market, every weekday</div>
+          <div style="font-family:${MONO};font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:${MUTED};margin-top:2px;">${c.edition === "weekly" ? `<span style="background:${INK};color:#fff;padding:2px 6px;">Week in review</span>` : "Lower middle market, every weekday"}</div>
         </td>
         <td valign="bottom" align="right" style="font-family:${MONO};font-size:11px;color:${MUTED};line-height:1.6;">
           No. ${o.issueNumber}<br>${escapeHtml(dateStr)}<br><a href="${escapeHtml(o.webUrl)}" style="color:${MUTED};">Read online</a>
@@ -325,9 +325,9 @@ export function renderIssueEmail(c: NewsletterContentV2, o: IssueEmailOptions): 
     ${editorsNote(c, o)}
     ${byTheNumbers(c.by_the_numbers)}
     ${headlines(c.top_headlines)}
-    ${dealTracker(c.deal_tracker)}
+    ${dealTracker(c.deal_tracker, c.edition === "weekly")}
     ${editorItems("On the market", "processes we're hearing about", c.on_the_market, true)}
-    ${fundTracker(c.fund_tracker)}
+    ${fundTracker(c.fund_tracker, c.edition === "weekly")}
     ${peopleMoves(c.people_moves)}
     ${marketPulse(c.market_pulse)}
     ${editorItems("Overheard", undefined, c.overheard)}

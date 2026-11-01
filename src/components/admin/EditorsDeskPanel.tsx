@@ -13,10 +13,10 @@ import { useToast } from "@/hooks/use-toast";
 import { IssueView } from "@/components/issue/IssueView";
 import { NewsletterContentV2, normalizeContent } from "@/lib/newsletter-content";
 import type { Json } from "@/integrations/supabase/types";
-import { Check, Eye, Loader2, Mail, Plus, RefreshCw, Send, Trash2, X } from "lucide-react";
+import { Check, Copy, Eye, Loader2, Mail, Plus, RefreshCw, Send, Share2, Trash2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type IssueRow = { id: string; subject: string; preheader: string | null; issue_number: number; status: string; created_at: string; sent_at: string | null; content: Json; recipient_count: number | null; open_count: number | null; click_count: number | null };
+type IssueRow = { id: string; subject: string; preheader: string | null; issue_number: number; status: string; created_at: string; sent_at: string | null; content: Json; recipient_count: number | null; open_count: number | null; click_count: number | null; slug: string | null; edition: string };
 type EditorItemRow = { id: string; kind: string; headline: string; body: string | null; url: string | null; attribution: string | null; status: string; created_at: string; submitted_by_email: string | null; submitted_by_role: string | null; attribution_ok: boolean };
 
 const KINDS = [
@@ -46,11 +46,14 @@ export function EditorsDeskPanel() {
   const [testEmail, setTestEmail] = useState("");
   const [testOpen, setTestOpen] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
+  const [postOpen, setPostOpen] = useState(false);
+  const [postText, setPostText] = useState("");
+  const [postCopied, setPostCopied] = useState(false);
 
   const issues = useQuery({
     queryKey: ["desk-issues"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("newsletters").select("id, subject, preheader, issue_number, status, created_at, sent_at, content, recipient_count, open_count, click_count").order("created_at", { ascending: false }).limit(15);
+      const { data, error } = await supabase.from("newsletters").select("id, subject, preheader, issue_number, status, created_at, sent_at, content, recipient_count, open_count, click_count, slug, edition").order("created_at", { ascending: false }).limit(15);
       if (error) throw error;
       return data as IssueRow[];
     },
@@ -138,6 +141,33 @@ export function EditorsDeskPanel() {
     await invoke("send-newsletter", { newsletter_id: selected.id, force: true }, "Send");
   };
 
+  // ---- "Post the Lede" — LinkedIn-ready text from the issue -----------------
+  const buildPost = () => {
+    if (!draft || !selected) return;
+    const c = draft.content;
+    const origin = window.location.origin;
+    const url = `${origin}/archive/${selected.slug ?? selected.id}`;
+    const stats = c.by_the_numbers.slice(0, 3).map((x) => `${x.value} — ${x.label}`).join("\n");
+    const deals = c.deal_tracker.filter((d) => d.ev_ebitda_multiple).slice(0, 3)
+      .map((d) => `• ${d.sponsor} → ${d.target}${d.sector ? ` (${d.sector})` : ""}: ${d.ev_ebitda_multiple?.toFixed(1)}x`).join("\n");
+    const lede = c.editors_note;
+    const lines = [
+      lede?.headline ?? draft.subject,
+      "",
+      ...(lede?.paragraphs ?? []).slice(0, 2),
+      stats ? `\nBy the numbers:\n${stats}` : "",
+      deals ? `\nDisclosed multiples this ${c.edition === "weekly" ? "week" : "morning"}:\n${deals}` : "",
+      "",
+      `Full issue (free): ${url}`,
+      "",
+      "#privateequity #lowermiddlemarket #mergersandacquisitions",
+    ].filter((l, i, arr) => !(l === "" && arr[i - 1] === ""));
+    setPostText(lines.join("\n").replace(/\n{3,}/g, "\n\n").trim());
+    setPostCopied(false);
+    setPostOpen(true);
+  };
+  const copyPost = async () => { await navigator.clipboard.writeText(postText); setPostCopied(true); setTimeout(() => setPostCopied(false), 1500); };
+
   // ---- editor queue ---------------------------------------------------------
   const [item, setItem] = useState({ kind: "on_the_market", headline: "", body: "", url: "", attribution: "" });
   const addItem = useMutation({
@@ -203,6 +233,7 @@ export function EditorsDeskPanel() {
               <div className="flex flex-wrap gap-2">
                 <Button size="sm" variant="outline" onClick={() => setPreview(true)}><Eye className="h-4 w-4 mr-1" />Preview</Button>
                 <Button size="sm" variant="outline" onClick={() => setTestOpen(true)}><Mail className="h-4 w-4 mr-1" />Test email</Button>
+                <Button size="sm" variant="outline" onClick={buildPost}><Share2 className="h-4 w-4 mr-1" />Post the Lede</Button>
                 <Button size="sm" variant="outline" onClick={() => save.mutate()} disabled={!dirty || save.isPending}>{save.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save"}</Button>
                 {selected.status === "draft" && <Button size="sm" onClick={() => setStatus("approved")}><Check className="h-4 w-4 mr-1" />Approve for 6am</Button>}
                 {selected.status === "approved" && <Button size="sm" variant="outline" onClick={() => setStatus("draft")}>Un-approve</Button>}
@@ -369,6 +400,19 @@ export function EditorsDeskPanel() {
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-2 sm:p-6">
           <DialogHeader><DialogTitle className="sr-only">Preview</DialogTitle></DialogHeader>
           {draft && selected && <IssueView content={draft.content} issueNumber={selected.issue_number} date={new Date(selected.sent_at ?? selected.created_at)} className="shadow-none" />}
+        </DialogContent>
+      </Dialog>
+
+      {/* Post the Lede */}
+      <Dialog open={postOpen} onOpenChange={setPostOpen}>
+        <DialogContent className="max-w-xl">
+          <DialogHeader><DialogTitle>Post the Lede</DialogTitle></DialogHeader>
+          <p className="text-sm text-muted-foreground">LinkedIn-ready. First line is the hook, link goes to the archive page. Edit, copy, paste. Post it the same morning the issue sends — the Lede is the free distribution channel.</p>
+          <Textarea rows={16} value={postText} onChange={(e) => setPostText(e.target.value)} className="font-sans text-sm leading-relaxed" />
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-muted-foreground font-mono">{postText.length} chars{postText.length > 3000 ? " — over LinkedIn's 3,000 limit" : ""}</span>
+            <Button onClick={copyPost}>{postCopied ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}{postCopied ? "Copied" : "Copy"}</Button>
+          </div>
         </DialogContent>
       </Dialog>
 

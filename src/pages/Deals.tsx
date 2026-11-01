@@ -117,7 +117,7 @@ export default function Deals() {
                 </table>
               </div>
             )}
-            <p className="text-xs text-muted-foreground mt-3 font-mono">n/d = not disclosed. We don't estimate.</p>
+            <p className="text-xs text-muted-foreground mt-3 font-mono">n/d = not disclosed. We don't estimate. Want medians by sector and size? <a href="/comps" className="underline">Comps</a>.</p>
 
             <div className="mt-12 border-2 border-foreground p-8 bg-secondary grid lg:grid-cols-[1fr_380px] gap-6 items-center">
               <div>

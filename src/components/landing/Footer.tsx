@@ -23,6 +23,7 @@ export const Footer = () => {
             </div>
             <nav className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
               <Link to="/deals" className="hover:text-foreground">Deals</Link>
+              <Link to="/comps" className="hover:text-foreground">Comps</Link>
               <Link to="/funds" className="hover:text-foreground">Funds</Link>
               <Link to="/deal-stats" className="hover:text-foreground">Index</Link>
               <Link to="/tip" className="hover:text-foreground">Send a tip</Link>

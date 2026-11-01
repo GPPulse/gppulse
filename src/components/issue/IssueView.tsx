@@ -115,12 +115,12 @@ function Headlines({ items, title = "The headlines", takeLabel = "Why it matters
   );
 }
 
-function Deals({ deals }: { deals: DealRow[] }) {
+function Deals({ deals, weekly }: { deals: DealRow[]; weekly?: boolean }) {
   if (!deals?.length) return null;
   const verb = (t: DealRow["deal_type"]) => (t === "exit" ? "exits" : t === "add-on" ? "adds on" : t === "recap" ? "recaps" : "acquires");
   return (
     <section className="px-6 md:px-8">
-      <Label sub="disclosed figures only">Deal tracker</Label>
+      <Label sub={weekly ? `${deals.length} tracked · ${deals.filter((d) => d.ev_ebitda_multiple).length} with disclosed multiples` : "disclosed figures only"}>{weekly ? "This week's deals" : "Deal tracker"}</Label>
       <div className="divide-y divide-border/40">
         {deals.map((d, i) => {
           const facts = [
@@ -145,11 +145,11 @@ function Deals({ deals }: { deals: DealRow[] }) {
   );
 }
 
-function Funds({ funds }: { funds: FundRow[] }) {
+function Funds({ funds, weekly }: { funds: FundRow[]; weekly?: boolean }) {
   if (!funds?.length) return null;
   return (
     <section className="px-6 md:px-8">
-      <Label sub="sub-$1B vehicles">Fund tracker</Label>
+      <Label sub="sub-$1B vehicles">{weekly ? "This week's funds" : "Fund tracker"}</Label>
       <table className="w-full text-sm">
         <tbody className="divide-y divide-border/40">
           {funds.map((f, i) => {
@@ -220,7 +220,9 @@ export function IssueView({ content: c, issueNumber, date, className, compact }:
       <header className="px-6 md:px-8 py-5 border-b-2 border-foreground flex items-end justify-between gap-4">
         <div>
           <p className="text-xl md:text-2xl font-extrabold tracking-tight">THE GP PULSE</p>
-          <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground">Lower middle market, every weekday</p>
+          {c.edition === "weekly"
+            ? <p className="font-mono text-[10px] uppercase tracking-[0.12em] inline-block bg-foreground text-background px-1.5 py-0.5 mt-0.5">Week in review</p>
+            : <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground">Lower middle market, every weekday</p>}
         </div>
         <p className="font-mono text-[11px] text-muted-foreground text-right leading-relaxed">No. {issueNumber}<br />{dateStr}</p>
       </header>
@@ -241,9 +243,9 @@ export function IssueView({ content: c, issueNumber, date, className, compact }:
         )}
         <Numbers stats={c.by_the_numbers} />
         <Headlines items={c.top_headlines} />
-        <Deals deals={c.deal_tracker} />
+        <Deals deals={c.deal_tracker} weekly={c.edition === "weekly"} />
         <Items title="On the market" sub="processes we're hearing about" items={c.on_the_market} boxed />
-        <Funds funds={c.fund_tracker} />
+        <Funds funds={c.fund_tracker} weekly={c.edition === "weekly"} />
         <People items={c.people_moves} />
         <Headlines items={c.market_pulse} title="Macro & credit" takeLabel="For the LMM" />
         <Items title="Overheard" items={c.overheard} />

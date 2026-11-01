@@ -170,6 +170,7 @@ async function editorialPass(
     pulse: DbArticle[];
     editorItems: EditorItem[];
     weekNarrative: string | null;
+    weekStats: string | null;
   },
   apiKey: string,
 ): Promise<EditorialOutput | null> {
@@ -186,6 +187,8 @@ async function editorialPass(
   const system = `${HOUSE_STYLE}
 
 You are writing today's issue of The GP Pulse (${input.edition === "weekly" ? "Friday week-in-review edition" : "daily edition"}) for ${input.dateLabel}. You have the day's raw material below. Produce the editorial layer.
+${input.edition === "weekly" ? `
+FRIDAY RULES. This is the keeper issue readers save. The Lede is 3–4 paragraphs and is about the PATTERN across the week, not one deal: where multiples cleared by sector, who was buying vs. selling, what the lenders did, which fund closes say something about LP appetite. Open with the single number that best summarizes the week. The subject line should read as a weekly verdict ("The week LMM industrials repriced to 7x"). By the numbers must use the computed week stats. Deal takes: write one for every deal with a disclosed multiple; skip the rest.` : ""}
 
 OUTPUT (JSON only, no prose outside it):
 {
@@ -223,7 +226,7 @@ ${fmtArt(input.pulse) || "(none)"}
 
 EDITOR-SUBMITTED ITEMS (processes, overheard, jobs — already written, do not rewrite; use for context only):
 ${fmtItems || "(none)"}
-${input.weekNarrative ? `\nWEEKLY INDEX NARRATIVE (for Friday context):\n${input.weekNarrative}` : ""}`;
+${input.weekStats ? `\nTHIS WEEK (computed from the tracker — use these numbers in By the numbers and the Lede):\n${input.weekStats}` : ""}${input.weekNarrative ? `\nWEEKLY INDEX NARRATIVE (for Friday context):\n${input.weekNarrative}` : ""}`;
 
   try {
     const text = await chat(apiKey, system, user, { temperature: 0.55, maxTokens: 3500, tier: "editorial" });
@@ -360,14 +363,45 @@ serve(async (req: Request): Promise<Response> => {
     const now = new Date();
     const edition: "daily" | "weekly" = now.getDay() === 5 ? "weekly" : "daily";
     let weekNarrative: string | null = null;
+    let weekStats: string | null = null;
     if (edition === "weekly") {
       const { data: idx } = await supabase.from("gp_pulse_index").select("narrative_summary").order("week_start", { ascending: false }).limit(1).maybeSingle();
       weekNarrative = idx?.narrative_summary ?? null;
+
+      // The Friday issue carries the whole week: everything in the tracker since Monday, not just today's pool.
+      const weekAgo = new Date(now); weekAgo.setDate(weekAgo.getDate() - 7);
+      const [{ data: weekDeals }, { data: weekFunds }] = await Promise.all([
+        supabase.from("deals").select("*").gte("announced_on", weekAgo.toISOString().slice(0, 10)).order("announced_on", { ascending: false }),
+        supabase.from("funds").select("*").gte("announced_on", weekAgo.toISOString().slice(0, 10)).order("announced_on", { ascending: false }),
+      ]);
+      const seenDeal = new Set(deals.map((d) => `${d.sponsor}|${d.target}`.toLowerCase()));
+      for (const d of (weekDeals ?? []) as (DealRow & { id: string })[]) {
+        const k = `${d.sponsor}|${d.target}`.toLowerCase();
+        if (!seenDeal.has(k)) { seenDeal.add(k); deals.push({ ...d, featured: false }); }
+      }
+      const seenFund = new Set(funds.map((f) => `${f.firm}|${f.fund_name}`.toLowerCase()));
+      for (const f of (weekFunds ?? []) as (FundRow & { id: string })[]) {
+        const k = `${f.firm}|${f.fund_name}`.toLowerCase();
+        if (!seenFund.has(k)) { seenFund.add(k); funds.push(f); }
+      }
+      // Disclosed multiples first, then everything else.
+      deals.sort((a, b) => Number(Boolean(b.ev_ebitda_multiple)) - Number(Boolean(a.ev_ebitda_multiple)));
+
+      const mults = deals.map((d) => d.ev_ebitda_multiple).filter((x): x is number => typeof x === "number").sort((a, b) => a - b);
+      const median = mults.length ? mults[Math.floor(mults.length / 2)] : null;
+      const closes = funds.filter((f) => f.status === "final_close" || f.status === "oversubscribed");
+      const raised = closes.reduce((a, f) => a + (f.raised_millions ?? 0), 0);
+      const bySector = deals.reduce((m, d) => { const k = d.sector ?? "Other"; m[k] = (m[k] ?? 0) + 1; return m; }, {} as Record<string, number>);
+      weekStats = [
+        `Deals tracked this week: ${deals.length} (${mults.length} with disclosed multiples${median ? `, median ${median.toFixed(1)}x` : ""})`,
+        `By sector: ${Object.entries(bySector).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${v}`).join(", ") || "n/a"}`,
+        `Fund closes: ${closes.length}${raised ? ` totaling $${Math.round(raised)}M` : ""}; funds newly in market: ${funds.filter((f) => f.status === "launched").length}`,
+      ].join("\n");
     }
 
     const dateLabel = now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
     const editorial = aiKey
-      ? await editorialPass({ dateLabel, edition, quotes, headlines, deals, funds, people, pulse, editorItems, weekNarrative }, aiKey)
+      ? await editorialPass({ dateLabel, edition, quotes, headlines, deals, funds, people, pulse, editorItems, weekNarrative, weekStats }, aiKey)
       : null;
 
     // Apply editorial layer
