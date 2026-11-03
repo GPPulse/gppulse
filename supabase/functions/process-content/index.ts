@@ -180,10 +180,10 @@ serve(async (req: Request): Promise<Response> => {
             const newLower = result.title.toLowerCase();
             // Check for exact match or high overlap (>70% of words shared)
             if (existingLower === newLower) return true;
-            const existingWords = new Set(existingLower.split(/\s+/).filter(w => w.length > 3));
-            const newWords = newLower.split(/\s+/).filter(w => w.length > 3);
+            const existingWords = new Set(existingLower.split(/\s+/).filter((w: string) => w.length > 3));
+            const newWords = newLower.split(/\s+/).filter((w: string) => w.length > 3);
             if (newWords.length === 0) return false;
-            const overlap = newWords.filter(w => existingWords.has(w)).length;
+            const overlap = newWords.filter((w: string) => existingWords.has(w)).length;
             return overlap / newWords.length > 0.7;
           });
 

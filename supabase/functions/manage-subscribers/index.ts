@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getStaff, isInternalCall, unauthorized } from "../_shared/auth.ts";
 import { renderWelcomeEmail } from "../_shared/email.ts";
 
@@ -38,7 +38,8 @@ function cfg() {
   };
 }
 
-async function sendWelcome(sub: { id: string; email: string; first_name: string | null; referral_code: string | null; unsubscribe_token: string | null }, supabase: ReturnType<typeof createClient>) {
+// deno-lint-ignore no-explicit-any
+async function sendWelcome(sub: { id: string; email: string; first_name: string | null; referral_code: string | null; unsubscribe_token: string | null }, supabase: SupabaseClient<any, any, any>) {
   const key = Deno.env.get("RESEND_API_KEY");
   if (!key) return;
   const c = cfg();
