@@ -18,6 +18,9 @@ on:
       force:
         description: "Rebuild even if a draft exists today (true/false)"
         default: "false"
+      step:
+        description: "Run a single step instead (e.g. reprocess-form-d, scrape-rss, discover-sources)"
+        default: ""
 jobs:
   run:
     runs-on: ubuntu-latest
@@ -53,8 +56,13 @@ jobs:
           RUN_ID: ${{ steps.mode.outputs.run_id }}
           RUN_MODE: ${{ steps.mode.outputs.mode }}
 
+      - name: Single step
+        if: github.event.inputs.step != ''
+        env: { RUN_ID: "${{ steps.mode.outputs.run_id }}", RUN_MODE: "step" }
+        run: ./step.sh "${{ github.event.inputs.step }}"
+
       - name: Scrape
-        if: contains(fromJSON('["full","scrape"]'), steps.mode.outputs.mode)
+        if: github.event.inputs.step == '' && contains(fromJSON('["full","scrape"]'), steps.mode.outputs.mode)
         env: { RUN_ID: "${{ steps.mode.outputs.run_id }}", RUN_MODE: "${{ steps.mode.outputs.mode }}" }
         run: |
           # Weekly (Sunday) or on demand: find feeds for any firm newsrooms not yet discovered
@@ -68,7 +76,7 @@ jobs:
           ./step.sh scrape-people-moves || true
 
       - name: Classify (loop until the queue is empty)
-        if: contains(fromJSON('["full","scrape"]'), steps.mode.outputs.mode)
+        if: github.event.inputs.step == '' && contains(fromJSON('["full","scrape"]'), steps.mode.outputs.mode)
         env: { RUN_ID: "${{ steps.mode.outputs.run_id }}", RUN_MODE: "${{ steps.mode.outputs.mode }}" }
         run: |
           for i in $(seq 1 40); do
@@ -80,14 +88,14 @@ jobs:
           done
 
       - name: Draft the issue
-        if: contains(fromJSON('["full","generate"]'), steps.mode.outputs.mode)
+        if: github.event.inputs.step == '' && contains(fromJSON('["full","generate"]'), steps.mode.outputs.mode)
         env: { RUN_ID: "${{ steps.mode.outputs.run_id }}", RUN_MODE: "${{ steps.mode.outputs.mode }}" }
         run: |
           ./step.sh generate-newsletter "\"force\":${{ github.event.inputs.force || 'false' }}"
           ./step.sh generate-gp-index || true
 
       - name: Send
-        if: steps.mode.outputs.mode == 'send'
+        if: github.event.inputs.step == '' && steps.mode.outputs.mode == 'send'
         env: { RUN_ID: "${{ steps.mode.outputs.run_id }}", RUN_MODE: "${{ steps.mode.outputs.mode }}" }
         run: |
           ./step.sh send-newsletter

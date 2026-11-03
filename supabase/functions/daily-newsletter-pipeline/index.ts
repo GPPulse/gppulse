@@ -74,6 +74,7 @@ serve(async (req: Request): Promise<Response> => {
       case "discover-sources": return finish(await call(supabaseUrl, serviceKey, "discover-sources", { limit: Number(body.limit ?? 25) }));
       case "scrape-rss": return finish(await call(supabaseUrl, serviceKey, "scrape-rss"));
       case "scrape-form-d": return finish(await call(supabaseUrl, serviceKey, "scrape-form-d"));
+      case "reprocess-form-d": return finish(await call(supabaseUrl, serviceKey, "scrape-form-d", { reprocess: true }));
       case "scrape-pe-sources": return finish(await call(supabaseUrl, serviceKey, "scrape-pe-sources", { limit: 15 }));
       case "scrape-industry-news": return finish(await call(supabaseUrl, serviceKey, "scrape-industry-news"));
       case "scrape-people-moves": return finish(await call(supabaseUrl, serviceKey, "scrape-people-moves"));
