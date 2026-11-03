@@ -24,7 +24,7 @@ export default function Deals() {
   const deals = useQuery({
     queryKey: ["public-deals"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("deals").select("*").order("announced_on", { ascending: false }).limit(300);
+      const { data, error } = await supabase.from("deals").select("*").eq("hidden", false).order("announced_on", { ascending: false }).limit(300);
       if (error) throw error;
       return data as unknown as Row[];
     },

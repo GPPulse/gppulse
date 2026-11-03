@@ -72,6 +72,7 @@ export type Database = {
       }
       deals: {
         Row: {
+          hidden: boolean
           alerted_at: string | null
           alert_recipients: number | null
           id: string
@@ -100,6 +101,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          hidden?: boolean
           alerted_at?: string | null
           alert_recipients?: number | null
           id?: string
@@ -128,6 +130,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          hidden?: boolean
           alerted_at?: string | null
           alert_recipients?: number | null
           id?: string
@@ -249,6 +252,7 @@ export type Database = {
       }
       funds: {
         Row: {
+          hidden: boolean
           id: string
           article_id: string | null
           announced_on: string | null
@@ -271,6 +275,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          hidden?: boolean
           id?: string
           article_id?: string | null
           announced_on?: string | null
@@ -293,6 +298,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          hidden?: boolean
           id?: string
           article_id?: string | null
           announced_on?: string | null

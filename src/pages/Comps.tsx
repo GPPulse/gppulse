@@ -47,7 +47,7 @@ export default function Comps() {
   const deals = useQuery({
     queryKey: ["comps-deals"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("deals").select("*").not("ev_ebitda_multiple", "is", null).order("announced_on", { ascending: false }).limit(1000);
+      const { data, error } = await supabase.from("deals").select("*").eq("hidden", false).not("ev_ebitda_multiple", "is", null).order("announced_on", { ascending: false }).limit(1000);
       if (error) throw error;
       return data as unknown as Row[];
     },

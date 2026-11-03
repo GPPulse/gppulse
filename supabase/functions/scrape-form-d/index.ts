@@ -59,12 +59,44 @@ function splitIssuer(name: string): { firm: string; fund: string; number: number
   return { firm, fund, number };
 }
 
+// "Private Equity Fund" is self-reported on Form D: SPVs, co-invest vehicles, feeders, real estate and
+// retail-platform series all tick it. Keep committed-capital buyout/growth vehicles under the cap only.
+const NOISE = /\b(SPV|Series of|a series|Note Issuer|Realty|Real Estate|REIT|Co-?Invest(?:ment|ors)?|Feeder|Master|Access|Equitybee|AngelList|Forge|Secondary|Credit|Lending|Debt|Infrastructure|Royalt|Blocker|Aggregator|Employee|GP|General Partner|Carry|Management|Advisors)\b/i;
+function evaluate(issuer: string, fundType: string | null, state: string, country: string, total: number | null, _sold: number | null, indefinite: boolean): boolean {
+  const isPE = (fundType ?? "").toLowerCase().includes("private equity");
+  const isUS = !country || /united states/i.test(country) || /^[A-Z]{2}$/.test(state);
+  const underCap = indefinite || total === null || total / 1e6 <= FUND_CAP_MILLIONS;
+  const bigEnough = indefinite || (total !== null && total / 1e6 >= 25);
+  return isPE && isUS && underCap && bigEnough && !NOISE.test(issuer);
+}
+
 serve(async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
   if (!isInternalCall(req) && !(await getStaff(req, supabase))) return unauthorized(corsHeaders);
 
+  const body = await req.json().catch(() => ({}));
   try {
+    if (body.reprocess) {
+      // Re-score filings we already stored (after a filter change) without touching EDGAR.
+      const { data: rows } = await supabase.from("sec_form_d").select("*").order("filed_at", { ascending: false }).limit(2000);
+      let kept = 0;
+      for (const r of rows ?? []) {
+        const total = r.total_offering ? Number(r.total_offering) : null, sold = r.amount_sold ? Number(r.amount_sold) : null;
+        if (!evaluate(r.issuer ?? "", r.fund_type, r.state ?? "", "", total, sold, total === null)) continue;
+        kept++;
+        const { firm, fund, number } = splitIssuer(r.issuer ?? "");
+        const totalM = total ? Math.round(total / 1e6) : null, soldM = sold ? Math.round(sold / 1e6) : null;
+        const status = soldM && totalM && soldM >= totalM ? "final_close" : soldM ? "first_close" : "launched";
+        const filingUrl = `https://www.sec.gov/Archives/edgar/data/${r.cik}/${r.accession}-index.htm`;
+        const summary = `Form D${r.is_amendment ? " amendment" : ""}: ${soldM !== null ? `$${soldM}M sold` : "no sales yet"}${totalM ? ` of $${totalM}M offering` : " (indefinite offering)"}.`;
+        const { data: existing } = await supabase.from("funds").select("id").eq("firm", firm).eq("fund_name", fund).maybeSingle();
+        const row = { firm, fund_name: fund, fund_number: number, status, strategy: "Private equity (per Form D)", target_millions: totalM, raised_millions: soldM, headquarters: r.state || null, summary, source: "SEC Form D", source_url: filingUrl, announced_on: String(r.filed_at ?? new Date().toISOString()).slice(0, 10), hidden: false };
+        if (existing) await supabase.from("funds").update(row).eq("id", existing.id); else await supabase.from("funds").insert(row);
+      }
+      return new Response(JSON.stringify({ message: `Re-evaluated ${(rows ?? []).length} stored filings, ${kept} kept visible` }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
     // Current Form D filings (includes D/A amendments). Two pages = up to 200 filings.
     const entries: { title: string; link: string; updated: string }[] = [];
     for (const start of [0, 100]) {
@@ -115,15 +147,7 @@ serve(async (req: Request): Promise<Response> => {
       // Record every filing we inspected so we never re-fetch it
       await supabase.from("sec_form_d").insert({ accession: acc, cik, issuer, fund_type: fundType, industry_group: industry, is_amendment: isAmendment, total_offering: total, amount_sold: sold, state, filed_at: e.updated || new Date().toISOString(), url: `${folder}/primary_doc.xml` });
 
-      const isPE = (fundType ?? "").toLowerCase().includes("private equity");
-      const isUS = !country || /united states/i.test(country) || /^[A-Z]{2}$/.test(state);
-      const underCap = indefinite || total === null || total / 1e6 <= FUND_CAP_MILLIONS;
-      // "Private Equity Fund" is self-reported on Form D: SPVs, co-invest vehicles, feeders, real estate and
-      // retail-platform series all tick it. Keep committed-capital buyout/growth vehicles only.
-      const NOISE = /\b(SPV|Series of|a series|Note Issuer|Realty|Real Estate|REIT|Co-?Invest(?:ment|ors)?|Feeder|Master|Access|Equitybee|AngelList|Forge|Secondary|Credit|Lending|Debt|Infrastructure|Royalt|Blocker|Aggregator|Employee|GP|General Partner|Carry|Management|Advisors)\b/i;
-      const totalMillions = total ? total / 1e6 : null;
-      const bigEnough = indefinite || (totalMillions !== null && totalMillions >= 25);
-      if (!isPE || !isUS || !underCap || NOISE.test(issuer) || !bigEnough) continue;
+      if (!evaluate(issuer, fundType, state, country, total, sold, indefinite)) continue;
       peFunds++;
 
       const { firm, fund, number } = splitIssuer(issuer);
@@ -136,10 +160,10 @@ serve(async (req: Request): Promise<Response> => {
       // Upsert the fund row (firm + fund_name unique). Amendments update amounts and status.
       const { data: existing } = await supabase.from("funds").select("id, raised_millions, status").eq("firm", firm).eq("fund_name", fund).maybeSingle();
       if (existing) {
-        await supabase.from("funds").update({ raised_millions: soldM ?? existing.raised_millions, target_millions: totalM, status, summary, source: "SEC Form D", source_url: filingUrl, headquarters: state || null }).eq("id", existing.id);
+        await supabase.from("funds").update({ raised_millions: soldM ?? existing.raised_millions, target_millions: totalM, status, summary, source: "SEC Form D", source_url: filingUrl, headquarters: state || null, hidden: false }).eq("id", existing.id);
         updated++;
       } else {
-        await supabase.from("funds").insert({ firm, fund_name: fund, fund_number: number, status, strategy: "Private equity (per Form D)", target_millions: totalM, raised_millions: soldM, headquarters: state || null, summary, source: "SEC Form D", source_url: filingUrl, announced_on: (e.updated || new Date().toISOString()).slice(0, 10) });
+        await supabase.from("funds").insert({ firm, fund_name: fund, fund_number: number, status, strategy: "Private equity (per Form D)", target_millions: totalM, raised_millions: soldM, headquarters: state || null, summary, source: "SEC Form D", source_url: filingUrl, announced_on: (e.updated || new Date().toISOString()).slice(0, 10), hidden: false });
         inserted++;
       }
       // An article so the issue's fund tracker and the Lede can see it (only when there's real money moving)

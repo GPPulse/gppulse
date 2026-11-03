@@ -23,7 +23,7 @@ export default function Funds() {
   const funds = useQuery({
     queryKey: ["public-funds"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("funds").select("*").order("announced_on", { ascending: false }).limit(300);
+      const { data, error } = await supabase.from("funds").select("*").eq("hidden", false).order("announced_on", { ascending: false }).limit(300);
       if (error) throw error;
       return data as unknown as Row[];
     },

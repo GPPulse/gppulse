@@ -77,7 +77,7 @@ serve(async (req: Request): Promise<Response> => {
       const content = nl.content as { deal_tracker?: { sponsor: string; target: string; ev_ebitda_multiple: number | null }[] };
       const keys = (content.deal_tracker ?? []).filter((d) => d.ev_ebitda_multiple).map((d) => [d.sponsor, d.target]);
       if (keys.length) {
-        const { data } = await supabase.from("deals").select("*").is("alerted_at", null).not("ev_ebitda_multiple", "is", null)
+        const { data } = await supabase.from("deals").select("*").eq("hidden", false).is("alerted_at", null).not("ev_ebitda_multiple", "is", null)
           .in("sponsor", keys.map((k) => k[0])).in("target", keys.map((k) => k[1]));
         deals = (data ?? []) as Deal[];
       }

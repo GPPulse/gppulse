@@ -393,8 +393,8 @@ serve(async (req: Request): Promise<Response> => {
       // The Friday issue carries the whole week: everything in the tracker since Monday, not just today's pool.
       const weekAgo = new Date(now); weekAgo.setDate(weekAgo.getDate() - 7);
       const [{ data: weekDeals }, { data: weekFunds }] = await Promise.all([
-        supabase.from("deals").select("*").gte("announced_on", weekAgo.toISOString().slice(0, 10)).order("announced_on", { ascending: false }),
-        supabase.from("funds").select("*").gte("announced_on", weekAgo.toISOString().slice(0, 10)).order("announced_on", { ascending: false }),
+        supabase.from("deals").select("*").eq("hidden", false).gte("announced_on", weekAgo.toISOString().slice(0, 10)).order("announced_on", { ascending: false }),
+        supabase.from("funds").select("*").eq("hidden", false).gte("announced_on", weekAgo.toISOString().slice(0, 10)).order("announced_on", { ascending: false }),
       ]);
       const seenDeal = new Set(deals.map((d) => `${d.sponsor}|${d.target}`.toLowerCase()));
       for (const d of (weekDeals ?? []) as (DealRow & { id: string })[]) {
