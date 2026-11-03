@@ -1,4 +1,4 @@
-project_id = "REPLACE_WITH_PROJECT_REF"
+project_id = "bhkiiaturzpxvoxmjlcx"
 
 [functions.scrape-pe-sources]
 verify_jwt = false
