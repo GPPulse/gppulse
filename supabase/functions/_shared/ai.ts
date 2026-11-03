@@ -10,6 +10,7 @@
 // If the primary returns a 4xx that isn't a rate limit (bad key, bad request) we also fail over, because
 // a dead key at 5pm should not stop the issue from being drafted.
 //
+// Anthropic thinking effort: ANTHROPIC_EFFORT=low|medium|high overrides the per-tier default (fast=low, editorial=medium).
 // Model overrides: ANTHROPIC_MODEL_EDITORIAL / ANTHROPIC_MODEL_FAST / OPENAI_MODEL_EDITORIAL / OPENAI_MODEL_FAST.
 // (AI_MODEL_EDITORIAL / AI_MODEL_FAST still work and apply to whichever provider is primary.)
 // The `apiKey` argument is kept for backward compatibility and ignored; keys come from env.
@@ -73,22 +74,36 @@ async function fetchWithTimeout(url: string, init: RequestInit, ms: number): Pro
   }
 }
 
-async function callAnthropic(system: string, user: string, model: string, temperature: number, maxTokens: number, timeoutMs: number): Promise<string> {
-  let r: Response;
-  try {
-    r = await fetchWithTimeout("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: { "x-api-key": keyFor("anthropic")!, "anthropic-version": "2023-06-01", "content-type": "application/json" },
-      // Claude 5.5-generation models reject `temperature`; older ones accept it. Send it only when explicitly allowed.
-      body: JSON.stringify({ model, system, max_tokens: maxTokens, ...(Deno.env.get("ANTHROPIC_SEND_TEMPERATURE") === "true" ? { temperature } : {}), messages: [{ role: "user", content: user }] }),
-    }, timeoutMs);
-  } catch (e) {
-    throw new AIError("anthropic", 0, String(e));
-  }
-  if (!r.ok) throw new AIError("anthropic", r.status, (await r.text()).slice(0, 300));
-  const d = await r.json();
-  const text = (d.content ?? []).filter((b: { type: string }) => b.type === "text").map((b: { text: string }) => b.text).join("");
-  if (!text) throw new AIError("anthropic", 502, "empty completion");
+async function callAnthropic(system: string, user: string, model: string, _temperature: number, maxTokens: number, timeoutMs: number, tier: "editorial" | "fast"): Promise<string> {
+  // Claude 5.5-generation models: adaptive thinking is on by default and thinking tokens count
+  // against max_tokens, so (a) steer it with output_config.effort rather than temperature, and
+  // (b) leave headroom above the text we actually want. `temperature` is rejected outright.
+  const THINKING_HEADROOM = 2048;
+  const attempt = async (budget: number) => {
+    let r: Response;
+    try {
+      r = await fetchWithTimeout("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "x-api-key": keyFor("anthropic")!, "anthropic-version": "2023-06-01", "content-type": "application/json" },
+        body: JSON.stringify({
+          model, system, max_tokens: budget,
+          thinking: { type: "adaptive" },
+          output_config: { effort: Deno.env.get("ANTHROPIC_EFFORT") ?? (tier === "editorial" ? "medium" : "low") },
+          messages: [{ role: "user", content: user }],
+        }),
+      }, timeoutMs);
+    } catch (e) {
+      throw new AIError("anthropic", 0, String(e));
+    }
+    if (!r.ok) throw new AIError("anthropic", r.status, (await r.text()).slice(0, 300));
+    const d = await r.json();
+    const text = (d.content ?? []).filter((b: { type: string }) => b.type === "text").map((b: { text: string }) => b.text).join("");
+    return { text, stop: d.stop_reason as string | undefined };
+  };
+  let { text, stop } = await attempt(maxTokens + THINKING_HEADROOM);
+  if (!text && stop === "max_tokens") ({ text, stop } = await attempt(maxTokens * 2 + THINKING_HEADROOM * 2));
+  if (stop === "refusal") throw new AIError("anthropic", 451, "refusal");
+  if (!text) throw new AIError("anthropic", 502, `empty completion (stop_reason=${stop})`);
   return text;
 }
 
@@ -144,7 +159,7 @@ export async function chat(_apiKey: string, system: string, user: string, opts: 
     try {
       const text = await withRetry(() =>
         provider === "anthropic"
-          ? callAnthropic(system, user, model, temperature, maxTokens, timeoutMs)
+          ? callAnthropic(system, user, model, temperature, maxTokens, timeoutMs, opts.tier ?? "fast")
           : callOpenAI(system, user, model, temperature, maxTokens, timeoutMs));
       if (i > 0) console.warn(`[ai] failed over to ${provider}/${model} after: ${errors.join(" | ")}`);
       lastProviderUsed = provider;
