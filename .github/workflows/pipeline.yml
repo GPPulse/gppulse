@@ -1,20 +1,31 @@
-# The scheduler. Builds the issue Sun–Thu evening, sends Mon–Fri morning.
-# Uses PIPELINE_SECRET (an x-pipeline-secret header) so the service-role key never leaves Supabase.
-# Both calls are idempotent on the function side: a second build won't stack drafts, a second send won't double-send.
-# GitHub cron is UTC and can lag by a few minutes; both times are set 10 minutes early to absorb that.
+# The scheduler and orchestrator. Each pipeline step is its own short edge-function call so
+# nothing runs long enough to hit Supabase's per-invocation limit; the classifier loops
+# until the queue is empty. Every step appends to one pipeline_runs row (run_id) so the
+# admin Pipeline tab shows the whole night as one run.
+#
+# Uses PIPELINE_SECRET (x-pipeline-secret header) so the service-role key never leaves Supabase.
+# GitHub cron is UTC and can lag by a few minutes; times are set 10 minutes early to absorb that.
 name: Newsletter pipeline
 on:
   schedule:
-    - cron: "50 21 * * 0-4"   # 4:50pm CDT / 5:50pm EDT — build tonight's draft
-    - cron: "50 10 * * 1-5"   # 5:50am EDT — morning send
+    - cron: "50 21 * * 0-4"   # 4:50pm CDT / 5:50pm EDT — build tonight's draft (Sun–Thu)
+    - cron: "50 10 * * 1-5"   # 5:50am EDT — morning send (Mon–Fri)
   workflow_dispatch:
     inputs:
       mode:
-        description: "full | send | full-send | scrape"
+        description: "full | send | scrape | generate"
         default: "full"
+      force:
+        description: "Rebuild even if a draft exists today (true/false)"
+        default: "false"
 jobs:
   run:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      FN: https://${{ secrets.SUPABASE_PROJECT_REF }}.supabase.co/functions/v1/daily-newsletter-pipeline
+      SECRET: ${{ secrets.PIPELINE_SECRET }}
+      ANON: ${{ secrets.SUPABASE_ANON_KEY }}
     steps:
       - name: Decide mode
         id: mode
@@ -22,13 +33,57 @@ jobs:
           if [ -n "${{ github.event.inputs.mode }}" ]; then echo "mode=${{ github.event.inputs.mode }}" >> $GITHUB_OUTPUT
           elif [ "$(date -u +%H)" -lt 15 ]; then echo "mode=send" >> $GITHUB_OUTPUT
           else echo "mode=full" >> $GITHUB_OUTPUT; fi
-      - name: Call pipeline
+          echo "run_id=$(cat /proc/sys/kernel/random/uuid)" >> $GITHUB_OUTPUT
+
+      - name: Define step runner
         run: |
-          code=$(curl -sS -o out.json -w '%{http_code}' --max-time 900 -X POST \
-            "https://${{ secrets.SUPABASE_PROJECT_REF }}.supabase.co/functions/v1/daily-newsletter-pipeline" \
-            -H "Content-Type: application/json" \
-            -H "x-pipeline-secret: ${{ secrets.PIPELINE_SECRET }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -d "{\"mode\":\"${{ steps.mode.outputs.mode }}\"}")
-          echo "HTTP $code"; cat out.json | head -c 4000; echo
-          [ "$code" = "200" ] && jq -e '.success == true' out.json > /dev/null
+          cat > step.sh <<'EOF'
+          #!/usr/bin/env bash
+          # usage: ./step.sh <step> [extra-json-fields]
+          set -o pipefail
+          extra="${2:-}"
+          body="{\"mode\":\"step\",\"step\":\"$1\",\"run_id\":\"$RUN_ID\",\"run_mode\":\"$RUN_MODE\"${extra:+,$extra}}"
+          code=$(curl -sS -o out.json -w '%{http_code}' --max-time 300 -X POST "$FN" \
+            -H "Content-Type: application/json" -H "x-pipeline-secret: $SECRET" -H "Authorization: Bearer $ANON" -d "$body")
+          echo "== $1 → HTTP $code"; head -c 1500 out.json; echo
+          [ "$code" = "200" ] || exit 1
+          EOF
+          chmod +x step.sh
+        env:
+          RUN_ID: ${{ steps.mode.outputs.run_id }}
+          RUN_MODE: ${{ steps.mode.outputs.mode }}
+
+      - name: Scrape
+        if: contains(fromJSON('["full","scrape"]'), steps.mode.outputs.mode)
+        env: { RUN_ID: "${{ steps.mode.outputs.run_id }}", RUN_MODE: "${{ steps.mode.outputs.mode }}" }
+        run: |
+          ./step.sh scrape-rss || true
+          ./step.sh scrape-pe-sources || true
+          ./step.sh scrape-industry-news || true
+          ./step.sh scrape-people-moves || true
+
+      - name: Classify (loop until the queue is empty)
+        if: contains(fromJSON('["full","scrape"]'), steps.mode.outputs.mode)
+        env: { RUN_ID: "${{ steps.mode.outputs.run_id }}", RUN_MODE: "${{ steps.mode.outputs.mode }}" }
+        run: |
+          for i in $(seq 1 40); do
+            ./step.sh process-content '"limit":8' || { echo "classifier call failed; stopping"; break; }
+            remaining=$(jq -r '.remaining // 0' out.json); processed=$(jq -r '.processed // 0' out.json)
+            echo "batch $i: processed=$processed remaining=$remaining"
+            if [ "$remaining" = "0" ] || [ "$processed" = "0" ]; then break; fi
+            sleep 2
+          done
+
+      - name: Draft the issue
+        if: contains(fromJSON('["full","generate"]'), steps.mode.outputs.mode)
+        env: { RUN_ID: "${{ steps.mode.outputs.run_id }}", RUN_MODE: "${{ steps.mode.outputs.mode }}" }
+        run: |
+          ./step.sh generate-newsletter "\"force\":${{ github.event.inputs.force || 'false' }}"
+          ./step.sh generate-gp-index || true
+
+      - name: Send
+        if: steps.mode.outputs.mode == 'send'
+        env: { RUN_ID: "${{ steps.mode.outputs.run_id }}", RUN_MODE: "${{ steps.mode.outputs.mode }}" }
+        run: |
+          ./step.sh send-newsletter
+          ./step.sh send-deal-alerts || true
