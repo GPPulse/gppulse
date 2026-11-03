@@ -91,6 +91,14 @@ serve(async (req: Request): Promise<Response> => {
         if (dow !== 4 && dow !== 5 && !body.force) { step.status = "skipped"; step.message = "weekly — runs Thu/Fri"; step.completedAt = new Date().toISOString(); return { step }; }
         return finish(await call(supabaseUrl, serviceKey, "generate-gp-index"));
       }
+      case "send-test": {
+        // Latest draft/approved issue → one address (body.test_email). Used for the editor's own preview.
+        const to = String(body.test_email ?? Deno.env.get("NEWSLETTER_REPLY_TO") ?? "").trim();
+        if (!to) { step.status = "error"; step.message = "test_email required"; step.completedAt = new Date().toISOString(); return { step }; }
+        const { data: issue } = await supabase.from("newsletters").select("id, subject").in("status", ["draft", "approved", "scheduled", "sent"]).order("created_at", { ascending: false }).limit(1).maybeSingle();
+        if (!issue) { step.status = "skipped"; step.message = "no issue to send"; step.completedAt = new Date().toISOString(); return { step }; }
+        return finish(await call(supabaseUrl, serviceKey, "send-newsletter", { newsletter_id: issue.id, test_email: to }), { newsletter_id: issue.id, to });
+      }
       case "send-newsletter": {
         const issue = await findSendable();
         if (!issue) { step.status = "skipped"; step.message = autoSend ? "nothing to send" : "no approved issue — approve today's draft in the Editor's Desk, or set AUTO_SEND=true"; step.completedAt = new Date().toISOString(); return { step }; }

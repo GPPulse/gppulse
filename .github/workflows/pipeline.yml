@@ -19,7 +19,10 @@ on:
         description: "Rebuild even if a draft exists today (true/false)"
         default: "false"
       step:
-        description: "Run a single step instead (e.g. reprocess-form-d, scrape-rss, discover-sources)"
+        description: "Run a single step instead (e.g. send-test, reprocess-form-d, scrape-rss, discover-sources)"
+        default: ""
+      test_email:
+        description: "For step=send-test: where to send the latest issue"
         default: ""
 jobs:
   run:
@@ -58,8 +61,14 @@ jobs:
 
       - name: Single step
         if: github.event.inputs.step != ''
-        env: { RUN_ID: "${{ steps.mode.outputs.run_id }}", RUN_MODE: "step" }
-        run: ./step.sh "${{ github.event.inputs.step }}"
+        env:
+          RUN_ID: "${{ steps.mode.outputs.run_id }}"
+          RUN_MODE: "step"
+          TEST_EMAIL: "${{ github.event.inputs.test_email }}"
+        run: |
+          extra=""
+          [ -n "$TEST_EMAIL" ] && extra="\"test_email\":\"$TEST_EMAIL\""
+          ./step.sh "${{ github.event.inputs.step }}" "$extra"
 
       - name: Scrape
         if: github.event.inputs.step == '' && contains(fromJSON('["full","scrape"]'), steps.mode.outputs.mode)
