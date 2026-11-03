@@ -235,15 +235,16 @@ serve(async (req: Request): Promise<Response> => {
               })
               .eq("id", item.id);
           }
-        } else {
-          // Mark as processed but don't create article (low relevance)
+        } else if (result) {
+          // Low relevance: mark as processed, no article
           await supabase
             .from("scraped_content")
-            .update({ 
-              processed: true, 
-              processed_at: new Date().toISOString() 
-            })
+            .update({ processed: true, processed_at: new Date().toISOString() })
             .eq("id", item.id);
+        } else {
+          // AI call failed: leave unprocessed so the next run retries it
+          console.warn(`AI unavailable for "${item.title}" — will retry next run`);
+          continue;
         }
 
         processed++;

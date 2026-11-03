@@ -79,7 +79,8 @@ async function callAnthropic(system: string, user: string, model: string, temper
     r = await fetchWithTimeout("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: { "x-api-key": keyFor("anthropic")!, "anthropic-version": "2023-06-01", "content-type": "application/json" },
-      body: JSON.stringify({ model, system, max_tokens: maxTokens, temperature, messages: [{ role: "user", content: user }] }),
+      // Claude 5.5-generation models reject `temperature`; older ones accept it. Send it only when explicitly allowed.
+      body: JSON.stringify({ model, system, max_tokens: maxTokens, ...(Deno.env.get("ANTHROPIC_SEND_TEMPERATURE") === "true" ? { temperature } : {}), messages: [{ role: "user", content: user }] }),
     }, timeoutMs);
   } catch (e) {
     throw new AIError("anthropic", 0, String(e));
