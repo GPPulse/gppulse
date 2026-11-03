@@ -288,8 +288,9 @@ serve(async (req: Request): Promise<Response> => {
     articles.sort((a, b) => tier(b) - tier(a) || (b.relevance_score ?? 0) - (a.relevance_score ?? 0));
 
     const seen = new Set<string>();
+    // Dedupe on title (and person for moves). Source is a feed name now, not a firm, so it's not a key.
     const keysOf = (a: DbArticle) => {
-      const k = [`source:${a.source.toLowerCase().trim()}`, `title:${a.title.toLowerCase().trim()}`];
+      const k = [`title:${a.title.toLowerCase().trim()}`];
       if (a.category === "people_moves") k.push(`person:${a.title.toLowerCase().trim()}`);
       return k;
     };
