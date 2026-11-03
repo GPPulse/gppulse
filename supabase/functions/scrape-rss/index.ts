@@ -10,7 +10,9 @@ const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-pipeline-secret",
 };
-const UA = "Mozilla/5.0 (compatible; GPPulseBot/1.0; +https://thegppulse.com)";
+// Several wires and trade sites 403 anything that looks like a bot. A plain browser UA gets the same public RSS.
+const UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36";
+const UA_ALT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:132.0) Gecko/20100101 Firefox/132.0";
 const MAX_AGE_DAYS = 3;
 const MAX_ITEMS_PER_FEED = 40;
 const MAX_ARTICLE_FETCHES = 60;   // across all feeds per run; keeps the run under the function timeout
@@ -53,14 +55,30 @@ function parseFeed(xml: string): Item[] {
   return items;
 }
 
-async function fetchWithTimeout(url: string, ms: number): Promise<Response> {
+async function fetchWithTimeout(url: string, ms: number, ua = UA): Promise<Response> {
   const ctl = new AbortController();
   const t = setTimeout(() => ctl.abort(), ms);
   try {
-    return await fetch(url, { headers: { "User-Agent": UA, Accept: "application/rss+xml, application/atom+xml, application/xml, text/xml, text/html;q=0.8, */*;q=0.5" }, signal: ctl.signal, redirect: "follow" });
+    return await fetch(url, {
+      headers: { "User-Agent": ua, Accept: "application/rss+xml, application/atom+xml, application/xml, text/xml, text/html;q=0.8, */*;q=0.5", "Accept-Language": "en-US,en;q=0.9", "Cache-Control": "no-cache" },
+      signal: ctl.signal, redirect: "follow",
+    });
   } finally {
     clearTimeout(t);
   }
+}
+
+/** Fetch a feed; on 403/406/429 or an HTML challenge page, retry once with a different UA. */
+async function fetchFeed(url: string): Promise<{ status: string; xml: string }> {
+  const attempt = async (ua: string) => {
+    const r = await fetchWithTimeout(url, 12000, ua);
+    const text = r.ok ? await r.text() : "";
+    const looksLikeFeed = /<rss|<feed|<rdf:RDF|<channel/i.test(text.slice(0, 4000));
+    return { ok: r.ok && looksLikeFeed, status: r.ok ? (looksLikeFeed ? "ok" : "not a feed") : `http ${r.status}`, xml: text };
+  };
+  let res = await attempt(UA);
+  if (!res.ok) { const retry = await attempt(UA_ALT); if (retry.ok || retry.status !== res.status) res = retry; }
+  return { status: res.status, xml: res.ok ? res.xml : "" };
 }
 
 /** Plain-fetch the article and strip it to readable text. Many sites allow this; those that don't just return null. */
@@ -101,13 +119,9 @@ serve(async (req: Request): Promise<Response> => {
     await Promise.all((feeds as Feed[]).map(async (feed) => {
       let status = "ok", items: Item[] = [], created = 0;
       try {
-        const r = await fetchWithTimeout(feed.url, 12000);
-        if (!r.ok) { status = `http ${r.status}`; }
-        else {
-          const xml = await r.text();
-          items = parseFeed(xml);
-          if (!items.length) status = /<rss|<feed|<rdf/i.test(xml) ? "empty" : "not a feed";
-        }
+        const r = await fetchFeed(feed.url);
+        status = r.status;
+        if (r.xml) { items = parseFeed(r.xml); if (!items.length) status = "empty"; }
       } catch (e) {
         status = `fetch error: ${String(e).slice(0, 80)}`;
       }

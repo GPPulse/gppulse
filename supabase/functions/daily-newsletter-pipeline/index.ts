@@ -14,7 +14,7 @@ import { getStaff, isInternalCall, unauthorized } from "../_shared/auth.ts";
 //     Legacy single-call orchestration for the admin "Run pipeline" button. Fine for
 //     small queues; for a full nightly build prefer the step mode.
 //
-// Steps: scrape-rss · scrape-pe-sources · scrape-industry-news · scrape-people-moves ·
+// Steps: discover-sources · scrape-rss · scrape-pe-sources · scrape-industry-news · scrape-people-moves ·
 //        process-content · generate-newsletter · generate-gp-index · send-newsletter · send-deal-alerts
 
 const corsHeaders = {
@@ -71,6 +71,7 @@ serve(async (req: Request): Promise<Response> => {
       return { step, extra };
     };
     switch (name) {
+      case "discover-sources": return finish(await call(supabaseUrl, serviceKey, "discover-sources", { limit: Number(body.limit ?? 25) }));
       case "scrape-rss": return finish(await call(supabaseUrl, serviceKey, "scrape-rss"));
       case "scrape-pe-sources": return finish(await call(supabaseUrl, serviceKey, "scrape-pe-sources", { limit: 15 }));
       case "scrape-industry-news": return finish(await call(supabaseUrl, serviceKey, "scrape-industry-news"));

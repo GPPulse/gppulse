@@ -38,3 +38,6 @@ verify_jwt = false
 
 [functions.scrape-rss]
 verify_jwt = false
+
+[functions.discover-sources]
+verify_jwt = false

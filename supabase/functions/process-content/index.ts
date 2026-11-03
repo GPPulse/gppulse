@@ -152,6 +152,21 @@ serve(async (req: Request): Promise<Response> => {
 
     for (const item of content) {
       try {
+        // Cheap pre-check: if a near-identical title already became an article, skip the AI call entirely.
+        {
+          const preCutoff = new Date(); preCutoff.setDate(preCutoff.getDate() - 7);
+          const { data: recent } = await supabase.from("articles").select("title").gte("created_at", preCutoff.toISOString()).order("created_at", { ascending: false }).limit(400);
+          const nw = (item.title ?? "").toLowerCase().split(/\s+/).filter((w: string) => w.length > 3);
+          const dup = nw.length >= 4 && (recent ?? []).some((r: { title: string }) => {
+            const ew = new Set(r.title.toLowerCase().split(/\s+/).filter((w: string) => w.length > 3));
+            return nw.filter((w: string) => ew.has(w)).length / nw.length > 0.7;
+          });
+          if (dup) {
+            await supabase.from("scraped_content").update({ processed: true, processed_at: new Date().toISOString() }).eq("id", item.id);
+            processed++;
+            continue;
+          }
+        }
         // Process with AI
         const result = await processWithAI(
           item.raw_content || item.title || "",
@@ -167,12 +182,13 @@ serve(async (req: Request): Promise<Response> => {
           const sourceName = item.pe_firm_sources?.name || item.source_name || (() => { try { return new URL(item.url).hostname.replace(/^www\./, ""); } catch { return "Unknown"; } })();
           const dupCutoff = new Date();
           dupCutoff.setDate(dupCutoff.getDate() - 14); // Check last 14 days for duplicates
+          // Across ALL sources: the same press release arrives from the wire, a news search and the firm's own feed.
           const { data: existingArticles } = await supabase
             .from("articles")
             .select("id, title")
-            .eq("source", sourceName)
             .gte("created_at", dupCutoff.toISOString())
-            .limit(100);
+            .order("created_at", { ascending: false })
+            .limit(400);
 
           // Skip if a similar title from the same firm already exists
           const isDuplicate = existingArticles?.some(existing => {

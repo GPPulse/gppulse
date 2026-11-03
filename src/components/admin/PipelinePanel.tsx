@@ -33,6 +33,7 @@ export function PipelinePanel() {
 
   const stepLabel = (name: string) => {
     const labels: Record<string, string> = {
+      "discover-sources": "Discover firm feeds",
       "scrape-rss": "RSS feeds",
       "scrape-pe-sources": "Scrape firm newsrooms",
       "scrape-industry-news": "Scrape trades & wires",

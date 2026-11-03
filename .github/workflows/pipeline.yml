@@ -57,6 +57,10 @@ jobs:
         if: contains(fromJSON('["full","scrape"]'), steps.mode.outputs.mode)
         env: { RUN_ID: "${{ steps.mode.outputs.run_id }}", RUN_MODE: "${{ steps.mode.outputs.mode }}" }
         run: |
+          # Weekly (Sunday) or on demand: find feeds for any firm newsrooms not yet discovered
+          if [ "$(date -u +%u)" = "7" ] || [ "${{ github.event.inputs.mode }}" = "scrape" ]; then
+            for i in 1 2 3 4 5; do ./step.sh discover-sources '"limit":25' || break; grep -q '"done"' out.json && break; done
+          fi
           ./step.sh scrape-rss || true
           ./step.sh scrape-pe-sources || true
           ./step.sh scrape-industry-news || true
