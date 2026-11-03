@@ -1,8 +1,8 @@
-# Deploys the Supabase side on every push to main: migrations, edge functions, secrets.
+# Deploys the Supabase side on every push to main: edge functions and secrets.
+# Schema migrations are applied through the Supabase connector (see deploy/README.md), not here.
 # Required repository secrets:
 #   SUPABASE_ACCESS_TOKEN  personal access token (supabase.com → Account → Access Tokens)
 #   SUPABASE_PROJECT_REF   e.g. abcdefghijklmnop
-#   SUPABASE_DB_PASSWORD   database password set when the project was created
 # Optional — set any of these and they are pushed as edge-function secrets:
 #   RESEND_API_KEY FIRECRAWL_API_KEY ANTHROPIC_API_KEY OPENAI_API_KEY OPENAI_BASE_URL AI_PROVIDER FRED_API_KEY
 #   NEWSLETTER_FROM NEWSLETTER_REPLY_TO NEWSLETTER_POSTAL_ADDRESS NEWSLETTER_EDITOR_NAME NEWSLETTER_EDITOR_TITLE
@@ -19,16 +19,11 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
       PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
     steps:
       - uses: actions/checkout@v4
       - uses: supabase/setup-cli@v1
         with: { version: latest }
-      - name: Link project
-        run: supabase link --project-ref "$PROJECT_REF"
-      - name: Apply migrations
-        run: supabase db push --include-all
       - name: Deploy edge functions
         run: supabase functions deploy --project-ref "$PROJECT_REF"
       - name: Push secrets

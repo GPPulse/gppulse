@@ -19,7 +19,6 @@ Settings → Secrets and variables → Actions. These drive `deploy-backend.yml`
 |---|---|
 | `SUPABASE_ACCESS_TOKEN` | personal access token |
 | `SUPABASE_PROJECT_REF` | from the project URL |
-| `SUPABASE_DB_PASSWORD` | the one you set at creation |
 | `SUPABASE_ANON_KEY` | Project Settings → API |
 | `PIPELINE_SECRET` | any long random string — `openssl rand -hex 24` |
 | `ANTHROPIC_API_KEY` | primary writer. Sonnet for the Lede, Haiku for extraction |
@@ -35,7 +34,7 @@ Settings → Secrets and variables → Actions. These drive `deploy-backend.yml`
 | `FRED_API_KEY` | optional; HY spread in the ticker |
 | `AUTO_SEND` | `false` |
 
-Push to `main` → the **Deploy backend** action applies migrations, deploys all edge functions and pushes every secret above into Supabase. Re-runs are safe.
+Push to `main` → the **Deploy backend** action deploys all edge functions and pushes every secret above into Supabase. Re-runs are safe. Schema migrations are applied by Claude through the Supabase connector when they're added to `supabase/migrations/`.
 
 ### 3. You as editor + subscriber
 Supabase → Authentication → Users → Add user (`cschlotman@littlejohncapital.com`, auto-confirm). Then SQL editor → paste `step3_admin_and_subscribe.sql`.
