@@ -118,7 +118,12 @@ serve(async (req: Request): Promise<Response> => {
       const isPE = (fundType ?? "").toLowerCase().includes("private equity");
       const isUS = !country || /united states/i.test(country) || /^[A-Z]{2}$/.test(state);
       const underCap = indefinite || total === null || total / 1e6 <= FUND_CAP_MILLIONS;
-      if (!isPE || !isUS || !underCap) continue;
+      // "Private Equity Fund" is self-reported on Form D: SPVs, co-invest vehicles, feeders, real estate and
+      // retail-platform series all tick it. Keep committed-capital buyout/growth vehicles only.
+      const NOISE = /\b(SPV|Series of|a series|Note Issuer|Realty|Real Estate|REIT|Co-?Invest(?:ment|ors)?|Feeder|Master|Access|Equitybee|AngelList|Forge|Secondary|Credit|Lending|Debt|Infrastructure|Royalt|Blocker|Aggregator|Employee|GP|General Partner|Carry|Management|Advisors)\b/i;
+      const totalMillions = total ? total / 1e6 : null;
+      const bigEnough = indefinite || (totalMillions !== null && totalMillions >= 25);
+      if (!isPE || !isUS || !underCap || NOISE.test(issuer) || !bigEnough) continue;
       peFunds++;
 
       const { firm, fund, number } = splitIssuer(issuer);
