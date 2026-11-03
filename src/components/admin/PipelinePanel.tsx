@@ -35,6 +35,7 @@ export function PipelinePanel() {
     const labels: Record<string, string> = {
       "discover-sources": "Discover firm feeds",
       "scrape-rss": "RSS feeds",
+      "scrape-form-d": "SEC Form D filings",
       "scrape-pe-sources": "Scrape firm newsrooms",
       "scrape-industry-news": "Scrape trades & wires",
       "scrape-people-moves": "People moves search",

@@ -62,6 +62,7 @@ jobs:
             for i in 1 2 3 4 5; do ./step.sh discover-sources '"limit":25' || break; grep -q '"done"' out.json && break; done
           fi
           ./step.sh scrape-rss || true
+          ./step.sh scrape-form-d || true
           ./step.sh scrape-pe-sources || true
           ./step.sh scrape-industry-news || true
           ./step.sh scrape-people-moves || true
