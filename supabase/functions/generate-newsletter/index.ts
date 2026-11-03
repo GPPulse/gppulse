@@ -103,6 +103,8 @@ For each item that describes a completed or signed equity transaction (platform 
 
 RULES
 - sponsor = the PE firm (buyer on acquisitions, seller on exits). target = the company changing hands.
+- Only sponsor-involved transactions: a PE/growth/independent-sponsor buyer, or a sponsor seller (exit). Skip strategic-to-strategic deals where no sponsor is on either side.
+- If several items describe the same transaction, return it ONCE (use the most complete item's index).
 - Figures: ONLY what the text states. If EV, EBITDA or multiple is not explicitly stated, use null and figures_disclosed=false. Never infer or estimate. "Undisclosed" means null.
 - Convert stated figures to millions USD (e.g. "$1.2 billion" → 1200).
 - sector: one of Industrials, Business Services, Healthcare, Technology, Consumer, Financial Services, Energy, Aerospace & Defense, Infrastructure, Other.
@@ -343,6 +345,25 @@ serve(async (req: Request): Promise<Response> => {
           summary: d.one_line, source: src.source, source_url: src.source_url, editor_take: null, featured: false,
         };
       });
+
+    // Same deal from several wires: collapse on sponsor + overlapping target words.
+    const norm = (t: string) => t.toLowerCase().replace(/[^a-z0-9 ]/g, " ").split(/\s+/).filter((w) => w.length > 2 && !["the", "and", "inc", "llc", "corp", "holdings", "group", "company", "portfolio", "fleet", "business"].includes(w));
+    for (let i = deals.length - 1; i > 0; i--) {
+      const a = deals[i];
+      for (let j = 0; j < i; j++) {
+        const b = deals[j];
+        if (a.sponsor.toLowerCase().split(/[;,(]/)[0].trim() !== b.sponsor.toLowerCase().split(/[;,(]/)[0].trim()) continue;
+        const wa = new Set(norm(a.target)), wb = norm(b.target);
+        const overlap = wb.filter((w) => wa.has(w)).length / Math.max(1, Math.min(wa.size, wb.length));
+        if (overlap >= 0.5) {
+          // keep the one with more disclosed figures / longer summary
+          const score = (d: DealRow) => Number(Boolean(d.ev_ebitda_multiple)) * 3 + Number(Boolean(d.enterprise_value_millions)) * 2 + (d.summary?.length ?? 0) / 1000;
+          if (score(a) > score(b)) deals[j] = a;
+          deals.splice(i, 1);
+          break;
+        }
+      }
+    }
 
     const funds: FundRow[] = rawFunds
       .filter((f) => f.firm && f.fund_name && fundArticles[f.index - 1])
