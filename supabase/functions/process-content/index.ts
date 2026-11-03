@@ -164,7 +164,7 @@ serve(async (req: Request): Promise<Response> => {
         if (result && result.relevance_score >= 20) {
           // Check for duplicate articles from the same source/firm
           // Check for duplicate articles across ALL articles (including previously sent newsletters)
-          const sourceName = item.pe_firm_sources?.name || "Unknown";
+          const sourceName = item.pe_firm_sources?.name || item.source_name || (() => { try { return new URL(item.url).hostname.replace(/^www\./, ""); } catch { return "Unknown"; } })();
           const dupCutoff = new Date();
           dupCutoff.setDate(dupCutoff.getDate() - 14); // Check last 14 days for duplicates
           const { data: existingArticles } = await supabase
@@ -208,11 +208,11 @@ serve(async (req: Request): Promise<Response> => {
               category: result.category,
               fund_size_relevant: result.fund_size_relevant,
               relevance_score: result.relevance_score,
-              source: item.pe_firm_sources?.name || "Unknown",
+              source: sourceName,
               source_url: item.url,
               original_content: item.raw_content,
               scraped_at: item.scraped_at,
-              published_at: result.estimated_publish_date ? new Date(result.estimated_publish_date).toISOString() : null,
+              published_at: item.published_at ?? (result.estimated_publish_date ? new Date(result.estimated_publish_date).toISOString() : null),
             })
             .select()
             .single();

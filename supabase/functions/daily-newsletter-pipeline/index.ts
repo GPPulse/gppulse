@@ -56,12 +56,13 @@ serve(async (req: Request): Promise<Response> => {
 
   try {
     if (["full", "scrape", "full-send"].includes(mode)) {
+      await run("scrape-rss", () => call(supabaseUrl, serviceKey, "scrape-rss"));
       await run("scrape-pe-sources", () => call(supabaseUrl, serviceKey, "scrape-pe-sources", { limit: 15 }));
       await run("scrape-industry-news", () => call(supabaseUrl, serviceKey, "scrape-industry-news"));
       await run("scrape-people-moves", () => call(supabaseUrl, serviceKey, "scrape-people-moves"));
 
       let processed = 0, created = 0;
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 12; i++) {
         const r = await call(supabaseUrl, serviceKey, "process-content", { limit: 10 });
         if (!r.ok) break;
         const d = r.data as { processed?: number; articles_created?: number };
