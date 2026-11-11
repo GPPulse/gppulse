@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getStaff, isInternalCall, unauthorized } from "../_shared/auth.ts";
 import { normalizeContent } from "../_shared/content.ts";
 import { renderIssueEmail } from "../_shared/email.ts";
+import { CONFIG } from "../_shared/config.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -17,15 +18,15 @@ interface Subscriber {
 }
 
 function config() {
-  const siteUrl = (Deno.env.get("SITE_URL") ?? "https://thegppulse.com").replace(/\/$/, "");
-  const from = Deno.env.get("NEWSLETTER_FROM") ?? "The GP Pulse <onboarding@resend.dev>";
+  const siteUrl = (CONFIG.siteUrl);
+  const from = CONFIG.from;
   if (from.includes("resend.dev")) console.warn("NEWSLETTER_FROM is not set — sending from resend.dev will land in spam. Verify a domain in Resend and set NEWSLETTER_FROM.");
   return {
     siteUrl, from,
-    replyTo: Deno.env.get("NEWSLETTER_REPLY_TO") ?? undefined,
-    postalAddress: Deno.env.get("NEWSLETTER_POSTAL_ADDRESS") ?? "The GP Pulse · Austin, TX",
-    editorName: Deno.env.get("NEWSLETTER_EDITOR_NAME") ?? "The GP Pulse",
-    editorTitle: Deno.env.get("NEWSLETTER_EDITOR_TITLE") ?? "Editor",
+    replyTo: CONFIG.replyTo,
+    postalAddress: CONFIG.postalAddress,
+    editorName: CONFIG.editorName,
+    editorTitle: CONFIG.editorTitle,
     autoSend: (Deno.env.get("AUTO_SEND") ?? "false").toLowerCase() === "true",
   };
 }

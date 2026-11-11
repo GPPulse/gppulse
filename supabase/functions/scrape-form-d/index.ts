@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getStaff, isInternalCall, unauthorized } from "../_shared/auth.ts";
+import { CONFIG } from "../_shared/config.ts";
 
 // SEC Form D → fund tracker. Every private fund raising capital under Reg D files a Form D
 // (and D/A amendments as it closes). We read EDGAR's "current filings" feed, pull each
@@ -14,7 +15,7 @@ const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-pipeline-secret",
 };
-const CONTACT = Deno.env.get("NEWSLETTER_REPLY_TO") ?? "editor@thegppulse.com";
+const CONTACT = CONFIG.replyTo;
 const UA = `TheGPPulse/1.0 (newsletter; ${CONTACT})`;
 const MAX_FILINGS = Number(Deno.env.get("FORM_D_MAX_FILINGS") ?? 160);
 const FUND_CAP_MILLIONS = 1000;

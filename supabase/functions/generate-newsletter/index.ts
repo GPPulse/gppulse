@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { aiConfigured, chat, HOUSE_STYLE, parseJSON } from "../_shared/ai.ts";
 import { getStaff, isInternalCall, unauthorized } from "../_shared/auth.ts";
+import { CONFIG } from "../_shared/config.ts";
 import {
   Article,
   DealRow,
@@ -445,7 +446,7 @@ serve(async (req: Request): Promise<Response> => {
       ? { title: readSource[editorial.the_read.index - 1].title, source: readSource[editorial.the_read.index - 1].source, url: readSource[editorial.the_read.index - 1].source_url, take: editorial.the_read.take }
       : null;
 
-    const editorName = Deno.env.get("NEWSLETTER_EDITOR_NAME") ?? "The GP Pulse";
+    const editorName = CONFIG.editorName;
 
     const content: NewsletterContentV2 = {
       ...emptyContent(edition),

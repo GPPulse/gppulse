@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getStaff, isInternalCall, unauthorized } from "../_shared/auth.ts";
+import { CONFIG } from "../_shared/config.ts";
 
 // Pipeline entry point. Two ways to drive it:
 //
@@ -93,7 +94,7 @@ serve(async (req: Request): Promise<Response> => {
       }
       case "send-test": {
         // Latest draft/approved issue → one address (body.test_email). Used for the editor's own preview.
-        const to = String(body.test_email ?? Deno.env.get("NEWSLETTER_REPLY_TO") ?? "").trim();
+        const to = String(body.test_email ?? CONFIG.replyTo).trim();
         if (!to) { step.status = "error"; step.message = "test_email required"; step.completedAt = new Date().toISOString(); return { step }; }
         const { data: issue } = await supabase.from("newsletters").select("id, subject").in("status", ["draft", "approved", "scheduled", "sent"]).order("created_at", { ascending: false }).limit(1).maybeSingle();
         if (!issue) { step.status = "skipped"; step.message = "no issue to send"; step.completedAt = new Date().toISOString(); return { step }; }

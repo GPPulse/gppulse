@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getStaff, isInternalCall, unauthorized } from "../_shared/auth.ts";
 import { DEAL_TYPE_LABEL, fmtMillions, fmtMultiple } from "../_shared/content.ts";
 import { escapeHtml } from "../_shared/email.ts";
+import { CONFIG } from "../_shared/config.ts";
 
 // Sector deal alerts. Fires when an editor approves an issue: every deal in that
 // issue with a disclosed multiple goes, as a one-paragraph email, to subscribers
@@ -60,9 +61,9 @@ serve(async (req: Request): Promise<Response> => {
     if (!isInternalCall(req) && !(await getStaff(req, supabase))) return unauthorized(corsHeaders);
     const resendKey = Deno.env.get("RESEND_API_KEY");
     if (!resendKey) throw new Error("RESEND_API_KEY not configured");
-    const siteUrl = (Deno.env.get("SITE_URL") ?? "https://thegppulse.com").replace(/\/$/, "");
-    const from = Deno.env.get("NEWSLETTER_FROM") ?? "The GP Pulse <onboarding@resend.dev>";
-    const replyTo = Deno.env.get("NEWSLETTER_REPLY_TO") ?? undefined;
+    const siteUrl = (CONFIG.siteUrl);
+    const from = CONFIG.from;
+    const replyTo = CONFIG.replyTo;
 
     const body = await req.json().catch(() => ({}));
     let deals: Deal[] = [];

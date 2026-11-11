@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getStaff, isInternalCall, unauthorized } from "../_shared/auth.ts";
 import { renderWelcomeEmail } from "../_shared/email.ts";
+import { CONFIG } from "../_shared/config.ts";
 
 // Public actions (anyone):  add · unsubscribe-token · get-preferences · update-preferences · referral-dashboard
 // Staff actions (admin JWT): list · stats · unsubscribe · reactivate · delete · bulk-import · export · add-role
@@ -27,14 +28,14 @@ const validEmail = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e);
 const FREEMAIL = ["gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "icloud.com", "aol.com"];
 
 function cfg() {
-  const siteUrl = (Deno.env.get("SITE_URL") ?? "https://thegppulse.com").replace(/\/$/, "");
+  const siteUrl = (CONFIG.siteUrl);
   return {
     siteUrl,
-    from: Deno.env.get("NEWSLETTER_FROM") ?? "The GP Pulse <onboarding@resend.dev>",
-    replyTo: Deno.env.get("NEWSLETTER_REPLY_TO") ?? undefined,
-    postalAddress: Deno.env.get("NEWSLETTER_POSTAL_ADDRESS") ?? "The GP Pulse · Austin, TX",
-    editorName: Deno.env.get("NEWSLETTER_EDITOR_NAME") ?? "The GP Pulse",
-    editorTitle: Deno.env.get("NEWSLETTER_EDITOR_TITLE") ?? "Editor",
+    from: CONFIG.from,
+    replyTo: CONFIG.replyTo,
+    postalAddress: CONFIG.postalAddress,
+    editorName: CONFIG.editorName,
+    editorTitle: CONFIG.editorTitle,
   };
 }
 
