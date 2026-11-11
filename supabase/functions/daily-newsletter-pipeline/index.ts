@@ -92,6 +92,15 @@ serve(async (req: Request): Promise<Response> => {
         if (dow !== 4 && dow !== 5 && !body.force) { step.status = "skipped"; step.message = "weekly — runs Thu/Fri"; step.completedAt = new Date().toISOString(); return { step }; }
         return finish(await call(supabaseUrl, serviceKey, "generate-gp-index"));
       }
+      case "email-status": {
+        // Look up delivery status of a Resend email id (body.email_id), for debugging deliverability.
+        const id = String(body.email_id ?? "").trim();
+        const key = Deno.env.get("RESEND_API_KEY") ?? "";
+        if (!id || !key) { step.status = "error"; step.message = "email_id and RESEND_API_KEY required"; step.completedAt = new Date().toISOString(); return { step }; }
+        const r = await fetch(`https://api.resend.com/emails/${id}`, { headers: { Authorization: `Bearer ${key.trim()}` } });
+        const d = await r.json().catch(() => ({}));
+        return finish({ ok: r.ok, data: { last_event: d.last_event, to: d.to, from: d.from, subject: d.subject, created_at: d.created_at }, error: r.ok ? undefined : JSON.stringify(d).slice(0, 300) });
+      }
       case "send-test": {
         // Latest draft/approved issue → one address (body.test_email). Used for the editor's own preview.
         const to = String(body.test_email ?? CONFIG.replyTo).trim();

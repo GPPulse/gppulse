@@ -24,6 +24,9 @@ on:
       test_email:
         description: "For step=send-test: where to send the latest issue"
         default: ""
+      email_id:
+        description: "For step=email-status: the Resend email id to look up"
+        default: ""
 jobs:
   run:
     runs-on: ubuntu-latest
@@ -65,9 +68,11 @@ jobs:
           RUN_ID: "${{ steps.mode.outputs.run_id }}"
           RUN_MODE: "step"
           TEST_EMAIL: "${{ github.event.inputs.test_email }}"
+          EMAIL_ID: "${{ github.event.inputs.email_id }}"
         run: |
           extra=""
           [ -n "$TEST_EMAIL" ] && extra="\"test_email\":\"$TEST_EMAIL\""
+          [ -n "$EMAIL_ID" ] && extra="\"email_id\":\"$EMAIL_ID\""
           ./step.sh "${{ github.event.inputs.step }}" "$extra"
 
       - name: Scrape
