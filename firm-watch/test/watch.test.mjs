@@ -31,6 +31,17 @@ test('news page extraction returns headlines only, with dates', () => {
   assert.ok(!items.some((i) => /page\/|privacy|portfolio|\.pdf/.test(i.url)));
 });
 
+test('a date inside the link text is used as the item date and removed from the headline', () => {
+  const html = `<main><div class="news-list"><span class="date">November 16, 2026</span>
+    <a href="/news/pod-pack/">May 1, 2018 LongueVue Capital Invests in Pod Pack International</a>
+    <a href="/news/traco/">June 24, 2021 LongueVue Capital Completes Investment in Traco Manufacturing, LLC</a></div></main>`;
+  const items = extractItems(html, 'https://www.lvcpartners.com/news/');
+  assert.deepEqual(items.map((i) => [i.title, i.date]), [
+    ['LongueVue Capital Invests in Pod Pack International', '2018-05-01'],
+    ['LongueVue Capital Completes Investment in Traco Manufacturing, LLC', '2021-06-24'],
+  ]);
+});
+
 test('dates', () => {
   assert.equal(parseDate('Posted Nov. 3, 2026 by staff'), '2026-11-03');
   assert.equal(parseDate('3 November 2026'), '2026-11-03');

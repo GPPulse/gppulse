@@ -200,12 +200,17 @@ export function extractItems(html, pageUrl) {
       if (alt.length >= 25) title = alt; else return;
     }
     title = title.replace(/\s*(continue reading|read more|learn more)\s*$/i, '').trim();
+    // Some sites put the date inside the link text ("May 1, 2018 Firm Invests in ..."). That date
+    // is the item's own, so it wins over anything else found nearby, and comes off the headline.
+    const lead = title.match(/^((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[a-z]*\.?\s+\d{1,2},?\s+\d{4}|\d{1,2}\/\d{1,2}\/\d{4}|\d{4}-\d{2}-\d{2})\s*[-–—|:]?\s*/i);
+    const titleDate = lead ? parseDate(lead[1]) : null;
+    if (lead) title = title.slice(lead[0].length).trim();
     if (title.length < 25 || title.length > 300 || title.split(' ').length < 4) return;
     // External links only count if they look like press coverage of a transaction.
     if (external && !/prnewswire|businesswire|globenewswire|newswire|accesswire|pehub|wsj\.com|bizjournals/i.test(href)) return;
 
     const scope = box.length ? box : a.parent();
-    const date = parseDate(scope.find('time').attr('datetime')) || parseDate(scope.find('time, .date, [class*="date"]').first().text()) || parseDate(clean(scope.text()).replace(title, ' ').slice(0, 200)) || parseDate(href.match(/\/(20\d{2})\/(\d{2})\/(\d{2})\//)?.slice(1).join('-'));
+    const date = titleDate || parseDate(scope.find('time').attr('datetime')) || parseDate(scope.find('time, .date, [class*="date"]').first().text()) || parseDate(clean(scope.text()).replace(title, ' ').slice(0, 200)) || parseDate(href.match(/\/(20\d{2})\/(\d{2})\/(\d{2})\//)?.slice(1).join('-'));
     const prev = items.get(href);
     if (!prev || (!prev.date && date)) items.set(href, { url: href, title, date });
   });
