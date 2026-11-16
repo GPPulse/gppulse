@@ -305,10 +305,15 @@ export function extractTombstones(html, pageUrl) {
     let url = null;
     const a = el.tagName === 'a' ? $(el) : $(el).find('a[href]').first().length ? $(el).find('a[href]').first() : $(el).closest('a[href]');
     if (a.length) { try { const u = new URL(a.attr('href'), pageUrl).href.split('#')[0]; if (sameSite(u, pageUrl) && u.replace(/\/$/, '') !== pageUrl.replace(/\/$/, '') && !SKIP_PATH.test(u)) url = u; } catch { /* no usable link */ } }
-    const title = text.replace(/\s*(view (details|transaction|case study)|read more|learn more|details)\s*$/i, '').slice(0, 220);
-    const key = title.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
-    if (!url) url = `${pageUrl.split('#')[0]}#t-${fnv(key)}`;
-    if (![...out.values()].some((o) => o.key === key)) out.set(url, { url, title, date: parseDate(text.match(/\b(20\d{2}-\d{2}-\d{2}|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[a-z]*\.?\s+\d{1,2},?\s+\d{4})\b/i)?.[0]), key });
+    // Some pages run several one-line deals together in one block; give each its own entry.
+    const sentences = text.split(/(?<=[a-z)]\.)\s+(?=[A-Z0-9])/).filter((p) => p.length >= 25 && DEAL_RE.test(p));
+    const parts = sentences.length >= 2 ? sentences : [text];
+    for (const part of parts) {
+      const title = part.replace(/\s*(view (details|transaction|case study)|read more|learn more|details)\s*$/i, '').slice(0, 220);
+      const key = title.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+      const address = url && parts.length === 1 ? url : `${pageUrl.split('#')[0]}#t-${fnv(key)}`;
+      if (![...out.values()].some((o) => o.key === key)) out.set(address, { url: address, title, date: parseDate(part.match(/\b(20\d{2}-\d{2}-\d{2}|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[a-z]*\.?\s+\d{1,2},?\s+\d{4})\b/i)?.[0]), key });
+    }
   }
   return [...out.values()].map(({ key, ...rest }) => rest).slice(0, 200);
 }
@@ -328,6 +333,9 @@ export function extractPortfolio(html, pageUrl) {
   const add = (raw) => {
     const name = clean(raw).replace(/\s*(logo|website|\(opens in a new (tab|window)\))\s*$/i, '').replace(/^logo (of|for)\s+/i, '').trim();
     if (name.length < 2 || name.length > 60 || !/[A-Za-z]/.test(name) || name.split(' ').length > 6 || NOT_A_COMPANY.test(name) || /[.!?:]$/.test(name) || /^\d+$/.test(name)) return;
+    // Dates, labels with a colon, bare web addresses and UI text are not company names.
+    if (/^[-–•|]/.test(name) || /:\s|:\/\/|^www\.|\.(com|net|org|io|co)\b\/?$/i.test(name) || /\b(login|log in|sign in|go to|click|image|exit date|investment date|since \d{4})\b/i.test(name)) return;
+    if (/^(?:(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\.?\s+)?(?:\d{1,2},?\s+)?(?:19|20)\d{2}$/i.test(name) || /^q[1-4]\s+(19|20)\d{2}$/i.test(name) || /^funds?(\s+[ivx\d]+)?$/i.test(name)) return;
     const key = normName(name);
     if (key.length >= 2 && !names.has(key)) names.set(key, name);
   };

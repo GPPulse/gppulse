@@ -146,3 +146,15 @@ test('finding the portfolio and transactions links on a home page', () => {
   assert.deepEqual(findLinks(html, 'https://x.com/', /^(portfolio|investments|companies|our companies)$/i, /\/(portfolio|investments|companies)/i), ['https://x.com/portfolio/']);
   assert.deepEqual(findLinks(html, 'https://x.com/', /transactions|tombstones|track record|deals/i, /\/(transactions|deals|tombstones)/i), ['https://x.com/our-transactions']);
 });
+
+test('portfolio names: dates, labels, web addresses and UI text are dropped', () => {
+  const html = `<main><h3>April 2019</h3><h3>Exit Date: November 2016</h3><h3>- Image</h3><h3>Funds</h3><h3>Fund IV</h3><h3>2021</h3>
+    <a href="https://www.crossfuze.com">https://www.crossfuze.com</a><a href="https://x.example">Investor Login</a><a href="https://y.example">Go to</a>
+    <h3>Crossfuze</h3><h3>Naylor Association Solutions</h3><h3>3D Corporate Solutions</h3></main>`;
+  assert.deepEqual(extractPortfolio(html, 'https://rlj.example/portfolio/'), ['Crossfuze', 'Naylor Association Solutions', '3D Corporate Solutions']);
+});
+
+test('tombstones: several one-line deals in one block are split', () => {
+  const html = '<main><div class="list"><p>ETI Precision was acquired by Accredited Labs. Macadam Company, Inc. has been acquired by Heartland Paving Partners.</p></div></main>';
+  assert.deepEqual(extractTombstones(html, 'https://bank.example/deals/').map((i) => i.title), ['ETI Precision was acquired by Accredited Labs.', 'Macadam Company, Inc. has been acquired by Heartland Paving Partners.']);
+});
