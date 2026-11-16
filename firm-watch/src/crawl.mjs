@@ -86,7 +86,7 @@ async function main() {
   // Which of these links has the database never seen?
   const allUrls = [...new Set(read.flatMap((r) => r.found.map((i) => i.url)))];
   const unknown = new Set();
-  for (const part of chunk(allUrls, 500)) (await api('check', { urls: part })).unknown.forEach((u) => unknown.add(u));
+  for (const part of chunk(allUrls, 200)) (await api('check', { urls: part })).unknown.forEach((u) => unknown.add(u));
 
   const queue = [], seenOnly = [];
   for (const r of read) {
@@ -101,7 +101,7 @@ async function main() {
     console.log(`Searching Google News for the ${active.length} most active firms`);
     const news = await googleNews(active);
     const fresh = new Set();
-    for (const part of chunk([...new Set(news.map((i) => i.url))], 500)) (await api('check', { urls: part })).unknown.forEach((u) => fresh.add(u));
+    for (const part of chunk([...new Set(news.map((i) => i.url))], 200)) (await api('check', { urls: part })).unknown.forEach((u) => fresh.add(u));
     // Skip coverage of a headline the firm's own site already gave us this run.
     const have = new Set(queue.map((i) => `${i.firm.id}|${i.title.toLowerCase().slice(0, 50)}`));
     for (const it of news) if (fresh.has(it.url) && !have.has(`${it.firm.id}|${it.title.toLowerCase().slice(0, 50)}`)) { have.add(`${it.firm.id}|${it.title.toLowerCase().slice(0, 50)}`); queue.push(it); }

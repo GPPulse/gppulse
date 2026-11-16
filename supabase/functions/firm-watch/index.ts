@@ -97,10 +97,22 @@ serve(async (req: Request): Promise<Response> => {
       case "check": {
         const urls = [...new Set((body.urls ?? []) as string[])].filter((u) => typeof u === "string" && u.length < 2000);
         const known = new Set<string>();
-        for (const part of chunk(urls, 100)) {
-          const { data, error } = await supabase.from("scraped_content").select("url").in("url", part);
-          if (error) throw new Error(error.message);
-          (data ?? []).forEach((r: { url: string }) => known.add(r.url));
+        // The lookup travels in a query string, so batch by encoded length, not by count:
+        // a hundred long URLs overflow the request line.
+        const parts: string[][] = [[]];
+        let size = 0;
+        for (const u of urls) {
+          const len = encodeURIComponent(u).length + 6;
+          if (size + len > 3000 && parts[parts.length - 1].length) { parts.push([]); size = 0; }
+          parts[parts.length - 1].push(u);
+          size += len;
+        }
+        for (const group of chunk(parts.filter((p) => p.length), 6)) {
+          await Promise.all(group.map(async (part) => {
+            const { data, error } = await supabase.from("scraped_content").select("url").in("url", part);
+            if (error) throw new Error(error.message);
+            (data ?? []).forEach((r: { url: string }) => known.add(r.url));
+          }));
         }
         return json({ unknown: urls.filter((u) => !known.has(u)) });
       }
