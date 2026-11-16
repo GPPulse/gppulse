@@ -7,6 +7,7 @@
 //
 // Secrets: RESEND_API_KEY, RESEND_INBOUND_WEBHOOK_SECRET (signing secret of the
 // email.received webhook). verify_jwt is off; the Svix signature authenticates the call.
+// Webhook and receiving domain (in.thegppulse.com) were created in Resend on 2026-11-16.
 
 const env = (k: string) => Deno.env.get(k) ?? "";
 
