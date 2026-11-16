@@ -1,0 +1,7742 @@
+[
+ {
+  "slug": "7ridge",
+  "name": "7RIDGE",
+  "website": "https://7ridge.com",
+  "domain": "7ridge.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "acorn-capital-management",
+  "name": "Acorn Capital Management",
+  "website": "https://acorncapitalmanagement.com",
+  "domain": "acorncapitalmanagement.com",
+  "hq": "Oklahoma City, OK",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "align-capital-partners",
+  "name": "Align Capital Partners",
+  "website": "https://www.aligncp.com",
+  "domain": "aligncp.com",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "alternative-investment-management",
+  "name": "Alternative Investment Management",
+  "website": "https://www.aim13.com",
+  "domain": "aim13.com",
+  "hq": "New York, NY",
+  "type": "Family Office",
+  "tier": 1
+ },
+ {
+  "slug": "angeleno-group",
+  "name": "Angeleno Group",
+  "website": "https://www.angelenogroup.com",
+  "domain": "angelenogroup.com",
+  "hq": "Los Angeles, CA",
+  "type": "Growth/Expansion",
+  "tier": 1
+ },
+ {
+  "slug": "apex-capital-florida",
+  "name": "Apex Capital (Florida)",
+  "website": "https://apexcapitalpe.com",
+  "domain": "apexcapitalpe.com",
+  "hq": "Coconut Grove, FL",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "architect-equity",
+  "name": "Architect Equity",
+  "website": "https://www.architectequity.com",
+  "domain": "architectequity.com",
+  "hq": "El Segundo, CA",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "ariel-alternatives",
+  "name": "Ariel Alternatives",
+  "website": "https://www.arielalternatives.com",
+  "domain": "arielalternatives.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "astara-capital-partners",
+  "name": "Astara Capital Partners",
+  "website": "https://www.astaracapital.com",
+  "domain": "astaracapital.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "astira-capital-partners",
+  "name": "Astira Capital Partners",
+  "website": "https://www.astiracp.com",
+  "domain": "astiracp.com",
+  "hq": "Boston, MA",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "atl-partners",
+  "name": "ATL Partners",
+  "website": "https://www.atlpartners.com",
+  "domain": "atlpartners.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "auxo-investment-partners",
+  "name": "Auxo Investment Partners",
+  "website": "https://www.auxopartners.com",
+  "domain": "auxopartners.com",
+  "hq": "Grand Rapids, MI",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "avance-investment-management",
+  "name": "Avance Investment Management",
+  "website": "https://www.avanceinv.com",
+  "domain": "avanceinv.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "baird-capital",
+  "name": "Baird Capital",
+  "website": "https://www.bairdcapital.com",
+  "domain": "bairdcapital.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "benford-capital-partners",
+  "name": "Benford Capital Partners",
+  "website": "https://www.benfordcapital.com",
+  "domain": "benfordcapital.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "bhms-investments",
+  "name": "BHMS Investments",
+  "website": "https://www.bhmsinvestments.com",
+  "domain": "bhmsinvestments.com",
+  "hq": "Westport, CT",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "blue-point-capital-partners",
+  "name": "Blue Point Capital Partners",
+  "website": "https://www.bluepointcapital.com",
+  "domain": "bluepointcapital.com",
+  "hq": "Cleveland, OH",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "boyne-capital",
+  "name": "Boyne Capital",
+  "website": "https://www.boynecapital.com",
+  "domain": "boynecapital.com",
+  "hq": "Miami, FL",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "broad-sky-partners",
+  "name": "Broad Sky Partners",
+  "website": "https://www.broadskypartners.com",
+  "domain": "broadskypartners.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "carousel-capital",
+  "name": "Carousel Capital",
+  "website": "https://www.carouselcapital.com",
+  "domain": "carouselcapital.com",
+  "hq": "Charlotte, NC",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "carr-s-hill-partners",
+  "name": "Carr's Hill Partners",
+  "website": "https://carrshillpartners.com",
+  "domain": "carrshillpartners.com",
+  "hq": "New Orleans, LA",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "center-rock-capital-partners",
+  "name": "Center Rock Capital Partners",
+  "website": "https://www.centerrockcp.com",
+  "domain": "centerrockcp.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "centre-partners",
+  "name": "Centre Partners",
+  "website": "https://www.centrepartners.com",
+  "domain": "centrepartners.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "closed-loop-partners",
+  "name": "Closed Loop Partners",
+  "website": "https://www.closedlooppartners.com",
+  "domain": "closedlooppartners.com",
+  "hq": "New York, NY",
+  "type": "Other Private Equity",
+  "tier": 1
+ },
+ {
+  "slug": "cohesive-capital-partners",
+  "name": "Cohesive Capital Partners",
+  "website": "https://www.cohesivecapital.com",
+  "domain": "cohesivecapital.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "continuim-equity-partners",
+  "name": "Continuim Equity Partners",
+  "website": "https://www.continuim.com",
+  "domain": "continuim.com",
+  "hq": "Pittsburgh, PA",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "corridor-capital",
+  "name": "Corridor Capital",
+  "website": "https://www.corridorcapital.com",
+  "domain": "corridorcapital.com",
+  "hq": "Los Angeles, CA",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "cotton-creek-capital",
+  "name": "Cotton Creek Capital",
+  "website": "https://www.cottoncreekcapital.com",
+  "domain": "cottoncreekcapital.com",
+  "hq": "Austin, TX",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "council-capital",
+  "name": "Council Capital",
+  "website": "https://www.councilcapital.com",
+  "domain": "councilcapital.com",
+  "hq": "Nashville, TN",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "creo-capital-partners",
+  "name": "CREO Capital Partners",
+  "website": "https://www.creocapitalpartners.com",
+  "domain": "creocapitalpartners.com",
+  "hq": "Miami, FL",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "dc-capital-partners",
+  "name": "DC Capital Partners",
+  "website": "https://www.dccp.com",
+  "domain": "dccp.com",
+  "hq": "Alexandria, VA",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "delcam-capital",
+  "name": "DelCam Capital",
+  "website": "https://www.delcamcapital.com",
+  "domain": "delcamcapital.com",
+  "hq": "Hopedale, MA",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "edited-capital",
+  "name": "Edited Capital",
+  "website": "https://editedcapital.com",
+  "domain": "editedcapital.com",
+  "hq": "Denver, CO",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "egateway-capital",
+  "name": "eGateway Capital",
+  "website": "https://www.egatewaycapital.com",
+  "domain": "egatewaycapital.com",
+  "hq": "Covington, KY",
+  "type": "Growth/Expansion",
+  "tier": 1
+ },
+ {
+  "slug": "encore-consumer-capital",
+  "name": "Encore Consumer Capital",
+  "website": "https://encoreconsumer.com",
+  "domain": "encoreconsumer.com",
+  "hq": "San Francisco, CA",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "estancia-capital-management",
+  "name": "Estancia Capital Management",
+  "website": "https://www.estanciapartners.com",
+  "domain": "estanciapartners.com",
+  "hq": "Scottsdale, AZ",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "forward-consumer-partners",
+  "name": "Forward Consumer Partners",
+  "website": "https://www.forwardconsumerpartners.com",
+  "domain": "forwardconsumerpartners.com",
+  "hq": "Greenwich, CT",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "fvlcrum",
+  "name": "FVLCRUM",
+  "website": "https://www.fvlcrum.com",
+  "domain": "fvlcrum.com",
+  "hq": "Bethesda, MD",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "gallant-capital",
+  "name": "Gallant Capital",
+  "website": "https://www.gallantcapital.com",
+  "domain": "gallantcapital.com",
+  "hq": "Los Angeles, CA",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "gcp-capital-partners",
+  "name": "GCP Capital Partners",
+  "website": "https://www.gcpcapital.com",
+  "domain": "gcpcapital.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "gemini-investors",
+  "name": "Gemini Investors",
+  "website": "https://www.gemini-investors.com",
+  "domain": "gemini-investors.com",
+  "hq": "Wellesley, MA",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "godspeed-capital",
+  "name": "Godspeed Capital",
+  "website": "https://www.godspeed.com",
+  "domain": "godspeed.com",
+  "hq": "Washington, DC",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "great-point-partners",
+  "name": "Great Point Partners",
+  "website": "https://www.gppfunds.com",
+  "domain": "gppfunds.com",
+  "hq": "Greenwich, CT",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "growth-catalyst-partners",
+  "name": "Growth Catalyst Partners",
+  "website": "https://www.growthcatalystpartners.com",
+  "domain": "growthcatalystpartners.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "guardian-capital-partners",
+  "name": "Guardian Capital Partners",
+  "website": "https://www.guardiancp.com",
+  "domain": "guardiancp.com",
+  "hq": "Wayne, PA",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "harris-preston-partners",
+  "name": "Harris Preston & Partners",
+  "website": "https://www.harrispreston.com",
+  "domain": "harrispreston.com",
+  "hq": "Austin, TX",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "hastings-equity-partners",
+  "name": "Hastings Equity Partners",
+  "website": "https://www.hastingsequity.com",
+  "domain": "hastingsequity.com",
+  "hq": "Boston, MA",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "heartwood-partners",
+  "name": "Heartwood Partners",
+  "website": "https://www.heartwoodpartners.com",
+  "domain": "heartwoodpartners.com",
+  "hq": "Norwalk, CT",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "hidden-harbor-capital-partners",
+  "name": "Hidden Harbor Capital Partners",
+  "website": "https://www.hh-cp.com",
+  "domain": "hh-cp.com",
+  "hq": "Boca Raton, FL",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "highview-capital",
+  "name": "Highview Capital",
+  "website": "https://highviewcapital.com",
+  "domain": "highviewcapital.com",
+  "hq": "Los Angeles, CA",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "holleway-capital-partners",
+  "name": "Holleway Capital Partners",
+  "website": "https://www.holleway.com",
+  "domain": "holleway.com",
+  "hq": "Saint Louis, MO",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "hughes-company",
+  "name": "Hughes & Company",
+  "website": "https://hughes-co.com",
+  "domain": "hughes-co.com",
+  "hq": "Chicago, IL",
+  "type": "Growth/Expansion",
+  "tier": 1
+ },
+ {
+  "slug": "industrial-growth-partners",
+  "name": "Industrial Growth Partners",
+  "website": "https://www.igpequity.com",
+  "domain": "igpequity.com",
+  "hq": "San Francisco, CA",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "industrial-opportunity-partners",
+  "name": "Industrial Opportunity Partners",
+  "website": "https://www.iopfund.com",
+  "domain": "iopfund.com",
+  "hq": "Evanston, IL",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "inverness-graham",
+  "name": "Inverness Graham",
+  "website": "https://www.invernessgraham.com",
+  "domain": "invernessgraham.com",
+  "hq": "Wayne, PA",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "kingfish-group",
+  "name": "Kingfish Group",
+  "website": "https://www.kingfishgroup.com",
+  "domain": "kingfishgroup.com",
+  "hq": "Southlake, TX",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "lake-street-capital-partners-chicago",
+  "name": "Lake Street Capital Partners (Chicago)",
+  "website": "https://www.lakestcap.com",
+  "domain": "lakestcap.com",
+  "hq": "Minneapolis, MN",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "liberty-hall-capital-partners",
+  "name": "Liberty Hall Capital Partners",
+  "website": "https://www.libertyhallcapital.com",
+  "domain": "libertyhallcapital.com",
+  "hq": "Charleston, SC",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "long-ridge-equity-partners",
+  "name": "Long Ridge Equity Partners",
+  "website": "https://www.long-ridge.com",
+  "domain": "long-ridge.com",
+  "hq": "New York, NY",
+  "type": "Growth/Expansion",
+  "tier": 1
+ },
+ {
+  "slug": "mason-wells",
+  "name": "Mason Wells",
+  "website": "https://masonwells.com",
+  "domain": "masonwells.com",
+  "hq": "Milwaukee, WI",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "mcnally-capital",
+  "name": "McNally Capital",
+  "website": "https://www.mcnallycapital.com",
+  "domain": "mcnallycapital.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "monogram-capital-partners",
+  "name": "Monogram Capital Partners",
+  "website": "https://monogramcapital.com",
+  "domain": "monogramcapital.com",
+  "hq": "Beverly Hills, CA",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "mosaic-capital-partners",
+  "name": "Mosaic Capital Partners",
+  "website": "https://www.mosaic-cp.com",
+  "domain": "mosaic-cp.com",
+  "hq": "Charlotte, NC",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "new-state-capital-partners",
+  "name": "New State Capital Partners",
+  "website": "https://www.newstatecp.com",
+  "domain": "newstatecp.com",
+  "hq": "New Rochelle, NY",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "new-water-capital",
+  "name": "New Water Capital",
+  "website": "https://www.newwatercap.com",
+  "domain": "newwatercap.com",
+  "hq": "Boca Raton, FL",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "nextgen-growth-partners",
+  "name": "NextGen Growth Partners",
+  "website": "https://nextgengp.com",
+  "domain": "nextgengp.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "nms-capital",
+  "name": "NMS Capital",
+  "website": "https://www.nms-capital.com",
+  "domain": "nms-capital.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "nonantum-capital-partners",
+  "name": "Nonantum Capital Partners",
+  "website": "https://www.nonantumcapital.com",
+  "domain": "nonantumcapital.com",
+  "hq": "Boston, MA",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "norlantic",
+  "name": "Norlantic",
+  "website": "https://www.norlantic.com",
+  "domain": "norlantic.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "northrim-horizon",
+  "name": "Northrim Horizon",
+  "website": "https://www.northrimhorizon.com",
+  "domain": "northrimhorizon.com",
+  "hq": "Mesa, AZ",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "o2-investment-partners",
+  "name": "O2 Investment Partners",
+  "website": "https://www.o2investment.com",
+  "domain": "o2investment.com",
+  "hq": "Bloomfield Hills, MI",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "palm-beach-capital",
+  "name": "Palm Beach Capital",
+  "website": "https://www.pbcap.com",
+  "domain": "pbcap.com",
+  "hq": "West Palm Beach, FL",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "patriot-financial-partners",
+  "name": "Patriot Financial Partners",
+  "website": "https://www.patriotfp.com",
+  "domain": "patriotfp.com",
+  "hq": "Radnor, PA",
+  "type": "Growth/Expansion",
+  "tier": 1
+ },
+ {
+  "slug": "pelican-energy-partners",
+  "name": "Pelican Energy Partners",
+  "website": "https://www.pelicanenergypartners.com",
+  "domain": "pelicanenergypartners.com",
+  "hq": "Houston, TX",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "performant-capital",
+  "name": "Performant Capital",
+  "website": "https://www.performantcapital.com",
+  "domain": "performantcapital.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "petra-capital-partners",
+  "name": "Petra Capital Partners",
+  "website": "https://www.petracapital.com",
+  "domain": "petracapital.com",
+  "hq": "Nashville, TN",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "pharos-capital-group",
+  "name": "Pharos Capital Group",
+  "website": "https://www.pharosfunds.com",
+  "domain": "pharosfunds.com",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "pine-tree-equity-partners",
+  "name": "Pine Tree Equity Partners",
+  "website": "https://www.pinetreeequity.com",
+  "domain": "pinetreeequity.com",
+  "hq": "Miami, FL",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "regal-healthcare-capital-partners",
+  "name": "Regal Healthcare Capital Partners",
+  "website": "https://www.regalhcp.com",
+  "domain": "regalhcp.com",
+  "hq": "New York, NY",
+  "type": "Growth/Expansion",
+  "tier": 1
+ },
+ {
+  "slug": "renovus-capital-partners",
+  "name": "Renovus Capital Partners",
+  "website": "https://www.renovuscapital.com",
+  "domain": "renovuscapital.com",
+  "hq": "Wayne, PA",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "rfe-investment-partners",
+  "name": "RFE Investment Partners",
+  "website": "https://www.rfeip.com",
+  "domain": "rfeip.com",
+  "hq": "Westport, CT",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "rockwood-equity-partners",
+  "name": "Rockwood Equity Partners",
+  "website": "https://www.rockwoodequity.com",
+  "domain": "rockwoodequity.com",
+  "hq": "Cleveland, OH",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "rotunda-capital-partners",
+  "name": "Rotunda Capital Partners",
+  "website": "https://www.rotundacapital.com",
+  "domain": "rotundacapital.com",
+  "hq": "Bethesda, MD",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "savory-fund",
+  "name": "Savory Fund",
+  "website": "https://savoryfund.com",
+  "domain": "savoryfund.com",
+  "hq": "Lehi, UT",
+  "type": "Growth/Expansion",
+  "tier": 1
+ },
+ {
+  "slug": "shorehill-capital",
+  "name": "Shorehill Capital",
+  "website": "https://www.shorehillcapital.com",
+  "domain": "shorehillcapital.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "silver-oak-services-partners",
+  "name": "Silver Oak Services Partners",
+  "website": "https://www.silveroaksp.com",
+  "domain": "silveroaksp.com",
+  "hq": "Evanston, IL",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "sky-island-capital",
+  "name": "Sky Island Capital",
+  "website": "https://www.skyislandcap.com",
+  "domain": "skyislandcap.com",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "sole-source-capital",
+  "name": "Sole Source Capital",
+  "website": "https://www.solesourcecapital.com",
+  "domain": "solesourcecapital.com",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "sterling-investment-partners",
+  "name": "Sterling Investment Partners",
+  "website": "https://www.sterlinglp.com",
+  "domain": "sterlinglp.com",
+  "hq": "Greenwich, CT",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "stonehenge-partners",
+  "name": "Stonehenge Partners",
+  "website": "https://www.stonehengepartners.com",
+  "domain": "stonehengepartners.com",
+  "hq": "Columbus, OH",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "strength-capital",
+  "name": "Strength Capital",
+  "website": "https://www.strengthcapital.com",
+  "domain": "strengthcapital.com",
+  "hq": "Detroit, MI",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "summit-park",
+  "name": "Summit Park",
+  "website": "https://www.summitparkllc.com",
+  "domain": "summitparkllc.com",
+  "hq": "Charlotte, NC",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "sweetwater-private-equity",
+  "name": "Sweetwater Private Equity",
+  "website": "https://www.sweetwaterpe.com",
+  "domain": "sweetwaterpe.com",
+  "hq": "Encinitas, CA",
+  "type": "Secondary Buyer",
+  "tier": 1
+ },
+ {
+  "slug": "the-brydon-group",
+  "name": "The Brydon Group",
+  "website": "https://www.brydon.com",
+  "domain": "brydon.com",
+  "hq": "Washington, DC",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "trinity-hunt-partners",
+  "name": "Trinity Hunt Partners",
+  "website": "https://www.trinityhunt.com",
+  "domain": "trinityhunt.com",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "trinity-investors",
+  "name": "Trinity Investors",
+  "website": "https://www.trinityinvestors.com",
+  "domain": "trinityinvestors.com",
+  "hq": "Southlake, TX",
+  "type": "Asset Manager",
+  "tier": 1
+ },
+ {
+  "slug": "trm-equity",
+  "name": "TRM Equity",
+  "website": "https://www.trmequity.com",
+  "domain": "trmequity.com",
+  "hq": "Southfield, MI",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "truelink-capital",
+  "name": "Truelink Capital",
+  "website": "https://www.truelinkcap.com",
+  "domain": "truelinkcap.com",
+  "hq": "Los Angeles, CA",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "tyree-d-angelo-partners",
+  "name": "Tyree & D'Angelo Partners",
+  "website": "https://www.tdpfund.com",
+  "domain": "tdpfund.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "valeas-capital-partners",
+  "name": "Valeas Capital Partners",
+  "website": "https://www.valeas.com",
+  "domain": "valeas.com",
+  "hq": "San Francisco, CA",
+  "type": "Growth/Expansion",
+  "tier": 1
+ },
+ {
+  "slug": "valesco-industries",
+  "name": "Valesco Industries",
+  "website": "https://www.valescoind.com",
+  "domain": "valescoind.com",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "virgo-investment-group",
+  "name": "Virgo Investment Group",
+  "website": "https://www.virgo-llc.com",
+  "domain": "virgo-llc.com",
+  "hq": "Burlingame, CA",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "walnut-grove-capital-partners",
+  "name": "Walnut Grove Capital Partners",
+  "website": "https://www.walnutgrove.com",
+  "domain": "walnutgrove.com",
+  "hq": "Memphis, TN",
+  "type": "PE/Buyout",
+  "tier": 1
+ },
+ {
+  "slug": "wavecrest-growth-partners",
+  "name": "Wavecrest Growth Partners",
+  "website": "https://www.wavecrestgrowth.com",
+  "domain": "wavecrestgrowth.com",
+  "hq": "Boston, MA",
+  "type": "Growth/Expansion",
+  "tier": 1
+ },
+ {
+  "slug": "1315-capital",
+  "name": "1315 Capital",
+  "website": "https://www.1315capital.com",
+  "domain": "1315capital.com",
+  "hq": "Philadelphia, PA",
+  "type": "Growth/Expansion",
+  "tier": 2
+ },
+ {
+  "slug": "1876-partners",
+  "name": "1876 Partners",
+  "website": "https://www.1876partners.com",
+  "domain": "1876partners.com",
+  "hq": "Tomball, TX",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "3-boomerang-capital",
+  "name": "3 Boomerang Capital",
+  "website": "https://www.3boomerang.com",
+  "domain": "3boomerang.com",
+  "hq": "Greenwich, CT",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "424-capital",
+  "name": "424 Capital",
+  "website": "https://424capital.com",
+  "domain": "424capital.com",
+  "hq": "Wakefield, MA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "4x4-capital",
+  "name": "4x4 Capital",
+  "website": "https://www.4x4capital.com",
+  "domain": "4x4capital.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "5th-century-partners",
+  "name": "5th Century Partners",
+  "website": "https://www.5cpartners.com",
+  "domain": "5cpartners.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "accelmed",
+  "name": "Accelmed",
+  "website": "https://www.accelmed.com",
+  "domain": "accelmed.com",
+  "hq": "Miami, FL",
+  "type": "Growth/Expansion",
+  "tier": 2
+ },
+ {
+  "slug": "achieve-partners",
+  "name": "Achieve Partners",
+  "website": "https://achievepartners.com",
+  "domain": "achievepartners.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "agr-partners",
+  "name": "AGR Partners",
+  "website": "https://www.agrpartners.com",
+  "domain": "agrpartners.com",
+  "hq": "Chicago, IL",
+  "type": "Growth/Expansion",
+  "tier": 2
+ },
+ {
+  "slug": "allied-industrial-partners",
+  "name": "Allied Industrial Partners",
+  "website": "https://www.alliedindustrialpartners.com",
+  "domain": "alliedindustrialpartners.com",
+  "hq": "Houston, TX",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "alterna-equity-partners",
+  "name": "Alterna Equity Partners",
+  "website": "https://www.alternaequitypartners.com",
+  "domain": "alternaequitypartners.com",
+  "hq": "Fort Lauderdale, FL",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "american-pacific-group",
+  "name": "American Pacific Group",
+  "website": "https://americanpacificgroup.com",
+  "domain": "americanpacificgroup.com",
+  "hq": "Larkspur, CA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "anacapa-partners",
+  "name": "Anacapa Partners",
+  "website": "https://www.anacapapartners.com",
+  "domain": "anacapapartners.com",
+  "hq": "San Mateo, CA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "angeles-equity-partners",
+  "name": "Angeles Equity Partners",
+  "website": "https://www.angelesequity.com",
+  "domain": "angelesequity.com",
+  "hq": "Los Angeles, CA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "arable-capital-partners",
+  "name": "Arable Capital Partners",
+  "website": "https://www.arablecp.com",
+  "domain": "arablecp.com",
+  "hq": "Bellevue, WA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "ardan-equity",
+  "name": "Ardan Equity",
+  "website": "https://www.ardanequity.com",
+  "domain": "ardanequity.com",
+  "hq": "Palm Beach, FL",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "argonne-capital-group",
+  "name": "Argonne Capital Group",
+  "website": "https://www.argonnecapital.com",
+  "domain": "argonnecapital.com",
+  "hq": "Atlanta, GA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "argosy-private-equity",
+  "name": "Argosy Private Equity",
+  "website": "https://www.argosyprivateequity.com",
+  "domain": "argosyprivateequity.com",
+  "hq": "Wayne, PA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "artemis-capital-partners",
+  "name": "Artemis Capital Partners",
+  "website": "https://www.artemislp.com",
+  "domain": "artemislp.com",
+  "hq": "Boston, MA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "ascend-partners-healthcare",
+  "name": "Ascend Partners (Healthcare)",
+  "website": "https://www.ascendpartners.com",
+  "domain": "ascendpartners.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "astor-place-holdings",
+  "name": "Astor Place Holdings",
+  "website": "https://www.astorplaceholdings.com",
+  "domain": "astorplaceholdings.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "aterian-investment-partners",
+  "name": "Aterian Investment Partners",
+  "website": "https://www.aterianpartners.com",
+  "domain": "aterianpartners.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "atlantic-street-capital",
+  "name": "Atlantic Street Capital",
+  "website": "https://www.atlanticstreetcapital.com",
+  "domain": "atlanticstreetcapital.com",
+  "hq": "Greenwich, CT",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "atwater-capital",
+  "name": "Atwater Capital",
+  "website": "https://www.atwater-capital.com",
+  "domain": "atwater-capital.com",
+  "hq": "Los Angeles, CA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "auldbrass-partners",
+  "name": "Auldbrass Partners",
+  "website": "https://www.auldbrasspartners.com",
+  "domain": "auldbrasspartners.com",
+  "hq": "New York, NY",
+  "type": "Secondary Buyer",
+  "tier": 2
+ },
+ {
+  "slug": "badlands-capital",
+  "name": "Badlands Capital",
+  "website": "https://www.badlands.capital",
+  "domain": "badlands.capital",
+  "hq": "Sioux Falls, SD",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "bain-capital-double-impact",
+  "name": "Bain Capital Double Impact",
+  "website": "https://www.baincapitaldoubleimpact.com",
+  "domain": "baincapitaldoubleimpact.com",
+  "hq": "Boston, MA",
+  "type": "Impact Investing",
+  "tier": 2
+ },
+ {
+  "slug": "battle-investment-group",
+  "name": "Battle Investment Group",
+  "website": "https://battleinvestmentgroup.com",
+  "domain": "battleinvestmentgroup.com",
+  "hq": "Atlanta, GA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "baum-capital-partners-management",
+  "name": "Baum Capital Partners Management",
+  "website": "https://www.baumpartners.com",
+  "domain": "baumpartners.com",
+  "hq": "Kansas City, MO",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "behrman-capital",
+  "name": "Behrman Capital",
+  "website": "https://www.behrmancap.com",
+  "domain": "behrmancap.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "belhealth-investment-partners",
+  "name": "BelHealth Investment Partners",
+  "website": "https://www.belhealth.com",
+  "domain": "belhealth.com",
+  "hq": "Fort Lauderdale, FL",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "blackford-capital",
+  "name": "Blackford Capital",
+  "website": "https://www.blackfordcapital.com",
+  "domain": "blackfordcapital.com",
+  "hq": "Grand Rapids, MI",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "bloom-equity-partners",
+  "name": "Bloom Equity Partners",
+  "website": "https://www.bloomequitypartners.com",
+  "domain": "bloomequitypartners.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "blue-sage-capital",
+  "name": "Blue Sage Capital",
+  "website": "https://www.bluesage.com",
+  "domain": "bluesage.com",
+  "hq": "Austin, TX",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "blue-sea-capital",
+  "name": "Blue Sea Capital",
+  "website": "https://www.blueseacapital.com",
+  "domain": "blueseacapital.com",
+  "hq": "West Palm Beach, FL",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "bluestone-equity-partners",
+  "name": "Bluestone Equity Partners",
+  "website": "https://www.bluestoneequity.com",
+  "domain": "bluestoneequity.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "bluestone-investment-partners",
+  "name": "Bluestone Investment Partners",
+  "website": "https://www.bluestoneinv.com",
+  "domain": "bluestoneinv.com",
+  "hq": "McLean, VA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "boathouse-capital",
+  "name": "Boathouse Capital",
+  "website": "https://www.boathousecapital.com",
+  "domain": "boathousecapital.com",
+  "hq": "Berwyn, PA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "bp-energy-partners",
+  "name": "BP Energy Partners",
+  "website": "https://www.bpenergypartners.com",
+  "domain": "bpenergypartners.com",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "bpoc",
+  "name": "BPOC",
+  "website": "https://www.bpoc.com",
+  "domain": "bpoc.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "bregal-partners",
+  "name": "Bregal Partners",
+  "website": "https://www.bregalpartners.com",
+  "domain": "bregalpartners.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "brighton-partners",
+  "name": "Brighton Partners",
+  "website": "https://www.bpequity.com",
+  "domain": "bpequity.com",
+  "hq": "Atlanta, GA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "broadwing-capital-management",
+  "name": "Broadwing Capital Management",
+  "website": "https://www.broadwingcap.com",
+  "domain": "broadwingcap.com",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "camber-partners-new-york",
+  "name": "Camber Partners (New York)",
+  "website": "https://www.camber.io",
+  "domain": "camber.io",
+  "hq": "New York, NY",
+  "type": "Growth/Expansion",
+  "tier": 2
+ },
+ {
+  "slug": "capstreet-private-equity",
+  "name": "CapStreet (Private Equity)",
+  "website": "https://www.capstreet.com",
+  "domain": "capstreet.com",
+  "hq": "Houston, TX",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "ccmp-growth-advisors",
+  "name": "CCMP Growth Advisors",
+  "website": "https://www.ccmpgrowth.com",
+  "domain": "ccmpgrowth.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "centergate-capital",
+  "name": "CenterGate Capital",
+  "website": "https://www.centergatecapital.com",
+  "domain": "centergatecapital.com",
+  "hq": "Austin, TX",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "ci-capital-partners",
+  "name": "CI Capital Partners",
+  "website": "https://cicapllc.com",
+  "domain": "cicapllc.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "cid-capital",
+  "name": "CID Capital",
+  "website": "https://www.cidcap.com",
+  "domain": "cidcap.com",
+  "hq": "Carmel, IN",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "cip-capital",
+  "name": "CIP Capital",
+  "website": "https://www.cip-capital.com",
+  "domain": "cip-capital.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "citation-capital-management",
+  "name": "Citation Capital Management",
+  "website": "https://www.citation.capital",
+  "domain": "citation.capital",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "clarion-capital-partners",
+  "name": "Clarion Capital Partners",
+  "website": "https://www.clarion-capital.com",
+  "domain": "clarion-capital.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "clearhaven-partners",
+  "name": "Clearhaven Partners",
+  "website": "https://www.clearhavenpartners.com",
+  "domain": "clearhavenpartners.com",
+  "hq": "Boston, MA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "cloud-equity-group",
+  "name": "Cloud Equity Group",
+  "website": "https://www.cloudequitygroup.com",
+  "domain": "cloudequitygroup.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "compass-group-equity-partners",
+  "name": "Compass Group Equity Partners",
+  "website": "https://www.cgep.com",
+  "domain": "cgep.com",
+  "hq": "Saint Louis, MO",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "composition-capital",
+  "name": "Composition Capital",
+  "website": "https://www.compositioncap.com",
+  "domain": "compositioncap.com",
+  "hq": "Los Angeles, CA",
+  "type": "Growth/Expansion",
+  "tier": 2
+ },
+ {
+  "slug": "concentric-equity-partners",
+  "name": "Concentric Equity Partners",
+  "website": "https://www.ficcep.com",
+  "domain": "ficcep.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "coral-tree-partners",
+  "name": "Coral Tree Partners",
+  "website": "https://coraltreelp.com",
+  "domain": "coraltreelp.com",
+  "hq": "Los Angeles, CA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "cordillera-investment-partners",
+  "name": "Cordillera Investment Partners",
+  "website": "https://www.cordillera-ip.com",
+  "domain": "cordillera-ip.com",
+  "hq": "San Francisco, CA",
+  "type": "Asset Manager",
+  "tier": 2
+ },
+ {
+  "slug": "corrum-capital-management",
+  "name": "Corrum Capital Management",
+  "website": "https://www.corrumcapital.com",
+  "domain": "corrumcapital.com",
+  "hq": "Charlotte, NC",
+  "type": "Asset Manager",
+  "tier": 2
+ },
+ {
+  "slug": "crest-rock-partners",
+  "name": "Crest Rock Partners",
+  "website": "https://www.crestrockpartners.com",
+  "domain": "crestrockpartners.com",
+  "hq": "Denver, CO",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "croft-bender",
+  "name": "Croft & Bender",
+  "website": "https://www.croft-bender.com",
+  "domain": "croft-bender.com",
+  "hq": "Atlanta, GA",
+  "type": "Investment Bank",
+  "tier": 2
+ },
+ {
+  "slug": "denali-growth-partners-boston",
+  "name": "Denali Growth Partners (Boston)",
+  "website": "https://www.denaligrowth.com",
+  "domain": "denaligrowth.com",
+  "hq": "Boston, MA",
+  "type": "Growth/Expansion",
+  "tier": 2
+ },
+ {
+  "slug": "dfw-capital-partners",
+  "name": "DFW Capital Partners",
+  "website": "https://www.dfwcapital.com",
+  "domain": "dfwcapital.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "dominus-capital",
+  "name": "Dominus Capital",
+  "website": "https://www.dominuscap.com",
+  "domain": "dominuscap.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "drum-capital-management",
+  "name": "Drum Capital Management",
+  "website": "https://www.drumcapital.com",
+  "domain": "drumcapital.com",
+  "hq": "Stamford, CT",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "dubin-clark-company",
+  "name": "Dubin Clark & Company",
+  "website": "https://www.dubinclark.com",
+  "domain": "dubinclark.com",
+  "hq": "Jacksonville Beach, FL",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "dunes-point-capital",
+  "name": "Dunes Point Capital",
+  "website": "https://www.dunespointcapital.com",
+  "domain": "dunespointcapital.com",
+  "hq": "Rye, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "eagle-merchant-partners",
+  "name": "Eagle Merchant Partners",
+  "website": "https://www.eaglemerchantpartners.com",
+  "domain": "eaglemerchantpartners.com",
+  "hq": "Atlanta, GA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "eden-capital",
+  "name": "Eden Capital",
+  "website": "https://www.edencp.com",
+  "domain": "edencp.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "elements-health-investors",
+  "name": "Elements Health Investors",
+  "website": "https://www.elementshealthinvestors.com",
+  "domain": "elementshealthinvestors.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "endicott-capital",
+  "name": "Endicott Capital",
+  "website": "https://endicottgp.com",
+  "domain": "endicottgp.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "entrepreneurial-equity-partners",
+  "name": "Entrepreneurial Equity Partners",
+  "website": "https://www.e2p.com",
+  "domain": "e2p.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "eos-partners",
+  "name": "Eos Partners",
+  "website": "https://www.eospartners.com",
+  "domain": "eospartners.com",
+  "hq": "New York, NY",
+  "type": "Hedge Fund",
+  "tier": 2
+ },
+ {
+  "slug": "evolution-capital-partners",
+  "name": "Evolution Capital Partners",
+  "website": "https://www.evolutioncapitalpartners.com",
+  "domain": "evolutioncapitalpartners.com",
+  "hq": "Cleveland, OH",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "farol-asset-management",
+  "name": "Farol Asset Management",
+  "website": "https://www.farolam.com",
+  "domain": "farolam.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "fga-partners-sharq",
+  "name": "FGA PARTNERS (Sharq)",
+  "website": "https://www.fgacw.com",
+  "domain": "fgacw.com",
+  "hq": "San Francisco, CA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "finaventures",
+  "name": "Finaventures",
+  "website": "https://www.finaventures.com",
+  "domain": "finaventures.com",
+  "hq": "Redwood City, CA",
+  "type": "Other Private Equity",
+  "tier": 2
+ },
+ {
+  "slug": "fort-point-capital",
+  "name": "Fort Point Capital",
+  "website": "https://www.fortpointcapital.com",
+  "domain": "fortpointcapital.com",
+  "hq": "Boston, MA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "frontier-growth",
+  "name": "Frontier Growth",
+  "website": "https://www.frontiergrowth.com",
+  "domain": "frontiergrowth.com",
+  "hq": "Charlotte, NC",
+  "type": "Growth/Expansion",
+  "tier": 2
+ },
+ {
+  "slug": "fulcrum-equity-partners",
+  "name": "Fulcrum Equity Partners",
+  "website": "https://www.fulcrumep.com",
+  "domain": "fulcrumep.com",
+  "hq": "Atlanta, GA",
+  "type": "Growth/Expansion",
+  "tier": 2
+ },
+ {
+  "slug": "gainline-capital-partners",
+  "name": "Gainline Capital Partners",
+  "website": "https://www.gainlinecapital.com",
+  "domain": "gainlinecapital.com",
+  "hq": "Stamford, CT",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "gec",
+  "name": "GEC",
+  "website": "https://www.geclp.com",
+  "domain": "geclp.com",
+  "hq": "Houston, TX",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "great-range-capital",
+  "name": "Great Range Capital",
+  "website": "https://www.greatrangecapital.com",
+  "domain": "greatrangecapital.com",
+  "hq": "Mission Woods, KS",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "grey-mountain-partners",
+  "name": "Grey Mountain Partners",
+  "website": "https://www.greymountain.com",
+  "domain": "greymountain.com",
+  "hq": "Boulder, CO",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "halle-capital-management",
+  "name": "Halle Capital Management",
+  "website": "https://www.hallecapital.com",
+  "domain": "hallecapital.com",
+  "hq": "New York, NY",
+  "type": "Growth/Expansion",
+  "tier": 2
+ },
+ {
+  "slug": "halmos-capital-partners",
+  "name": "Halmos Capital Partners",
+  "website": "https://www.halmoscapital.com",
+  "domain": "halmoscapital.com",
+  "hq": "Coral Gables, FL",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "hamilton-robinson-capital-partners",
+  "name": "Hamilton Robinson Capital Partners",
+  "website": "https://www.hrco.com",
+  "domain": "hrco.com",
+  "hq": "Stamford, CT",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "harren-equity-partners",
+  "name": "Harren Equity Partners",
+  "website": "https://www.harrenequity.com",
+  "domain": "harrenequity.com",
+  "hq": "Charlottesville, VA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "hauser-private-equity",
+  "name": "Hauser Private Equity",
+  "website": "https://www.hauserprivateequity.com",
+  "domain": "hauserprivateequity.com",
+  "hq": "Cincinnati, OH",
+  "type": "Fund of Funds",
+  "tier": 2
+ },
+ {
+  "slug": "hci-equity-partners",
+  "name": "HCI Equity Partners",
+  "website": "https://www.hciequity.com",
+  "domain": "hciequity.com",
+  "hq": "Washington, DC",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "health-enterprise-partners",
+  "name": "Health Enterprise Partners",
+  "website": "https://www.hepfund.com",
+  "domain": "hepfund.com",
+  "hq": "New York, NY",
+  "type": "Growth/Expansion",
+  "tier": 2
+ },
+ {
+  "slug": "healthquest-capital",
+  "name": "HealthQuest Capital",
+  "website": "https://www.healthquestcapital.com",
+  "domain": "healthquestcapital.com",
+  "hq": "Redwood City, CA",
+  "type": "Growth/Expansion",
+  "tier": 2
+ },
+ {
+  "slug": "heritage-group-us",
+  "name": "Heritage Group (US)",
+  "website": "https://www.heritagegroupusa.com",
+  "domain": "heritagegroupusa.com",
+  "hq": "Nashville, TN",
+  "type": "Growth/Expansion",
+  "tier": 2
+ },
+ {
+  "slug": "high-road-private-equity",
+  "name": "High Road ( Private Equity)",
+  "website": "https://www.highroadcap.com",
+  "domain": "highroadcap.com",
+  "hq": "Greenwich, CT",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "high-street-capital",
+  "name": "High Street Capital",
+  "website": "https://www.highstreetcapital.com",
+  "domain": "highstreetcapital.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "hkw",
+  "name": "HKW",
+  "website": "https://www.hkwinc.com",
+  "domain": "hkwinc.com",
+  "hq": "Indianapolis, IN",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "housatonic-partners",
+  "name": "Housatonic Partners",
+  "website": "https://housatonicpartners.com",
+  "domain": "housatonicpartners.com",
+  "hq": "San Francisco, CA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "huck-capital",
+  "name": "Huck Capital",
+  "website": "https://www.huckcapital.com",
+  "domain": "huckcapital.com",
+  "hq": "San Francisco, CA",
+  "type": "Impact Investing",
+  "tier": 2
+ },
+ {
+  "slug": "hunter-street-partners",
+  "name": "Hunter Street Partners",
+  "website": "https://www.hunterst.com",
+  "domain": "hunterst.com",
+  "hq": "Wayzata, MN",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "huron-capital",
+  "name": "Huron Capital",
+  "website": "https://www.huroncapital.com",
+  "domain": "huroncapital.com",
+  "hq": "Detroit, MI",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "insight-equity",
+  "name": "Insight Equity",
+  "website": "https://www.insightequity.com",
+  "domain": "insightequity.com",
+  "hq": "Southlake, TX",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "insignia-capital-group",
+  "name": "Insignia Capital Group",
+  "website": "https://www.insigniacap.com",
+  "domain": "insigniacap.com",
+  "hq": "Walnut Creek, CA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "iron-path-capital",
+  "name": "Iron Path Capital",
+  "website": "https://www.ironpathcapital.com",
+  "domain": "ironpathcapital.com",
+  "hq": "Nashville, TN",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "jmh-capital-partners",
+  "name": "JMH Capital Partners",
+  "website": "https://www.jmhcapital.com",
+  "domain": "jmhcapital.com",
+  "hq": "Boston, MA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "juggernaut-capital-partners",
+  "name": "Juggernaut Capital Partners",
+  "website": "https://www.juggernautcap.com",
+  "domain": "juggernautcap.com",
+  "hq": "Washington, DC",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "juna-equity-partners",
+  "name": "Juna Equity Partners",
+  "website": "https://www.junaequitypartners.com",
+  "domain": "junaequitypartners.com",
+  "hq": "Westport, CT",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "juniper-capital-management",
+  "name": "Juniper Capital Management",
+  "website": "https://www.junipercapmgt.com",
+  "domain": "junipercapmgt.com",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "kainos-capital",
+  "name": "Kainos Capital",
+  "website": "https://www.kainoscapital.com",
+  "domain": "kainoscapital.com",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "keystone-capital-management",
+  "name": "Keystone Capital Management",
+  "website": "https://www.keystonecapital.com",
+  "domain": "keystonecapital.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "kian-capital",
+  "name": "Kian Capital",
+  "website": "https://www.kiancapital.com",
+  "domain": "kiancapital.com",
+  "hq": "Charlotte, NC",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "l-capital",
+  "name": "L Capital",
+  "website": "https://www.lcapitalmgmt.com",
+  "domain": "lcapitalmgmt.com",
+  "hq": "San Francisco, CA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "l-squared-capital-partners",
+  "name": "L Squared Capital Partners",
+  "website": "https://www.lsquaredcap.com",
+  "domain": "lsquaredcap.com",
+  "hq": "Newport Beach, CA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "langford-energy-partners",
+  "name": "Langford Energy Partners",
+  "website": "https://www.langfordep.com",
+  "domain": "langfordep.com",
+  "hq": "Austin, TX",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "latticework-capital-management",
+  "name": "Latticework Capital Management",
+  "website": "https://www.latticeworkcapital.com",
+  "domain": "latticeworkcapital.com",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "leavitt-equity-partners",
+  "name": "Leavitt Equity Partners",
+  "website": "https://www.leavittequity.com",
+  "domain": "leavittequity.com",
+  "hq": "Salt Lake City, UT",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "lfm-capital",
+  "name": "LFM Capital",
+  "website": "https://www.lfmcapital.com",
+  "domain": "lfmcapital.com",
+  "hq": "Nashville, TN",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "lightsmith-group",
+  "name": "Lightsmith Group",
+  "website": "https://www.lightsmithgp.com",
+  "domain": "lightsmithgp.com",
+  "hq": "New York, NY",
+  "type": "Growth/Expansion",
+  "tier": 2
+ },
+ {
+  "slug": "lightspring-capital-partners",
+  "name": "Lightspring Capital Partners",
+  "website": "https://www.lightspringcapitalpartners.com",
+  "domain": "lightspringcapitalpartners.com",
+  "hq": "Minneapolis, MN",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "lightview-capital",
+  "name": "Lightview Capital",
+  "website": "https://www.lightviewcapital.com",
+  "domain": "lightviewcapital.com",
+  "hq": "West Palm Beach, FL",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "lilium-group",
+  "name": "Lilium Group",
+  "website": "https://www.lilium-holdings.com",
+  "domain": "lilium-holdings.com",
+  "hq": "Houston, TX",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "lime-rock-new-energy",
+  "name": "Lime Rock New Energy",
+  "website": "https://www.lrnewenergy.com",
+  "domain": "lrnewenergy.com",
+  "hq": "Westport, CT",
+  "type": "Growth/Expansion",
+  "tier": 2
+ },
+ {
+  "slug": "lincolnshire-management",
+  "name": "Lincolnshire Management",
+  "website": "https://www.lincolnshiremgmt.com",
+  "domain": "lincolnshiremgmt.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "lineage-capital",
+  "name": "Lineage Capital",
+  "website": "https://www.lineagecap.com",
+  "domain": "lineagecap.com",
+  "hq": "Boston, MA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "lionshield",
+  "name": "Lionshield",
+  "website": "https://www.lionshield.com",
+  "domain": "lionshield.com",
+  "hq": "Austin, TX",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "lnc-partners",
+  "name": "LNC Partners",
+  "website": "https://www.lnc-partners.com",
+  "domain": "lnc-partners.com",
+  "hq": "Arlington, VA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "lnk-partners",
+  "name": "LNK Partners",
+  "website": "https://www.lnkpartners.com",
+  "domain": "lnkpartners.com",
+  "hq": "White Plains, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "long-arc-capital",
+  "name": "Long Arc Capital",
+  "website": "https://www.longarc.com",
+  "domain": "longarc.com",
+  "hq": "New York, NY",
+  "type": "Growth/Expansion",
+  "tier": 2
+ },
+ {
+  "slug": "longshore-capital-partners",
+  "name": "Longshore Capital Partners",
+  "website": "https://www.longshorecp.com",
+  "domain": "longshorecp.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "longwater-opportunities",
+  "name": "LongWater Opportunities",
+  "website": "https://www.longwateropportunities.com",
+  "domain": "longwateropportunities.com",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "lumerity-capital",
+  "name": "Lumerity Capital",
+  "website": "https://www.lumerity.com",
+  "domain": "lumerity.com",
+  "hq": "Sunny Isles Beach, FL",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "madison-river-capital",
+  "name": "Madison River Capital",
+  "website": "https://www.mrivercapital.com",
+  "domain": "mrivercapital.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "mangrove-equity-partners",
+  "name": "Mangrove Equity Partners",
+  "website": "https://www.mangroveequity.com",
+  "domain": "mangroveequity.com",
+  "hq": "Tampa, FL",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "mbf-healthcare-partners",
+  "name": "MBF Healthcare Partners",
+  "website": "https://www.mbfhp.com",
+  "domain": "mbfhp.com",
+  "hq": "Coral Gables, FL",
+  "type": "Growth/Expansion",
+  "tier": 2
+ },
+ {
+  "slug": "meaningful-partners",
+  "name": "Meaningful Partners",
+  "website": "https://meaningfulpartners.com",
+  "domain": "meaningfulpartners.com",
+  "hq": "Los Angeles, CA",
+  "type": "Growth/Expansion",
+  "tier": 2
+ },
+ {
+  "slug": "midwest-growth-partners",
+  "name": "Midwest Growth Partners",
+  "website": "https://www.mgpfund.com",
+  "domain": "mgpfund.com",
+  "hq": "West Des Moines, IA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "milk-street-ventures",
+  "name": "Milk Street Ventures",
+  "website": "https://www.milkstreetventures.com",
+  "domain": "milkstreetventures.com",
+  "hq": "Boston, MA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "mkh-capital-partners",
+  "name": "MKH Capital Partners",
+  "website": "https://www.mkhpartners.com",
+  "domain": "mkhpartners.com",
+  "hq": "Coral Gables, FL",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "mpe-partners",
+  "name": "MPE Partners",
+  "website": "https://www.mpepartners.com",
+  "domain": "mpepartners.com",
+  "hq": "Boston, MA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "natureza-growth-partners",
+  "name": "Natureza Growth Partners",
+  "website": "https://natureza.co",
+  "domain": "natureza.co",
+  "hq": "Greenwich, CT",
+  "type": "Growth/Expansion",
+  "tier": 2
+ },
+ {
+  "slug": "navimed-capital",
+  "name": "NaviMed Capital",
+  "website": "https://www.navimed.com",
+  "domain": "navimed.com",
+  "hq": "Rosslyn, VA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "new-harbor-capital",
+  "name": "New Harbor Capital",
+  "website": "https://www.newharborcap.com",
+  "domain": "newharborcap.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "nexa-equity",
+  "name": "Nexa Equity",
+  "website": "https://www.nexaequity.com",
+  "domain": "nexaequity.com",
+  "hq": "San Francisco, CA",
+  "type": "Growth/Expansion",
+  "tier": 2
+ },
+ {
+  "slug": "next-coast-legacy",
+  "name": "Next Coast Legacy",
+  "website": "https://www.nextcoastlegacy.com",
+  "domain": "nextcoastlegacy.com",
+  "hq": "Austin, TX",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "north-castle-partners",
+  "name": "North Castle Partners",
+  "website": "https://www.northcastlepartners.com",
+  "domain": "northcastlepartners.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "northern-pacific-group",
+  "name": "Northern Pacific Group",
+  "website": "https://www.northernpacificgroup.com",
+  "domain": "northernpacificgroup.com",
+  "hq": "Minneapolis, MN",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "northlane-capital-partners",
+  "name": "Northlane Capital Partners",
+  "website": "https://www.northlanecapital.com",
+  "domain": "northlanecapital.com",
+  "hq": "Bethesda, MD",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "opengate-capital",
+  "name": "OpenGate Capital",
+  "website": "https://www.opengatecapital.com",
+  "domain": "opengatecapital.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "osceola-capital-management",
+  "name": "Osceola Capital Management",
+  "website": "https://www.osceola.com",
+  "domain": "osceola.com",
+  "hq": "Tampa, FL",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "owner-resource-group",
+  "name": "Owner Resource Group",
+  "website": "https://www.orgroup.com",
+  "domain": "orgroup.com",
+  "hq": "Austin, TX",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "p2-capital-partners",
+  "name": "P2 Capital Partners",
+  "website": "https://www.p2capital.com",
+  "domain": "p2capital.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "paceline-equity-partners",
+  "name": "Paceline Equity Partners",
+  "website": "https://www.pacelineequity.com",
+  "domain": "pacelineequity.com",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "parkergale-capital",
+  "name": "ParkerGale Capital",
+  "website": "https://www.parkergale.com",
+  "domain": "parkergale.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "partnership-capital-growth",
+  "name": "Partnership Capital Growth",
+  "website": "https://www.pcginvestors.com",
+  "domain": "pcginvestors.com",
+  "hq": "Los Gatos, CA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "peakequity-partners",
+  "name": "PeakEquity Partners",
+  "website": "https://www.peakequity.com",
+  "domain": "peakequity.com",
+  "hq": "Villanova, PA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "peloton-equity",
+  "name": "Peloton Equity",
+  "website": "https://www.pelotonequity.com",
+  "domain": "pelotonequity.com",
+  "hq": "Greenwich, CT",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "periscope-equity",
+  "name": "Periscope Equity",
+  "website": "https://www.periscopeequity.com",
+  "domain": "periscopeequity.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "permanent-equity",
+  "name": "Permanent Equity",
+  "website": "https://www.permanentequity.com",
+  "domain": "permanentequity.com",
+  "hq": "Columbia, MO",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "peterson-partners",
+  "name": "Peterson Partners",
+  "website": "https://www.petersonpartners.com",
+  "domain": "petersonpartners.com",
+  "hq": "Salt Lake City, UT",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "pfingsten-partners",
+  "name": "Pfingsten Partners",
+  "website": "https://www.pfingsten.com",
+  "domain": "pfingsten.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "pike-street-capital",
+  "name": "Pike Street Capital",
+  "website": "https://www.pikestreetcapital.com",
+  "domain": "pikestreetcapital.com",
+  "hq": "Seattle, WA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "platte-river-equity",
+  "name": "Platte River Equity",
+  "website": "https://platteriverequity.com",
+  "domain": "platteriverequity.com",
+  "hq": "Denver, CO",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "plexus-capital",
+  "name": "Plexus Capital",
+  "website": "https://www.plexuscap.com",
+  "domain": "plexuscap.com",
+  "hq": "Raleigh, NC",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "pondera-holdings",
+  "name": "Pondera Holdings",
+  "website": "https://www.ponderaholdings.com",
+  "domain": "ponderaholdings.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "post-capital-partners",
+  "name": "Post Capital Partners",
+  "website": "https://www.postcp.com",
+  "domain": "postcp.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "prairie-capital",
+  "name": "Prairie Capital",
+  "website": "https://www.prairie-capital.com",
+  "domain": "prairie-capital.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "primus-capital",
+  "name": "Primus Capital",
+  "website": "https://www.primuscapital.com",
+  "domain": "primuscapital.com",
+  "hq": "Atlanta, GA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "princeton-equity-group",
+  "name": "Princeton Equity Group",
+  "website": "https://www.princetonequity.com",
+  "domain": "princetonequity.com",
+  "hq": "Princeton, NJ",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "promus-equity-partners",
+  "name": "Promus Equity Partners",
+  "website": "https://www.promusequity.com",
+  "domain": "promusequity.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "prospect-hill-growth-partners",
+  "name": "Prospect Hill Growth Partners",
+  "website": "https://www.prospecthillgrowth.com",
+  "domain": "prospecthillgrowth.com",
+  "hq": "Waltham, MA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "prospect-partners",
+  "name": "Prospect Partners",
+  "website": "https://www.prospect-partners.com",
+  "domain": "prospect-partners.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "radial-equity-partners",
+  "name": "Radial Equity Partners",
+  "website": "https://www.radialequity.com",
+  "domain": "radialequity.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "rallyday-partners",
+  "name": "Rallyday Partners",
+  "website": "https://rallydaypartners.com",
+  "domain": "rallydaypartners.com",
+  "hq": "Denver, CO",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "red-arts-capital",
+  "name": "Red Arts Capital",
+  "website": "https://www.redartscapital.com",
+  "domain": "redartscapital.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "rf-investment-partners",
+  "name": "RF Investment Partners",
+  "website": "https://www.rf-partners.com",
+  "domain": "rf-partners.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "river-associates-investments",
+  "name": "River Associates Investments",
+  "website": "https://www.riverassociates.com",
+  "domain": "riverassociates.com",
+  "hq": "Chattanooga, TN",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "riverglade-capital",
+  "name": "RiverGlade Capital",
+  "website": "https://riverglade.com",
+  "domain": "riverglade.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "rlh-equity-partners",
+  "name": "RLH Equity Partners",
+  "website": "https://www.rlhequity.com",
+  "domain": "rlhequity.com",
+  "hq": "Los Angeles, CA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "rlj-equity-partners",
+  "name": "RLJ Equity Partners",
+  "website": "https://www.rljequitypartners.com",
+  "domain": "rljequitypartners.com",
+  "hq": "Bethesda, MD",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "rockbridge-growth-equity",
+  "name": "Rockbridge Growth Equity",
+  "website": "https://www.rbequity.com",
+  "domain": "rbequity.com",
+  "hq": "Detroit, MI",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "rural-american-fund",
+  "name": "Rural American Fund",
+  "website": "https://www.raflp.com",
+  "domain": "raflp.com",
+  "hq": "Deerfield, IL",
+  "type": "Growth/Expansion",
+  "tier": 2
+ },
+ {
+  "slug": "sagewind-capital",
+  "name": "Sagewind Capital",
+  "website": "https://www.sagewindcapital.com",
+  "domain": "sagewindcapital.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "salt-creek-capital",
+  "name": "Salt Creek Capital",
+  "website": "https://www.saltcreekcap.com",
+  "domain": "saltcreekcap.com",
+  "hq": "Woodside, CA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "san-francisco-equity-partners",
+  "name": "San Francisco Equity Partners",
+  "website": "https://www.sfequitypartners.com",
+  "domain": "sfequitypartners.com",
+  "hq": "San Francisco, CA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "saw-mill-capital",
+  "name": "Saw Mill Capital",
+  "website": "https://www.sawmillcapital.com",
+  "domain": "sawmillcapital.com",
+  "hq": "Briarcliff Manor, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "sbj-capital",
+  "name": "SBJ Capital",
+  "website": "https://www.sbjcap.com",
+  "domain": "sbjcap.com",
+  "hq": "Walnut Creek, CA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "seaport-capital",
+  "name": "Seaport Capital",
+  "website": "https://www.seaportcapital.com",
+  "domain": "seaportcapital.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "seaside-equity-partners",
+  "name": "Seaside Equity Partners",
+  "website": "https://www.seasideequity.com",
+  "domain": "seasideequity.com",
+  "hq": "San Diego, CA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "sequel-holdings",
+  "name": "Sequel Holdings",
+  "website": "https://www.sequelholdings.com",
+  "domain": "sequelholdings.com",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "sharpvue-capital",
+  "name": "SharpVue Capital",
+  "website": "https://www.sharpvuecapital.com",
+  "domain": "sharpvuecapital.com",
+  "hq": "Raleigh, NC",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "sheridan-capital-partners",
+  "name": "Sheridan Capital Partners",
+  "website": "https://www.sheridancp.com",
+  "domain": "sheridancp.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "shoreview-industries",
+  "name": "ShoreView Industries",
+  "website": "https://www.shoreview.com",
+  "domain": "shoreview.com",
+  "hq": "Minneapolis, MN",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "soundcore-capital-partners",
+  "name": "Soundcore Capital Partners",
+  "website": "https://www.soundcorecap.com",
+  "domain": "soundcorecap.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "southfield-capital",
+  "name": "Southfield Capital",
+  "website": "https://www.southfieldcapital.com",
+  "domain": "southfieldcapital.com",
+  "hq": "Greenwich, CT",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "spell-capital-partners",
+  "name": "Spell Capital Partners",
+  "website": "https://spellcapital.com",
+  "domain": "spellcapital.com",
+  "hq": "Edina, MN",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "speyside-equity",
+  "name": "Speyside Equity",
+  "website": "https://speysideequity.com",
+  "domain": "speysideequity.com",
+  "hq": "Ann Arbor, MI",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "spring-mountain-capital",
+  "name": "Spring Mountain Capital",
+  "website": "https://www.springmountaincapital.com",
+  "domain": "springmountaincapital.com",
+  "hq": "New York, NY",
+  "type": "Growth/Expansion",
+  "tier": 2
+ },
+ {
+  "slug": "sterling-partners",
+  "name": "Sterling Partners",
+  "website": "https://sterlingpartners.com",
+  "domain": "sterlingpartners.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "stone-goff-partners",
+  "name": "Stone-Goff Partners",
+  "website": "https://www.stonegoff.com",
+  "domain": "stonegoff.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "strattam-capital",
+  "name": "Strattam Capital",
+  "website": "https://www.strattam.com",
+  "domain": "strattam.com",
+  "hq": "Austin, TX",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "svoboda-capital-partners",
+  "name": "Svoboda Capital Partners",
+  "website": "https://www.svoco.com",
+  "domain": "svoco.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "tengram-capital-partners",
+  "name": "Tengram Capital Partners",
+  "website": "https://www.tengramcapital.com",
+  "domain": "tengramcapital.com",
+  "hq": "Westport, CT",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "the-beekman-group",
+  "name": "The Beekman Group",
+  "website": "https://www.thebeekmangroup.com",
+  "domain": "thebeekmangroup.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "the-enterprise-center-capital",
+  "name": "The Enterprise Center Capital",
+  "website": "https://theenterprisecenter.com",
+  "domain": "theenterprisecenter.com",
+  "hq": "Philadelphia, PA",
+  "type": "Growth/Expansion",
+  "tier": 2
+ },
+ {
+  "slug": "the-firmament-group",
+  "name": "The Firmament Group",
+  "website": "https://www.firmament.com",
+  "domain": "firmament.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "the-halifax-group",
+  "name": "The Halifax Group",
+  "website": "https://www.thehalifaxgroup.com",
+  "domain": "thehalifaxgroup.com",
+  "hq": "Washington, DC",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "the-operand-group",
+  "name": "The Operand Group",
+  "website": "https://www.theoperandgroup.com",
+  "domain": "theoperandgroup.com",
+  "hq": "Barrington, IL",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "tilia-holdings",
+  "name": "Tilia Holdings",
+  "website": "https://www.tiliallc.com",
+  "domain": "tiliallc.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "tower-arch-capital",
+  "name": "Tower Arch Capital",
+  "website": "https://www.towerarch.com",
+  "domain": "towerarch.com",
+  "hq": "Draper, UT",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "tower-three-partners",
+  "name": "Tower Three Partners",
+  "website": "https://www.towerthreepartners.com",
+  "domain": "towerthreepartners.com",
+  "hq": "Greenwich, CT",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "transom-capital-group",
+  "name": "Transom Capital Group",
+  "website": "https://transomcap.com",
+  "domain": "transomcap.com",
+  "hq": "El Segundo, CA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "tritium-partners",
+  "name": "Tritium Partners",
+  "website": "https://www.tritiumpartners.com",
+  "domain": "tritiumpartners.com",
+  "hq": "Austin, TX",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "trp-capital-partners",
+  "name": "TRP Capital Partners",
+  "website": "https://www.trpfund.com",
+  "domain": "trpfund.com",
+  "hq": "Birmingham, MI",
+  "type": "Growth/Expansion",
+  "tier": 2
+ },
+ {
+  "slug": "tuckerman-capital",
+  "name": "Tuckerman Capital",
+  "website": "https://www.tuckermancapital.com",
+  "domain": "tuckermancapital.com",
+  "hq": "Hanover, NH",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "two-roads-partners",
+  "name": "Two Roads Partners",
+  "website": "https://www.tworoads.com",
+  "domain": "tworoads.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "updata-partners",
+  "name": "Updata Partners",
+  "website": "https://www.updata.com",
+  "domain": "updata.com",
+  "hq": "Washington, DC",
+  "type": "Growth/Expansion",
+  "tier": 2
+ },
+ {
+  "slug": "varsity-healthcare-partners",
+  "name": "Varsity Healthcare Partners",
+  "website": "https://www.varsityhealthcarepartners.com",
+  "domain": "varsityhealthcarepartners.com",
+  "hq": "Los Angeles, CA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "vesey-street-capital-partners",
+  "name": "Vesey Street Capital Partners",
+  "website": "https://www.vscpllc.com",
+  "domain": "vscpllc.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "victor-capital-partners",
+  "name": "Victor Capital Partners",
+  "website": "https://www.victorcapitalpartners.com",
+  "domain": "victorcapitalpartners.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "weatherford-capital",
+  "name": "Weatherford Capital",
+  "website": "https://www.weatherfordcapital.com",
+  "domain": "weatherfordcapital.com",
+  "hq": "Tampa, FL",
+  "type": "Growth/Expansion",
+  "tier": 2
+ },
+ {
+  "slug": "west-lane-capital-partners",
+  "name": "West Lane Capital Partners",
+  "website": "https://www.westlanecap.com",
+  "domain": "westlanecap.com",
+  "hq": "Los Angeles, CA",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "westlake-asset-management",
+  "name": "Westlake Asset Management",
+  "website": "https://www.westlakellc.com",
+  "domain": "westlakellc.com",
+  "hq": "Austin, TX",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "westshore-capital-partners",
+  "name": "Westshore Capital Partners",
+  "website": "https://www.westshorecapitalpartners.com",
+  "domain": "westshorecapitalpartners.com",
+  "hq": "Tampa, FL",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "white-wolf-capital-group",
+  "name": "White Wolf Capital Group",
+  "website": "https://www.whitewolfcapital.com",
+  "domain": "whitewolfcapital.com",
+  "hq": "Miami, FL",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "wilsquare-capital",
+  "name": "WILsquare Capital",
+  "website": "https://www.wilsquare.com",
+  "domain": "wilsquare.com",
+  "hq": "Saint Louis, MO",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "wsc-company",
+  "name": "WSC & Company",
+  "website": "https://www.wscandcompany.com",
+  "domain": "wscandcompany.com",
+  "hq": "Charlotte, NC",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "zenyth-partners",
+  "name": "Zenyth Partners",
+  "website": "https://www.zenythpartners.com",
+  "domain": "zenythpartners.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2
+ },
+ {
+  "slug": "a-street",
+  "name": "A-Street",
+  "website": "https://www.astreet.com",
+  "domain": "astreet.com",
+  "hq": "Bentonville, AR",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "aavin-private-equity",
+  "name": "AAVIN Private Equity",
+  "website": "https://www.aavin.com",
+  "domain": "aavin.com",
+  "hq": "Cedar Rapids, IA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "abs-capital-partners",
+  "name": "ABS Capital Partners",
+  "website": "https://www.abscapital.com",
+  "domain": "abscapital.com",
+  "hq": "Washington, DC",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "acacia-partners",
+  "name": "Acacia Partners",
+  "website": "https://www.acaciapartnersllc.com",
+  "domain": "acaciapartnersllc.com",
+  "hq": "Austin, TX",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "adit-ventures",
+  "name": "ADIT Ventures",
+  "website": "https://www.aditventures.com",
+  "domain": "aditventures.com",
+  "hq": "New York, NY",
+  "type": "Venture Capital",
+  "tier": 3
+ },
+ {
+  "slug": "advantage-capital-louisiana",
+  "name": "Advantage Capital (Louisiana)",
+  "website": "https://www.advantagecap.com",
+  "domain": "advantagecap.com",
+  "hq": "New Orleans, LA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "aldrich-capital-partners",
+  "name": "Aldrich Capital Partners",
+  "website": "https://www.aldrichcap.com",
+  "domain": "aldrichcap.com",
+  "hq": "Vienna, VA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "alliance-consumer-growth",
+  "name": "Alliance Consumer Growth",
+  "website": "https://www.acgpartners.com",
+  "domain": "acgpartners.com",
+  "hq": "New York, NY",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "altura-capital-group",
+  "name": "Altura Capital Group",
+  "website": "https://www.alturacap.com",
+  "domain": "alturacap.com",
+  "hq": "Coral Gables, FL",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "altus-capital-partners",
+  "name": "Altus Capital Partners",
+  "website": "https://www.altuscapitalpartners.com",
+  "domain": "altuscapitalpartners.com",
+  "hq": "Wilton, CT",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "amberjack-capital-partners",
+  "name": "Amberjack Capital Partners",
+  "website": "https://www.amberjackcapital.com",
+  "domain": "amberjackcapital.com",
+  "hq": "Houston, TX",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "american-discovery-capital",
+  "name": "American Discovery Capital",
+  "website": "https://www.americandiscoverycapital.com",
+  "domain": "americandiscoverycapital.com",
+  "hq": "Los Angeles, CA",
+  "type": "Merchant Banking Firm",
+  "tier": 3
+ },
+ {
+  "slug": "aretex-capital-partners",
+  "name": "Aretex Capital Partners",
+  "website": "https://www.aretexcapital.com",
+  "domain": "aretexcapital.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "argand-partners",
+  "name": "Argand Partners",
+  "website": "https://www.argandequity.com",
+  "domain": "argandequity.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "argentum-new-york",
+  "name": "Argentum (New York)",
+  "website": "https://www.argentumgroup.com",
+  "domain": "argentumgroup.com",
+  "hq": "New York, NY",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "astra-capital-management-washington-dc",
+  "name": "Astra Capital Management (Washington DC)",
+  "website": "https://www.astracapitalmgmt.com",
+  "domain": "astracapitalmgmt.com",
+  "hq": "Washington, DC",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "atlas-merchant-capital",
+  "name": "Atlas Merchant Capital",
+  "website": "https://www.atlasmerchantcapital.com",
+  "domain": "atlasmerchantcapital.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "aua-private-equity-partners",
+  "name": "AUA Private Equity Partners",
+  "website": "https://www.auaequity.com",
+  "domain": "auaequity.com",
+  "hq": "West Palm Beach, FL",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "avathon-capital",
+  "name": "Avathon Capital",
+  "website": "https://avathoncapital.com",
+  "domain": "avathoncapital.com",
+  "hq": "Chicago, IL",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "avila-growth",
+  "name": "Avila Growth",
+  "website": "https://www.avilagrowth.com",
+  "domain": "avilagrowth.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "azalea-capital",
+  "name": "Azalea Capital",
+  "website": "https://www.azaleacapital.com",
+  "domain": "azaleacapital.com",
+  "hq": "Greenville, SC",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "b-29-investments",
+  "name": "B-29 Investments",
+  "website": "https://www.b29investments.com",
+  "domain": "b29investments.com",
+  "hq": "Addison, TX",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "b-flexion-life-sciences",
+  "name": "B-FLEXION Life Sciences",
+  "website": "https://www.gurnetpointcapital.com",
+  "domain": "gurnetpointcapital.com",
+  "hq": "Cambridge, MA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "b12-capital-partners",
+  "name": "B12 Capital Partners",
+  "website": "https://www.b12capitalpartners.com",
+  "domain": "b12capitalpartners.com",
+  "hq": "Shawnee, KS",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "balmoral-funds",
+  "name": "Balmoral Funds",
+  "website": "https://www.balmoralfunds.com",
+  "domain": "balmoralfunds.com",
+  "hq": "Los Angeles, CA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "bankcap-partners",
+  "name": "BankCap Partners",
+  "website": "https://www.bankcap.com",
+  "domain": "bankcap.com",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "banner-capital-lehi",
+  "name": "Banner Capital (Lehi)",
+  "website": "https://www.bannercap.com",
+  "domain": "bannercap.com",
+  "hq": "Lehi, UT",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "basis-vectors",
+  "name": "Basis Vectors",
+  "website": "https://www.basisvectors.com",
+  "domain": "basisvectors.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "bayou-city-energy",
+  "name": "Bayou City Energy",
+  "website": "https://www.bayoucityenergy.com",
+  "domain": "bayoucityenergy.com",
+  "hq": "Houston, TX",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "bdi-partners",
+  "name": "BDI Partners",
+  "website": "https://www.bdipartners.com",
+  "domain": "bdipartners.com",
+  "hq": "Raleigh, NC",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "berenson-company",
+  "name": "Berenson & Company",
+  "website": "https://www.berensonco.com",
+  "domain": "berensonco.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "biscayneamericas-advisers",
+  "name": "BiscayneAmericas Advisers",
+  "website": "https://www.biscayneamericas.com",
+  "domain": "biscayneamericas.com",
+  "hq": "Miami, FL",
+  "type": "Asset Manager",
+  "tier": 3
+ },
+ {
+  "slug": "black-oak-capital",
+  "name": "Black Oak Capital",
+  "website": "https://www.blackoakcp.com",
+  "domain": "blackoakcp.com",
+  "hq": "Salt Lake City, UT",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "black-pearl-global-investments",
+  "name": "Black Pearl Global Investments",
+  "website": "https://www.blackpearlglobalinvestments.com",
+  "domain": "blackpearlglobalinvestments.com",
+  "hq": "Charlotte, NC",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "blackeagle-partners",
+  "name": "BlackEagle Partners",
+  "website": "https://www.blackeaglepartners.com",
+  "domain": "blackeaglepartners.com",
+  "hq": "Bloomfield Hills, MI",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "blue-delta-capital-partners",
+  "name": "Blue Delta Capital Partners",
+  "website": "https://www.bluedeltacapitalpartners.com",
+  "domain": "bluedeltacapitalpartners.com",
+  "hq": "McLean, VA",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "bookend-capital-partners",
+  "name": "Bookend Capital Partners",
+  "website": "https://www.bookendcapital.com",
+  "domain": "bookendcapital.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "brass-ring-capital",
+  "name": "Brass Ring Capital",
+  "website": "https://www.brassringcapital.com",
+  "domain": "brassringcapital.com",
+  "hq": "Minnetonka, MN",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "breck-partners",
+  "name": "Breck Partners",
+  "website": "https://www.breckpartners.com",
+  "domain": "breckpartners.com",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "bridge-growth-partners",
+  "name": "Bridge Growth Partners",
+  "website": "https://www.bridgegrowthpartners.com",
+  "domain": "bridgegrowthpartners.com",
+  "hq": "New York, NY",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "brightwater-partners",
+  "name": "BrightWater Partners",
+  "website": "https://www.bwpcapital.com",
+  "domain": "bwpcapital.com",
+  "hq": "Enterprise, AL",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "brookside-equity-partners",
+  "name": "Brookside Equity Partners",
+  "website": "https://www.brooksideequity.com",
+  "domain": "brooksideequity.com",
+  "hq": "Stamford, CT",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "bruckmann-rosser-sherrill-company",
+  "name": "Bruckmann, Rosser, Sherrill & Company",
+  "website": "https://www.brs.com",
+  "domain": "brs.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "bw-forsyth-partners",
+  "name": "BW Forsyth Partners",
+  "website": "https://www.bwforsyth.com",
+  "domain": "bwforsyth.com",
+  "hq": "Saint Louis, MO",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "caltius-equity-partners",
+  "name": "Caltius Equity Partners",
+  "website": "https://www.caltiusequitypartners.com",
+  "domain": "caltiusequitypartners.com",
+  "hq": "Los Angeles, CA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "camden-partners",
+  "name": "Camden Partners",
+  "website": "https://www.camdenpartners.com",
+  "domain": "camdenpartners.com",
+  "hq": "Owings Mills, MD",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "capital-for-business",
+  "name": "Capital For Business",
+  "website": "https://www.cfb.com",
+  "domain": "cfb.com",
+  "hq": "Saint Louis, MO",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "carrick-capital-partners",
+  "name": "Carrick Capital Partners",
+  "website": "https://www.carrickcapitalpartners.com",
+  "domain": "carrickcapitalpartners.com",
+  "hq": "San Francisco, CA",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "cartesian-capital-group",
+  "name": "Cartesian Capital Group",
+  "website": "https://www.cartesiangroup.com",
+  "domain": "cartesiangroup.com",
+  "hq": "New York, NY",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "castanea-partners",
+  "name": "Castanea Partners",
+  "website": "https://www.castaneapartners.com",
+  "domain": "castaneapartners.com",
+  "hq": "Newton, MA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "catalyst-investors",
+  "name": "Catalyst Investors",
+  "website": "https://www.catalyst.com",
+  "domain": "catalyst.com",
+  "hq": "New York, NY",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "centana-growth-partners",
+  "name": "Centana Growth Partners",
+  "website": "https://www.centanagrowth.com",
+  "domain": "centanagrowth.com",
+  "hq": "Palo Alto, CA",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "century-equity-partners",
+  "name": "Century Equity Partners",
+  "website": "https://www.cepfunds.com",
+  "domain": "cepfunds.com",
+  "hq": "Boston, MA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "century-park-capital-partners",
+  "name": "Century Park Capital Partners",
+  "website": "https://www.centuryparkcapital.com",
+  "domain": "centuryparkcapital.com",
+  "hq": "El Segundo, CA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "champlain-capital",
+  "name": "Champlain Capital",
+  "website": "https://www.champlaincapital.com",
+  "domain": "champlaincapital.com",
+  "hq": "San Francisco, CA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "cic-partners",
+  "name": "CIC Partners",
+  "website": "https://www.cicpartners.com",
+  "domain": "cicpartners.com",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "cimbal-capital-group",
+  "name": "Cimbal Capital Group",
+  "website": "https://www.cimbal.com",
+  "domain": "cimbal.com",
+  "hq": "Las Vegas, NV",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "clearlight-partners",
+  "name": "ClearLight Partners",
+  "website": "https://www.clearlightpartners.com",
+  "domain": "clearlightpartners.com",
+  "hq": "Newport Beach, CA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "clovis-point-capital",
+  "name": "Clovis Point Capital",
+  "website": "https://clovispoint.com",
+  "domain": "clovispoint.com",
+  "hq": "Houston, TX",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "cm-equity-partners",
+  "name": "CM Equity Partners",
+  "website": "https://www.cmequity.com",
+  "domain": "cmequity.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "cohere-capital-partners",
+  "name": "Cohere Capital Partners",
+  "website": "https://www.coherecapital.com",
+  "domain": "coherecapital.com",
+  "hq": "Boston, MA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "contour-ridge",
+  "name": "Contour Ridge",
+  "website": "https://www.contourridge.com",
+  "domain": "contourridge.com",
+  "hq": "San Antonio, TX",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "corbel-capital-partners",
+  "name": "Corbel Capital Partners",
+  "website": "https://www.corbelcap.com",
+  "domain": "corbelcap.com",
+  "hq": "Los Angeles, CA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "corinthian-capital-group",
+  "name": "Corinthian Capital Group",
+  "website": "https://www.corinthiancap.com",
+  "domain": "corinthiancap.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "crossplane-capital",
+  "name": "Crossplane Capital",
+  "website": "https://www.crossplanecapital.com",
+  "domain": "crossplanecapital.com",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "crosstimbers-capital-group",
+  "name": "Crosstimbers Capital Group",
+  "website": "https://www.crosstimbers.com",
+  "domain": "crosstimbers.com",
+  "hq": "Houston, TX",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "crowdout-capital",
+  "name": "CrowdOut Capital",
+  "website": "https://www.crowdout.com",
+  "domain": "crowdout.com",
+  "hq": "Austin, TX",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "crown-capital-atlanta",
+  "name": "Crown Capital (Atlanta)",
+  "website": "https://www.crown-inv.com",
+  "domain": "crown-inv.com",
+  "hq": "Atlanta, GA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "cw-industrial-partners",
+  "name": "CW Industrial Partners",
+  "website": "https://www.cwindustrials.com",
+  "domain": "cwindustrials.com",
+  "hq": "Cleveland, OH",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "dalfort-capital-partners",
+  "name": "DalFort Capital Partners",
+  "website": "https://www.dalfortcapital.com",
+  "domain": "dalfortcapital.com",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "delos-capital",
+  "name": "Delos Capital",
+  "website": "https://www.deloscap.com",
+  "domain": "deloscap.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "delta-v-capital",
+  "name": "Delta-v Capital",
+  "website": "https://www.deltavcapital.com",
+  "domain": "deltavcapital.com",
+  "hq": "Denver, CO",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "demopolis-equity-partners",
+  "name": "Demopolis Equity Partners",
+  "website": "https://www.demopolisequity.com",
+  "domain": "demopolisequity.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "dos-rios-partners",
+  "name": "Dos Rios Partners",
+  "website": "https://www.dosriospartners.com",
+  "domain": "dosriospartners.com",
+  "hq": "Austin, TX",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "edgewater-capital-partners",
+  "name": "Edgewater Capital Partners",
+  "website": "https://www.edgewatercapital.com",
+  "domain": "edgewatercapital.com",
+  "hq": "Cleveland, OH",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "egis-capital-partners",
+  "name": "Egis Capital Partners",
+  "website": "https://www.egiscapitalpartners.com",
+  "domain": "egiscapitalpartners.com",
+  "hq": "Summit, NJ",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "ellipse-capital",
+  "name": "Ellipse Capital",
+  "website": "https://www.ellipsecapital.com",
+  "domain": "ellipsecapital.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "emerging-capital-partners",
+  "name": "Emerging Capital Partners",
+  "website": "https://www.ecpinvestments.com",
+  "domain": "ecpinvestments.com",
+  "hq": "Washington, DC",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "enhanced-healthcare-partners",
+  "name": "Enhanced Healthcare Partners",
+  "website": "https://www.enhancedhealthcare.com",
+  "domain": "enhancedhealthcare.com",
+  "hq": "Santa Monica, CA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "equality-asset-management",
+  "name": "Equality Asset Management",
+  "website": "https://www.equalityassetmanagement.com",
+  "domain": "equalityassetmanagement.com",
+  "hq": "Boston, MA",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "equity-international",
+  "name": "Equity International",
+  "website": "https://www.equityinternational.com",
+  "domain": "equityinternational.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "everberg-capital",
+  "name": "Everberg Capital",
+  "website": "https://www.everbergcapital.com",
+  "domain": "everbergcapital.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "everlane-equity-partners",
+  "name": "Everlane Equity Partners",
+  "website": "https://www.everlaneequity.com",
+  "domain": "everlaneequity.com",
+  "hq": "Boston, MA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "excolere-equity-partners",
+  "name": "Excolere Equity Partners",
+  "website": "https://www.excolerepartners.com",
+  "domain": "excolerepartners.com",
+  "hq": "Los Angeles, CA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "falconpoint-capital-partners",
+  "name": "FalconPoint Capital Partners",
+  "website": "https://www.falconpointpartners.com",
+  "domain": "falconpointpartners.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "fg1-partners",
+  "name": "FG1 Partners",
+  "website": "https://www.fg1partners.com",
+  "domain": "fg1partners.com",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "first-beverage-group",
+  "name": "First Beverage Group",
+  "website": "https://www.firstbev.com",
+  "domain": "firstbev.com",
+  "hq": "Los Angeles, CA",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "first-nations-capital-partners",
+  "name": "First Nations Capital Partners",
+  "website": "https://www.firstnationscapitalpartners.com",
+  "domain": "firstnationscapitalpartners.com",
+  "hq": "Woodland Hills, CA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "footbridge-partners",
+  "name": "Footbridge Partners",
+  "website": "https://www.footbridgepartners.com",
+  "domain": "footbridgepartners.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "founders-equity-partners",
+  "name": "Founders Equity Partners",
+  "website": "https://e58.a67.myftpupload.com",
+  "domain": "e58.a67.myftpupload.com",
+  "hq": "Jackson, WY",
+  "type": "Secondary Buyer",
+  "tier": 3
+ },
+ {
+  "slug": "fow-partners",
+  "name": "FoW Partners",
+  "website": "https://www.fowpartners.com",
+  "domain": "fowpartners.com",
+  "hq": "Portland, ME",
+  "type": "Impact Investing",
+  "tier": 3
+ },
+ {
+  "slug": "frontline-healthcare-partners",
+  "name": "Frontline Healthcare Partners",
+  "website": "https://www.frontlinehcp.com",
+  "domain": "frontlinehcp.com",
+  "hq": "Charleston, SC",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "g-scott-capital-partners",
+  "name": "G. Scott Capital Partners",
+  "website": "https://www.scottcap.com",
+  "domain": "scottcap.com",
+  "hq": "Darien, CT",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "garden-city-equity",
+  "name": "Garden City Equity",
+  "website": "https://www.gardencityequity.com",
+  "domain": "gardencityequity.com",
+  "hq": "Jupiter, FL",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "gen-cap-america",
+  "name": "Gen Cap America",
+  "website": "https://www.gencapamerica.com",
+  "domain": "gencapamerica.com",
+  "hq": "Nashville, TN",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "generation-growth-capital",
+  "name": "Generation Growth Capital",
+  "website": "https://www.generationgrowth.com",
+  "domain": "generationgrowth.com",
+  "hq": "Milwaukee, WI",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "generation-partners",
+  "name": "Generation Partners",
+  "website": "https://www.generation.com",
+  "domain": "generation.com",
+  "hq": "Greenwich, CT",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "genesis-park",
+  "name": "Genesis Park",
+  "website": "https://www.genesis-park.com",
+  "domain": "genesis-park.com",
+  "hq": "Houston, TX",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "global-environment-fund",
+  "name": "Global Environment Fund",
+  "website": "https://www.globalenvironmentfund.com",
+  "domain": "globalenvironmentfund.com",
+  "hq": "Bethesda, MD",
+  "type": "Asset Manager",
+  "tier": 3
+ },
+ {
+  "slug": "goldner-hawn",
+  "name": "Goldner Hawn",
+  "website": "https://www.goldnerhawn.com",
+  "domain": "goldnerhawn.com",
+  "hq": "Minneapolis, MN",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "goode-partners",
+  "name": "Goode Partners",
+  "website": "https://www.goodepartners.com",
+  "domain": "goodepartners.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "gpb-capital",
+  "name": "GPB Capital",
+  "website": "https://www.gpb-cap.com",
+  "domain": "gpb-cap.com",
+  "hq": "New York, NY",
+  "type": "Asset Manager",
+  "tier": 3
+ },
+ {
+  "slug": "graham-allen-partners",
+  "name": "Graham Allen Partners",
+  "website": "https://www.graham-allen.com",
+  "domain": "graham-allen.com",
+  "hq": "South Bend, IN",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "granite-growth-health-partners",
+  "name": "Granite Growth Health Partners",
+  "website": "https://www.granitegrowthhealthpartners.com",
+  "domain": "granitegrowthhealthpartners.com",
+  "hq": "Hillsborough, CA",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "greenhaven-partners",
+  "name": "Greenhaven Partners",
+  "website": "https://www.greenhavenpartners.com",
+  "domain": "greenhavenpartners.com",
+  "hq": "Stamford, CT",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "greenridge-growth-partners",
+  "name": "Greenridge Growth Partners",
+  "website": "https://www.greenridgegrowth.com",
+  "domain": "greenridgegrowth.com",
+  "hq": "Austin, TX",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "greybull-stewardship",
+  "name": "Greybull Stewardship",
+  "website": "https://www.greybullstewardship.com",
+  "domain": "greybullstewardship.com",
+  "hq": "Jackson, WY",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "growth-street-partners",
+  "name": "Growth Street Partners",
+  "website": "https://www.growthstreetpartners.com",
+  "domain": "growthstreetpartners.com",
+  "hq": "San Francisco, CA",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "growthcurve-capital",
+  "name": "GrowthCurve Capital",
+  "website": "https://www.growthcurvecapital.com",
+  "domain": "growthcurvecapital.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "guidepost-growth-equity",
+  "name": "Guidepost Growth Equity",
+  "website": "https://guidepostgrowth.com",
+  "domain": "guidepostgrowth.com",
+  "hq": "Boston, MA",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "haddington-ventures",
+  "name": "Haddington Ventures",
+  "website": "https://www.hvllc.com",
+  "domain": "hvllc.com",
+  "hq": "Houston, TX",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "hadley-capital",
+  "name": "Hadley Capital",
+  "website": "https://www.hadleycapital.com",
+  "domain": "hadleycapital.com",
+  "hq": "Wilmette, IL",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "hall-capital",
+  "name": "Hall Capital",
+  "website": "https://www.hall-capital.com",
+  "domain": "hall-capital.com",
+  "hq": "Oklahoma City, OK",
+  "type": "PE-Backed Company",
+  "tier": 3
+ },
+ {
+  "slug": "harbour-group",
+  "name": "Harbour Group",
+  "website": "https://www.harbourgroup.com",
+  "domain": "harbourgroup.com",
+  "hq": "Saint Louis, MO",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "havencrest-capital-management",
+  "name": "Havencrest Capital Management",
+  "website": "https://www.havencrest.com",
+  "domain": "havencrest.com",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "hayden-creek-capital",
+  "name": "Hayden Creek Capital",
+  "website": "https://www.haydencreekcapital.com",
+  "domain": "haydencreekcapital.com",
+  "hq": "San Francisco, CA",
+  "type": "Fundless Sponsor",
+  "tier": 3
+ },
+ {
+  "slug": "healthedge-investment-partners",
+  "name": "HealthEdge Investment Partners",
+  "website": "https://www.healthedgepartners.com",
+  "domain": "healthedgepartners.com",
+  "hq": "Tampa, FL",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "heartland-equity-partners",
+  "name": "Heartland Equity Partners",
+  "website": "https://www.heartland.fund",
+  "domain": "heartland.fund",
+  "hq": "Brooklyn Center, MN",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "hidden-river-strategic-capital",
+  "name": "Hidden River Strategic Capital",
+  "website": "https://hiddenrivercap.com",
+  "domain": "hiddenrivercap.com",
+  "hq": "Radnor, PA",
+  "type": "Mezzanine",
+  "tier": 3
+ },
+ {
+  "slug": "highbar-partners",
+  "name": "HighBar Partners",
+  "website": "https://www.highbarpartners.com",
+  "domain": "highbarpartners.com",
+  "hq": "Menlo Park, CA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "highpost-capital",
+  "name": "HighPost Capital",
+  "website": "https://www.highpost.com",
+  "domain": "highpost.com",
+  "hq": "West Palm Beach, FL",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "icv-partners",
+  "name": "ICV Partners",
+  "website": "https://www.icvpartners.com",
+  "domain": "icvpartners.com",
+  "hq": "Miami, FL",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "impact-engine",
+  "name": "Impact Engine",
+  "website": "https://www.theimpactengine.com",
+  "domain": "theimpactengine.com",
+  "hq": "Chicago, IL",
+  "type": "Impact Investing",
+  "tier": 3
+ },
+ {
+  "slug": "interalpen-partners",
+  "name": "InterAlpen Partners",
+  "website": "https://www.interalpenpartners.com",
+  "domain": "interalpenpartners.com",
+  "hq": "Omaha, NE",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "intrinsic-capital-partners",
+  "name": "Intrinsic Capital Partners",
+  "website": "https://www.intrinsiccapitalpartners.com",
+  "domain": "intrinsiccapitalpartners.com",
+  "hq": "Conshohocken, PA",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "invision-capital",
+  "name": "Invision Capital",
+  "website": "https://www.invcg.com",
+  "domain": "invcg.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "j-h-whitney-capital-partners",
+  "name": "J.H. Whitney Capital Partners",
+  "website": "https://www.whitney.com",
+  "domain": "whitney.com",
+  "hq": "New Canaan, CT",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "jlm-financial-investments",
+  "name": "JLM Financial Investments",
+  "website": "https://www.jlmfinancialinvestments.com",
+  "domain": "jlmfinancialinvestments.com",
+  "hq": "Austin, TX",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "kain-capital",
+  "name": "Kain Capital",
+  "website": "https://www.kaincap.com",
+  "domain": "kaincap.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "karpreilly",
+  "name": "KarpReilly",
+  "website": "https://www.karpreilly.com",
+  "domain": "karpreilly.com",
+  "hq": "Greenwich, CT",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "kiron-capital",
+  "name": "Kiron Capital",
+  "website": "https://www.kironcapital.com",
+  "domain": "kironcapital.com",
+  "hq": "Plano, TX",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "klh-capital",
+  "name": "KLH Capital",
+  "website": "https://www.klhcapital.com",
+  "domain": "klhcapital.com",
+  "hq": "Tampa, FL",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "korr-acquisitions-group",
+  "name": "KORR Acquisitions Group",
+  "website": "https://www.korrag.com",
+  "domain": "korrag.com",
+  "hq": "Westbury, NY",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "krf-capital",
+  "name": "KRF Capital",
+  "website": "https://www.krfcap.com",
+  "domain": "krfcap.com",
+  "hq": "Atherton, CA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "ksv-global-innovations",
+  "name": "KSV Global Innovations",
+  "website": "https://www.ksvglobal.com",
+  "domain": "ksvglobal.com",
+  "hq": "Boston, MA",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "lateral-investment-management",
+  "name": "Lateral Investment Management",
+  "website": "https://www.lateralim.com",
+  "domain": "lateralim.com",
+  "hq": "San Mateo, CA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "level-5-capital-partners",
+  "name": "Level 5 Capital Partners",
+  "website": "https://www.lfivecapital.com",
+  "domain": "lfivecapital.com",
+  "hq": "Atlanta, GA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "lewis-clark-partners",
+  "name": "Lewis & Clark Partners",
+  "website": "https://lewisandclarkpartners.com",
+  "domain": "lewisandclarkpartners.com",
+  "hq": "Saint Louis, MO",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "linx-partners",
+  "name": "Linx Partners",
+  "website": "https://www.linxpartners.com",
+  "domain": "linxpartners.com",
+  "hq": "Atlanta, GA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "lion-equity-investment-advisors",
+  "name": "Lion Equity Investment Advisors",
+  "website": "https://www.lionequity.com",
+  "domain": "lionequity.com",
+  "hq": "Denver, CO",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "lone-view-capital",
+  "name": "Lone View Capital",
+  "website": "https://loneviewcap.com",
+  "domain": "loneviewcap.com",
+  "hq": "Los Angeles, CA",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "long-point-capital",
+  "name": "Long Point Capital",
+  "website": "https://www.longpointcapital.com",
+  "domain": "longpointcapital.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "longuevue-capital",
+  "name": "LongueVue Capital",
+  "website": "https://www.lvcpartners.com",
+  "domain": "lvcpartners.com",
+  "hq": "New Orleans, LA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "lorient-capital-management",
+  "name": "Lorient Capital Management",
+  "website": "https://www.lorientcap.com",
+  "domain": "lorientcap.com",
+  "hq": "Birmingham, MI",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "ltv-saas-fund",
+  "name": "LTV SaaS Fund",
+  "website": "https://ltv.fund",
+  "domain": "ltv.fund",
+  "hq": "Denver, CO",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "lumos-capital-group",
+  "name": "Lumos Capital Group",
+  "website": "https://www.lumoscapitalgroup.com",
+  "domain": "lumoscapitalgroup.com",
+  "hq": "New York, NY",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "lyfe-capital",
+  "name": "LYFE Capital",
+  "website": "https://www.lyfecapital.com",
+  "domain": "lyfecapital.com",
+  "hq": "Menlo Park, CA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "m-c-partners",
+  "name": "M/C Partners",
+  "website": "https://www.mcpartners.com",
+  "domain": "mcpartners.com",
+  "hq": "Boston, MA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "maddix-capital",
+  "name": "Maddix Capital",
+  "website": "https://www.maddixcapital.com",
+  "domain": "maddixcapital.com",
+  "hq": "Lehi, UT",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "main-street-capital-holdings",
+  "name": "Main Street Capital Holdings",
+  "website": "https://www.mainstcap.com",
+  "domain": "mainstcap.com",
+  "hq": "Sarasota, FL",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "manhattan-west-asset-management",
+  "name": "Manhattan West Asset Management",
+  "website": "https://manhattanwest.com",
+  "domain": "manhattanwest.com",
+  "hq": "Los Angeles, CA",
+  "type": "Asset Manager",
+  "tier": 3
+ },
+ {
+  "slug": "manna-tree",
+  "name": "Manna Tree",
+  "website": "https://www.mannatreepartners.com",
+  "domain": "mannatreepartners.com",
+  "hq": "Denver, CO",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "maven-equity-partners",
+  "name": "Maven Equity Partners",
+  "website": "https://mavenequitypartners.com",
+  "domain": "mavenequitypartners.com",
+  "hq": "Larkspur, CA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "may-river-capital",
+  "name": "May River Capital",
+  "website": "https://www.mayrivercapital.com",
+  "domain": "mayrivercapital.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "mcm-capital-partners",
+  "name": "MCM Capital Partners",
+  "website": "https://www.mcmcapital.com",
+  "domain": "mcmcapital.com",
+  "hq": "Beachwood, OH",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "medequity-capital",
+  "name": "MedEquity Capital",
+  "website": "https://www.medequity.com",
+  "domain": "medequity.com",
+  "hq": "Waltham, MA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "mereo-capital-partners",
+  "name": "Mereo Capital Partners",
+  "website": "https://www.mereocapitalpartners.com",
+  "domain": "mereocapitalpartners.com",
+  "hq": "Conshohocken, PA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "merida-capital-holdings",
+  "name": "Merida Capital Holdings",
+  "website": "https://www.meridacap.com",
+  "domain": "meridacap.com",
+  "hq": "Rye, NY",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "midstates-capital",
+  "name": "MidStates Capital",
+  "website": "https://www.midstatescap.com",
+  "domain": "midstatescap.com",
+  "hq": "Overland Park, KS",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "mill-road-capital",
+  "name": "Mill Road Capital",
+  "website": "https://www.millroadcapital.com",
+  "domain": "millroadcapital.com",
+  "hq": "Greenwich, CT",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "milton-street-capital",
+  "name": "Milton Street Capital",
+  "website": "https://www.miltonstreetcap.com",
+  "domain": "miltonstreetcap.com",
+  "hq": "Houston, TX",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "moonsail-capital",
+  "name": "MoonSail Capital",
+  "website": "https://www.moonsailcapital.com",
+  "domain": "moonsailcapital.com",
+  "hq": "San Juan, PR",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "mp-next-management",
+  "name": "MP Next Management",
+  "website": "https://mpnextcapital.com",
+  "domain": "mpnextcapital.com",
+  "hq": "Villanova, PA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "new-heritage-capital",
+  "name": "New Heritage Capital",
+  "website": "https://www.newheritagecapital.com",
+  "domain": "newheritagecapital.com",
+  "hq": "Boston, MA",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "newcastle-partners",
+  "name": "NewCastle Partners",
+  "website": "https://www.newcastle-partners.com",
+  "domain": "newcastle-partners.com",
+  "hq": "Greenwich, CT",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "nightdragon",
+  "name": "NightDragon",
+  "website": "https://www.nightdragon.com",
+  "domain": "nightdragon.com",
+  "hq": "San Francisco, CA",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "north-branch-capital",
+  "name": "North Branch Capital",
+  "website": "https://www.northbranchcap.com",
+  "domain": "northbranchcap.com",
+  "hq": "Oak Brook, IL",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "novaquest-capital-management",
+  "name": "NovaQuest Capital Management",
+  "website": "https://www.novaquest.com",
+  "domain": "novaquest.com",
+  "hq": "Raleigh, NC",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "orangewood-partners",
+  "name": "Orangewood Partners",
+  "website": "https://www.orangewoodpartners.com",
+  "domain": "orangewoodpartners.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "orchard-holdings-group",
+  "name": "Orchard Holdings Group",
+  "website": "https://www.orchardholdings.com",
+  "domain": "orchardholdings.com",
+  "hq": "Cincinnati, OH",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "paperclip-ventures",
+  "name": "Paperclip Ventures",
+  "website": "https://www.paperclipventures.com",
+  "domain": "paperclipventures.com",
+  "hq": "San Francisco, CA",
+  "type": "Venture Capital",
+  "tier": 3
+ },
+ {
+  "slug": "parallel49-equity",
+  "name": "Parallel49 Equity",
+  "website": "https://www.p49equity.com",
+  "domain": "p49equity.com",
+  "hq": "Lake Forest, IL",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "pegasus-capital-advisors",
+  "name": "Pegasus Capital Advisors",
+  "website": "https://www.pcalp.com",
+  "domain": "pcalp.com",
+  "hq": "Stamford, CT",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "perkin-industries",
+  "name": "Perkin Industries",
+  "website": "https://www.perkinindustries.com",
+  "domain": "perkinindustries.com",
+  "hq": "New Orleans, LA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "petros-partners",
+  "name": "Petros Partners",
+  "website": "https://www.petrospartners.com",
+  "domain": "petrospartners.com",
+  "hq": "Austin, TX",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "platform-partners",
+  "name": "Platform Partners",
+  "website": "https://www.platformllc.com",
+  "domain": "platformllc.com",
+  "hq": "Houston, TX",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "plymouth-growth",
+  "name": "Plymouth Growth",
+  "website": "https://straylightcapital.com",
+  "domain": "straylightcapital.com",
+  "hq": "Ann Arbor, MI",
+  "type": "Venture Capital",
+  "tier": 3
+ },
+ {
+  "slug": "praesidian-capital",
+  "name": "Praesidian Capital",
+  "website": "https://www.praesidian.com",
+  "domain": "praesidian.com",
+  "hq": "Oklahoma City, OK",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "presidio-investors",
+  "name": "Presidio Investors",
+  "website": "https://www.presidioinvestors.com",
+  "domain": "presidioinvestors.com",
+  "hq": "Austin, TX",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "prophet-equity",
+  "name": "Prophet Equity",
+  "website": "https://www.prophetequity.com",
+  "domain": "prophetequity.com",
+  "hq": "Southlake, TX",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "pt-capital",
+  "name": "Pt Capital",
+  "website": "https://www.ptcapital.com",
+  "domain": "ptcapital.com",
+  "hq": "Anchorage, AK",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "quad-partners",
+  "name": "Quad Partners",
+  "website": "https://www.quadpartners.com",
+  "domain": "quadpartners.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "rainier-partners",
+  "name": "Rainier Partners",
+  "website": "https://rainierpartners.com",
+  "domain": "rainierpartners.com",
+  "hq": "Seattle, WA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "rc-capital-cincinnati",
+  "name": "RC Capital (Cincinnati)",
+  "website": "https://www.rccf.com",
+  "domain": "rccf.com",
+  "hq": "Cincinnati, OH",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "realization-capital-partners",
+  "name": "Realization Capital Partners",
+  "website": "https://realicap.com",
+  "domain": "realicap.com",
+  "hq": "Menlo Park, CA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "reignrock-capital-partners",
+  "name": "ReignRock Capital Partners",
+  "website": "https://www.reignrock.com",
+  "domain": "reignrock.com",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "renovo-capital",
+  "name": "Renovo Capital",
+  "website": "https://www.renovocapital.com",
+  "domain": "renovocapital.com",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "resilience-capital-partners",
+  "name": "Resilience Capital Partners",
+  "website": "https://www.resiliencecapital.com",
+  "domain": "resiliencecapital.com",
+  "hq": "Cleveland, OH",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "resilient-capital-partners",
+  "name": "Resilient Capital Partners",
+  "website": "https://www.resilientcappartners.com",
+  "domain": "resilientcappartners.com",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "riata-capital-group",
+  "name": "Riata Capital Group",
+  "website": "https://www.riatacapital.com",
+  "domain": "riatacapital.com",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "rise-run-capital",
+  "name": "Rise Run Capital",
+  "website": "https://www.riseruncapital.com",
+  "domain": "riseruncapital.com",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "riverarch-equity-partners",
+  "name": "Riverarch Equity Partners",
+  "website": "https://www.riverarch.com",
+  "domain": "riverarch.com",
+  "hq": "Pittsburgh, PA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "riverside-partners",
+  "name": "Riverside Partners",
+  "website": "https://www.riversidepartners.com",
+  "domain": "riversidepartners.com",
+  "hq": "Boston, MA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "rock-hill-capital",
+  "name": "Rock Hill Capital",
+  "website": "https://www.rockhillcap.com",
+  "domain": "rockhillcap.com",
+  "hq": "Houston, TX",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "rock-island-capital",
+  "name": "Rock Island Capital",
+  "website": "https://www.rockislandcapital.com",
+  "domain": "rockislandcapital.com",
+  "hq": "Oak Brook, IL",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "roebling-capital-partners",
+  "name": "Roebling Capital Partners",
+  "website": "https://www.roeblingcp.com",
+  "domain": "roeblingcp.com",
+  "hq": "Cincinnati, OH",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "ronin-equity-partners-new-york",
+  "name": "Ronin Equity Partners(New York)",
+  "website": "https://www.roninequitypartners.com",
+  "domain": "roninequitypartners.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "rosemont-investment-group",
+  "name": "Rosemont Investment Group",
+  "website": "https://www.rosemontinv.com",
+  "domain": "rosemontinv.com",
+  "hq": "Conshohocken, PA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "rosewood-private-investments",
+  "name": "Rosewood Private Investments",
+  "website": "https://www.rosewoodpi.com",
+  "domain": "rosewoodpi.com",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "rosser-capital-partners",
+  "name": "Rosser Capital Partners",
+  "website": "https://www.rossercapitalpartners.com",
+  "domain": "rossercapitalpartners.com",
+  "hq": "Greenwich, CT",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "rtc-partners",
+  "name": "RTC Partners",
+  "website": "https://www.rtcpartners.com",
+  "domain": "rtcpartners.com",
+  "hq": "Miami, FL",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "sage-capital",
+  "name": "Sage Capital",
+  "website": "https://www.sagecapitalllc.com",
+  "domain": "sagecapitalllc.com",
+  "hq": "Saint Louis, MO",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "sageview-capital",
+  "name": "Sageview Capital",
+  "website": "https://www.sageviewcapital.com",
+  "domain": "sageviewcapital.com",
+  "hq": "Palo Alto, CA",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "samson-investment-partners",
+  "name": "Samson Investment Partners",
+  "website": "https://www.samsonip.com",
+  "domain": "samsonip.com",
+  "hq": "New York, NY",
+  "type": "Family Office",
+  "tier": 3
+ },
+ {
+  "slug": "sandton-capital-partners",
+  "name": "Sandton Capital Partners",
+  "website": "https://www.sandtoncapital.com",
+  "domain": "sandtoncapital.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "saratoga-partners",
+  "name": "Saratoga Partners",
+  "website": "https://www.saratogapartners.com",
+  "domain": "saratogapartners.com",
+  "hq": "New York, NY",
+  "type": "Lender/Debt Provider",
+  "tier": 3
+ },
+ {
+  "slug": "satori-capital",
+  "name": "Satori Capital",
+  "website": "https://www.satoricapital.com",
+  "domain": "satoricapital.com",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "savano-capital-partners",
+  "name": "Savano Capital Partners",
+  "website": "https://savanocapital.com",
+  "domain": "savanocapital.com",
+  "hq": "Baltimore, MD",
+  "type": "Venture Capital",
+  "tier": 3
+ },
+ {
+  "slug": "scaleco-capital",
+  "name": "ScaleCo Capital",
+  "website": "https://scaleco.com",
+  "domain": "scaleco.com",
+  "hq": "Cleveland, OH",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "sciens-capital-management",
+  "name": "Sciens Capital Management",
+  "website": "https://www.sciensam.com",
+  "domain": "sciensam.com",
+  "hq": "New York, NY",
+  "type": "Asset Manager",
+  "tier": 3
+ },
+ {
+  "slug": "seawall-capital",
+  "name": "Seawall Capital",
+  "website": "https://www.seawallcap.com",
+  "domain": "seawallcap.com",
+  "hq": "Austin, TX",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "sfw-capital-partners",
+  "name": "SFW Capital Partners",
+  "website": "https://sfwcap.com",
+  "domain": "sfwcap.com",
+  "hq": "Rye, NY",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "shoreline-equity-partners",
+  "name": "Shoreline Equity Partners",
+  "website": "https://www.shorelineequitypartners.com",
+  "domain": "shorelineequitypartners.com",
+  "hq": "Neptune Beach, FL",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "signet-healthcare-partners",
+  "name": "Signet Healthcare Partners",
+  "website": "https://www.signethealthcarepartners.com",
+  "domain": "signethealthcarepartners.com",
+  "hq": "New York, NY",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "skylark-private-equity-partners",
+  "name": "Skylark Private Equity Partners",
+  "website": "https://www.skylarkpe.com",
+  "domain": "skylarkpe.com",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "sleeping-giant-capital",
+  "name": "Sleeping Giant Capital",
+  "website": "https://www.sleepinggiantcapital.com",
+  "domain": "sleepinggiantcapital.com",
+  "hq": "Kalamazoo, MI",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "sorenson-capital",
+  "name": "Sorenson Capital",
+  "website": "https://www.sorensoncapital.com",
+  "domain": "sorensoncapital.com",
+  "hq": "Lehi, UT",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "spindletop-capital",
+  "name": "Spindletop Capital",
+  "website": "https://www.spindletopcapital.com",
+  "domain": "spindletopcapital.com",
+  "hq": "Austin, TX",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "spire-capital",
+  "name": "Spire Capital",
+  "website": "https://www.spirecapital.com",
+  "domain": "spirecapital.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "spotlight-equity-partners",
+  "name": "Spotlight Equity Partners",
+  "website": "https://www.spotlightequity.com",
+  "domain": "spotlightequity.com",
+  "hq": "San Francisco, CA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "spring-lake-equity-partners",
+  "name": "Spring Lake Equity Partners",
+  "website": "https://www.springlep.com",
+  "domain": "springlep.com",
+  "hq": "Boston, MA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "ssm-partners",
+  "name": "SSM Partners",
+  "website": "https://www.ssmpartners.com",
+  "domain": "ssmpartners.com",
+  "hq": "Memphis, TN",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "stagwell-nas-stgw",
+  "name": "Stagwell (NAS: STGW)",
+  "website": "https://www.stagwellglobal.com",
+  "domain": "stagwellglobal.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "stonebridge-partners",
+  "name": "Stonebridge Partners",
+  "website": "https://www.stonebridgepartners.com",
+  "domain": "stonebridgepartners.com",
+  "hq": "White Plains, NY",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "stonecourt-capital",
+  "name": "Stonecourt Capital",
+  "website": "https://www.stonecourtlp.com",
+  "domain": "stonecourtlp.com",
+  "hq": "New York, NY",
+  "type": "Family Office",
+  "tier": 3
+ },
+ {
+  "slug": "stonehenge-capital",
+  "name": "Stonehenge Capital",
+  "website": "https://www.stonehengecapital.com",
+  "domain": "stonehengecapital.com",
+  "hq": "Baton Rouge, LA",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "story3-capital-partners",
+  "name": "STORY3 Capital Partners",
+  "website": "https://www.story3capital.com",
+  "domain": "story3capital.com",
+  "hq": "Los Angeles, CA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "summer-street-capital-partners",
+  "name": "Summer Street Capital Partners",
+  "website": "https://www.summerstreetcapital.com",
+  "domain": "summerstreetcapital.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "suntx-capital-partners",
+  "name": "SunTx Capital Partners",
+  "website": "https://suntxcapitalpartners.com",
+  "domain": "suntxcapitalpartners.com",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "superior-capital-partners",
+  "name": "Superior Capital Partners",
+  "website": "https://www.superiorfund.com",
+  "domain": "superiorfund.com",
+  "hq": "Royal Oak, MI",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "supply-chain-equity-partners",
+  "name": "Supply Chain Equity Partners",
+  "website": "https://www.supplychainequity.com",
+  "domain": "supplychainequity.com",
+  "hq": "Tampa, FL",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "swander-pace-capital",
+  "name": "Swander Pace Capital",
+  "website": "https://www.spcap.com",
+  "domain": "spcap.com",
+  "hq": "San Francisco, CA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "symmetric-capital",
+  "name": "Symmetric Capital",
+  "website": "https://www.symmetriccapital.com",
+  "domain": "symmetriccapital.com",
+  "hq": "Burlington, MA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "syndicate-venture-group",
+  "name": "Syndicate Venture Group",
+  "website": "https://svgpe.com",
+  "domain": "svgpe.com",
+  "hq": "Manalapan, NJ",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "t-street-capital",
+  "name": "T-street Capital",
+  "website": "https://www.t-street.com",
+  "domain": "t-street.com",
+  "hq": "New York, NY",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "talara-capital-management",
+  "name": "Talara Capital Management",
+  "website": "https://www.talaracapital.com",
+  "domain": "talaracapital.com",
+  "hq": "Houston, TX",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "teleo-capital",
+  "name": "TELEO Capital",
+  "website": "https://www.teleocapital.com",
+  "domain": "teleocapital.com",
+  "hq": "Boise, ID",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "thayer-street-partners",
+  "name": "Thayer Street Partners",
+  "website": "https://www.thayerstreet.com",
+  "domain": "thayerstreet.com",
+  "hq": "New York, NY",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "the-builders-fund",
+  "name": "The Builders Fund",
+  "website": "https://www.thebuildersfund.com",
+  "domain": "thebuildersfund.com",
+  "hq": "San Francisco, CA",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "the-chertoff-group",
+  "name": "The Chertoff Group",
+  "website": "https://www.chertoffgroup.com",
+  "domain": "chertoffgroup.com",
+  "hq": "Washington, DC",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "the-higro-group",
+  "name": "The HiGro Group",
+  "website": "https://www.higrogroup.com",
+  "domain": "higrogroup.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "the-silverfern-group",
+  "name": "The Silverfern Group",
+  "website": "https://www.silfern.com",
+  "domain": "silfern.com",
+  "hq": "Greenwich, CT",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "the-wicks-group-of-companies",
+  "name": "The Wicks Group of Companies",
+  "website": "https://www.wicksgroup.com",
+  "domain": "wicksgroup.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "thurston-group-chicago",
+  "name": "Thurston Group (Chicago)",
+  "website": "https://www.thurstongroup.com",
+  "domain": "thurstongroup.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "tlg-capital-management",
+  "name": "TLG Capital Management",
+  "website": "https://www.tlgholding.com",
+  "domain": "tlgholding.com",
+  "hq": "West Palm Beach, FL",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "tonka-bay-equity-partners",
+  "name": "Tonka Bay Equity Partners",
+  "website": "https://tonkabayequity.com",
+  "domain": "tonkabayequity.com",
+  "hq": "Minnetonka, MN",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "topspin-consumer-partners",
+  "name": "Topspin Consumer Partners",
+  "website": "https://www.topspincp.com",
+  "domain": "topspincp.com",
+  "hq": "Mamaroneck, NY",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "townsend-street-capital",
+  "name": "Townsend Street Capital",
+  "website": "https://www.townsendstreetcapital.com",
+  "domain": "townsendstreetcapital.com",
+  "hq": "Birmingham, MI",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "tpe-boulder",
+  "name": "TPE Boulder",
+  "website": "https://www.tpeboulder.com",
+  "domain": "tpeboulder.com",
+  "hq": "Boulder, CO",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "traub-capital-partners",
+  "name": "Traub Capital Partners",
+  "website": "https://www.traubcapitalpartners.com",
+  "domain": "traubcapitalpartners.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "tregaron-capital",
+  "name": "Tregaron Capital",
+  "website": "https://www.tregaroncapital.com",
+  "domain": "tregaroncapital.com",
+  "hq": "Palo Alto, CA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "trent-capital-partners",
+  "name": "Trent Capital Partners",
+  "website": "https://www.trentequity.com",
+  "domain": "trentequity.com",
+  "hq": "Naples, FL",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "triangle-peak-partners",
+  "name": "Triangle Peak Partners",
+  "website": "https://www.trianglepeakpartners.com",
+  "domain": "trianglepeakpartners.com",
+  "hq": "Palo Alto, CA",
+  "type": "Venture Capital",
+  "tier": 3
+ },
+ {
+  "slug": "triton-pacific-capital-partners",
+  "name": "Triton Pacific Capital Partners",
+  "website": "https://www.tritonpacific.com",
+  "domain": "tritonpacific.com",
+  "hq": "El Segundo, CA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "tt-capital-partners",
+  "name": "TT Capital Partners",
+  "website": "https://www.ttcapitalpartners.com",
+  "domain": "ttcapitalpartners.com",
+  "hq": "Bloomington, MN",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "twelve31",
+  "name": "Twelve31",
+  "website": "https://twelve31.com",
+  "domain": "twelve31.com",
+  "hq": "Omaha, NE",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "twin-point-capital",
+  "name": "Twin Point Capital",
+  "website": "https://www.twinpointcap.com",
+  "domain": "twinpointcap.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "union-park-capital",
+  "name": "Union Park Capital",
+  "website": "https://www.union-park.com",
+  "domain": "union-park.com",
+  "hq": "Boston, MA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "variant-equity-advisors",
+  "name": "Variant Equity Advisors",
+  "website": "https://www.variantequity.com",
+  "domain": "variantequity.com",
+  "hq": "Los Angeles, CA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "velocity-capital-management",
+  "name": "Velocity Capital Management",
+  "website": "https://www.velocitycm.com",
+  "domain": "velocitycm.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "versa-capital",
+  "name": "Versa Capital",
+  "website": "https://www.versa.com",
+  "domain": "versa.com",
+  "hq": "Philadelphia, PA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "vertica-capital-partners",
+  "name": "Vertica Capital Partners",
+  "website": "https://www.verticacp.com",
+  "domain": "verticacp.com",
+  "hq": "New York, NY",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "vopne-capital",
+  "name": "Vopne Capital",
+  "website": "https://www.vopne.com",
+  "domain": "vopne.com",
+  "hq": "Mill Valley, CA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "vss-capital-partners",
+  "name": "VSS Capital Partners",
+  "website": "https://www.vss.com",
+  "domain": "vss.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "wayne-capital-partners",
+  "name": "Wayne Capital Partners",
+  "website": "https://www.waynecapitalpartners.com",
+  "domain": "waynecapitalpartners.com",
+  "hq": "Dallas, TX",
+  "type": "Growth/Expansion",
+  "tier": 3
+ },
+ {
+  "slug": "westbourne-capital-partners",
+  "name": "Westbourne Capital Partners",
+  "website": "https://www.westbournecp.com",
+  "domain": "westbournecp.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "westhook-capital",
+  "name": "Westhook Capital",
+  "website": "https://www.westhook.com",
+  "domain": "westhook.com",
+  "hq": "Los Angeles, CA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "westward-partners",
+  "name": "Westward Partners",
+  "website": "https://www.westwardpartnersllc.com",
+  "domain": "westwardpartnersllc.com",
+  "hq": "Seattle, WA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "wm-partners",
+  "name": "WM Partners",
+  "website": "https://wmplp.com",
+  "domain": "wmplp.com",
+  "hq": "Aventura, FL",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "xenon-partners",
+  "name": "Xenon Partners",
+  "website": "https://www.xenon.io",
+  "domain": "xenon.io",
+  "hq": "Santa Barbara, CA",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "zs-fund",
+  "name": "ZS Fund",
+  "website": "https://www.zsfundlp.com",
+  "domain": "zsfundlp.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 3
+ },
+ {
+  "slug": "1st-main-growth-partners",
+  "name": "1st & Main Growth Partners",
+  "website": "https://1standmain.co",
+  "domain": "1standmain.co",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "access-global-investments",
+  "name": "Access Global Investments",
+  "website": "https://www.aglb.com",
+  "domain": "aglb.com",
+  "hq": "Houston, TX",
+  "type": "Asset Manager",
+  "tier": 4
+ },
+ {
+  "slug": "aci-capital",
+  "name": "ACI Capital",
+  "website": "https://www.acicapital.com",
+  "domain": "acicapital.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "activant-capital",
+  "name": "Activant Capital",
+  "website": "https://www.activantcapital.com",
+  "domain": "activantcapital.com",
+  "hq": "Greenwich, CT",
+  "type": "Venture Capital",
+  "tier": 4
+ },
+ {
+  "slug": "advent-morro-equity-partners",
+  "name": "Advent-Morro Equity Partners",
+  "website": "https://www.adventmorro.com",
+  "domain": "adventmorro.com",
+  "hq": "San Juan, PR",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "albright-capital-management",
+  "name": "Albright Capital Management",
+  "website": "https://www.albrightcapital.com",
+  "domain": "albrightcapital.com",
+  "hq": "Arlington, VA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "alitus-partners",
+  "name": "Alitus Partners",
+  "website": "https://www.alituspartners.com",
+  "domain": "alituspartners.com",
+  "hq": "Saint Louis, MO",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "ally-bridge-group",
+  "name": "Ally Bridge Group",
+  "website": "https://www.ally-bridge.com",
+  "domain": "ally-bridge.com",
+  "hq": "New York, NY",
+  "type": "Growth/Expansion",
+  "tier": 4
+ },
+ {
+  "slug": "alpha-capital-partners",
+  "name": "Alpha Capital Partners",
+  "website": "https://www.alphacapital.com",
+  "domain": "alphacapital.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "alterna-capital-partners",
+  "name": "Alterna Capital Partners",
+  "website": "https://www.alternacapital.com",
+  "domain": "alternacapital.com",
+  "hq": "Bedford, NH",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "american-infrastructure-funds",
+  "name": "American Infrastructure Funds",
+  "website": "https://www.aimlp.com",
+  "domain": "aimlp.com",
+  "hq": "Foster City, CA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "arborview-capital",
+  "name": "Arborview Capital",
+  "website": "https://www.arborviewcapital.com",
+  "domain": "arborviewcapital.com",
+  "hq": "Washington, DC",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "arias-resource-capital-management",
+  "name": "Arias Resource Capital Management",
+  "website": "https://www.arc-fund.com",
+  "domain": "arc-fund.com",
+  "hq": "Miami, FL",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "atyant-capital",
+  "name": "Atyant Capital",
+  "website": "https://www.atyantcapital.com",
+  "domain": "atyantcapital.com",
+  "hq": "Miami, FL",
+  "type": "Asset Manager",
+  "tier": 4
+ },
+ {
+  "slug": "australis-partners",
+  "name": "Australis Partners",
+  "website": "https://www.australispartners.com",
+  "domain": "australispartners.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "avego-management",
+  "name": "Avego Management",
+  "website": "https://www.avego.com",
+  "domain": "avego.com",
+  "hq": "Alpharetta, GA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "axia-partners",
+  "name": "Axia Partners",
+  "website": "https://www.axia-partners.com",
+  "domain": "axia-partners.com",
+  "hq": "Boston, MA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "axum-capital-partners",
+  "name": "Axum Capital Partners",
+  "website": "https://www.axumcp.com",
+  "domain": "axumcp.com",
+  "hq": "Charlotte, NC",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "banyan-growth-partners",
+  "name": "Banyan Growth Partners",
+  "website": "https://www.banyangrowthpartners.com",
+  "domain": "banyangrowthpartners.com",
+  "hq": "Holladay, UT",
+  "type": "Growth/Expansion",
+  "tier": 4
+ },
+ {
+  "slug": "bedford-funding-capital-management",
+  "name": "Bedford Funding Capital Management",
+  "website": "https://www.bedfordfunding.com",
+  "domain": "bedfordfunding.com",
+  "hq": "White Plains, NY",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "beringea",
+  "name": "Beringea",
+  "website": "https://www.beringea.com",
+  "domain": "beringea.com",
+  "hq": "Farmington Hills, MI",
+  "type": "Venture Capital",
+  "tier": 4
+ },
+ {
+  "slug": "bird-dog-equity-partners",
+  "name": "Bird Dog Equity Partners",
+  "website": "https://www.birddogequity.com",
+  "domain": "birddogequity.com",
+  "hq": "Sioux Falls, SD",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "blackstreet-capital-management",
+  "name": "Blackstreet Capital Management",
+  "website": "https://www.blackstreetcapital.com",
+  "domain": "blackstreetcapital.com",
+  "hq": "Bethesda, MD",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "blauvelt-capital-partners",
+  "name": "Blauvelt Capital Partners",
+  "website": "https://www.blauveltcapital.com",
+  "domain": "blauveltcapital.com",
+  "hq": "Miami, FL",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "blue-consumer-capital",
+  "name": "Blue Consumer Capital",
+  "website": "https://www.blueconsumercapital.com",
+  "domain": "blueconsumercapital.com",
+  "hq": "Los Angeles, CA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "blue-heron-capital",
+  "name": "Blue Heron Capital",
+  "website": "https://www.blueheroncap.com",
+  "domain": "blueheroncap.com",
+  "hq": "Richmond, VA",
+  "type": "Growth/Expansion",
+  "tier": 4
+ },
+ {
+  "slug": "bluescape-group",
+  "name": "Bluescape Group",
+  "website": "https://bluescapegroup.com",
+  "domain": "bluescapegroup.com",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "bluestem-capital-company",
+  "name": "Bluestem Capital Company",
+  "website": "https://www.bluestemcapital.com",
+  "domain": "bluestemcapital.com",
+  "hq": "Sioux Falls, SD",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "blum-capital-partners",
+  "name": "Blum Capital Partners",
+  "website": "https://www.blumcapital.com",
+  "domain": "blumcapital.com",
+  "hq": "San Francisco, CA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "bonaventure-capital",
+  "name": "Bonaventure Capital",
+  "website": "https://bonaventurecapital.net",
+  "domain": "bonaventurecapital.net",
+  "hq": "Birmingham, AL",
+  "type": "Venture Capital",
+  "tier": 4
+ },
+ {
+  "slug": "bradford-equities-management",
+  "name": "Bradford Equities Management",
+  "website": "https://www.bradfordequities.com",
+  "domain": "bradfordequities.com",
+  "hq": "White Plains, NY",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "brentwood-capital-advisors",
+  "name": "Brentwood Capital Advisors",
+  "website": "https://www.brentwoodcap.com",
+  "domain": "brentwoodcap.com",
+  "hq": "Nashville, TN",
+  "type": "Investment Bank",
+  "tier": 4
+ },
+ {
+  "slug": "britton-hill-partners",
+  "name": "Britton Hill Partners",
+  "website": "https://www.brittonhillpartners.com",
+  "domain": "brittonhillpartners.com",
+  "hq": "Miami, FL",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "broadview-capital",
+  "name": "Broadview Capital",
+  "website": "https://www.broadviewcapital.com",
+  "domain": "broadviewcapital.com",
+  "hq": "San Mateo, CA",
+  "type": "Real Estate",
+  "tier": 4
+ },
+ {
+  "slug": "brockway-moran-partners",
+  "name": "Brockway Moran & Partners",
+  "website": "https://www.brockwaymoran.com",
+  "domain": "brockwaymoran.com",
+  "hq": "Boca Raton, FL",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "bunker-hill-capital",
+  "name": "Bunker Hill Capital",
+  "website": "https://www.bunkerhillcapital.com",
+  "domain": "bunkerhillcapital.com",
+  "hq": "Wellesley Hills, MA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "byrdview-capital",
+  "name": "ByrdView Capital",
+  "website": "https://www.byrdviewcapital.com",
+  "domain": "byrdviewcapital.com",
+  "hq": "Nashville, TN",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "calvert-street-investment-partners",
+  "name": "Calvert Street Investment Partners",
+  "website": "https://calvertstreetinvestmentpartners.com",
+  "domain": "calvertstreetinvestmentpartners.com",
+  "hq": "Lutherville-Timonium, MD",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "cannon-capital",
+  "name": "Cannon Capital",
+  "website": "https://cannon.pe",
+  "domain": "cannon.pe",
+  "hq": "Framingham, MA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "capitol-partners",
+  "name": "Capitol Partners",
+  "website": "https://www.capitolpartners.com",
+  "domain": "capitolpartners.com",
+  "hq": "Chevy Chase, MD",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "casla-partners",
+  "name": "Casla Partners",
+  "website": "https://www.caslapartners.com",
+  "domain": "caslapartners.com",
+  "hq": "New Hope, PA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "castle-creek-capital",
+  "name": "Castle Creek Capital",
+  "website": "https://www.castlecreek.com",
+  "domain": "castlecreek.com",
+  "hq": "San Diego, CA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "castle-harlan",
+  "name": "Castle Harlan",
+  "website": "https://www.castleharlan.com",
+  "domain": "castleharlan.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "catalus-capital-management",
+  "name": "Catalus Capital Management",
+  "website": "https://cataluscapital.com",
+  "domain": "cataluscapital.com",
+  "hq": "West Palm Beach, FL",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "cc-capital",
+  "name": "CC Capital",
+  "website": "https://www.cc.capital",
+  "domain": "cc.capital",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "ccp-capital-strategies",
+  "name": "CCP Capital Strategies",
+  "website": "https://www.chartcapital.com",
+  "domain": "chartcapital.com",
+  "hq": "Greenwich, CT",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "cea-group",
+  "name": "CEA Group",
+  "website": "https://www.ceaworldwide.com",
+  "domain": "ceaworldwide.com",
+  "hq": "Tampa, FL",
+  "type": "Investment Bank",
+  "tier": 4
+ },
+ {
+  "slug": "cedar-springs-capital",
+  "name": "Cedar Springs Capital",
+  "website": "https://www.cedarspringscapital.com",
+  "domain": "cedarspringscapital.com",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "celerity-partners",
+  "name": "Celerity Partners",
+  "website": "https://www.celeritypartners.com",
+  "domain": "celeritypartners.com",
+  "hq": "Los Angeles, CA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "centerview-capital",
+  "name": "Centerview Capital",
+  "website": "https://www.centerviewcapital.com",
+  "domain": "centerviewcapital.com",
+  "hq": "Naples, FL",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "charger-investment-partners",
+  "name": "Charger Investment Partners",
+  "website": "https://www.chargerinv.com",
+  "domain": "chargerinv.com",
+  "hq": "El Segundo, CA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "charter-oak-equity",
+  "name": "Charter Oak Equity",
+  "website": "https://www.charteroak-equity.com",
+  "domain": "charteroak-equity.com",
+  "hq": "Westport, CT",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "chilmark-partners",
+  "name": "Chilmark Partners",
+  "website": "https://www.chilmarkpartners.com",
+  "domain": "chilmarkpartners.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "cimarron-healthcare-capital",
+  "name": "Cimarron Healthcare Capital",
+  "website": "https://www.cimarronhc.com",
+  "domain": "cimarronhc.com",
+  "hq": "Salt Lake City, UT",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "clarity-partners",
+  "name": "Clarity Partners",
+  "website": "https://www.claritypartners.net",
+  "domain": "claritypartners.net",
+  "hq": "Los Angeles, CA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "coastedge-partners",
+  "name": "CoastEdge Partners",
+  "website": "https://www.coastedge.com",
+  "domain": "coastedge.com",
+  "hq": "San Diego, CA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "columbia-pacific-advisors",
+  "name": "Columbia Pacific Advisors",
+  "website": "https://www.columbiapacific.com",
+  "domain": "columbiapacific.com",
+  "hq": "Seattle, WA",
+  "type": "Asset Manager",
+  "tier": 4
+ },
+ {
+  "slug": "coniston-capital",
+  "name": "Coniston Capital",
+  "website": "https://www.coniston-capital.com",
+  "domain": "coniston-capital.com",
+  "hq": "Chatham, NJ",
+  "type": "Growth/Expansion",
+  "tier": 4
+ },
+ {
+  "slug": "content-partners",
+  "name": "Content Partners",
+  "website": "https://www.contentllc.com",
+  "domain": "contentllc.com",
+  "hq": "Los Angeles, CA",
+  "type": "Asset Manager",
+  "tier": 4
+ },
+ {
+  "slug": "cooper-investment-partners",
+  "name": "Cooper Investment Partners",
+  "website": "https://www.cooperinvest.net",
+  "domain": "cooperinvest.net",
+  "hq": "Fairfield, CT",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "copeley-capital",
+  "name": "Copeley Capital",
+  "website": "https://copeleycapital.com",
+  "domain": "copeleycapital.com",
+  "hq": "Charlotte, NC",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "corporate-fuel",
+  "name": "Corporate Fuel",
+  "website": "https://www.corporatefuel.com",
+  "domain": "corporatefuel.com",
+  "hq": "New York, NY",
+  "type": "Investment Bank",
+  "tier": 4
+ },
+ {
+  "slug": "corstone-capital",
+  "name": "Corstone Capital",
+  "website": "https://www.corstonecapital.com",
+  "domain": "corstonecapital.com",
+  "hq": "Bethesda, MD",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "creation-investments-capital-management",
+  "name": "Creation Investments Capital Management",
+  "website": "https://www.creationinvestments.com",
+  "domain": "creationinvestments.com",
+  "hq": "Chicago, IL",
+  "type": "Impact Investing",
+  "tier": 4
+ },
+ {
+  "slug": "crest-equity-partners",
+  "name": "Crest Equity Partners",
+  "website": "https://www.crestequity.com",
+  "domain": "crestequity.com",
+  "hq": "Boca Raton, FL",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "criterion-africa-partners",
+  "name": "Criterion Africa Partners",
+  "website": "https://www.criterionafrica.com",
+  "domain": "criterionafrica.com",
+  "hq": "Bethesda, MD",
+  "type": "Growth/Expansion",
+  "tier": 4
+ },
+ {
+  "slug": "cyprium-partners",
+  "name": "Cyprium Partners",
+  "website": "https://www.cyprium.com",
+  "domain": "cyprium.com",
+  "hq": "Cleveland, OH",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "d-orazio-holdings",
+  "name": "D'Orazio Holdings",
+  "website": "https://www.doraziocp.com",
+  "domain": "doraziocp.com",
+  "hq": "Burr Ridge, IL",
+  "type": "Holding Company",
+  "tier": 4
+ },
+ {
+  "slug": "dakota-pacific",
+  "name": "Dakota Pacific",
+  "website": "https://www.dakotapacific.com",
+  "domain": "dakotapacific.com",
+  "hq": "Salt Lake City, UT",
+  "type": "Asset Manager",
+  "tier": 4
+ },
+ {
+  "slug": "developing-world-markets-dwm",
+  "name": "Developing World Markets (DWM)",
+  "website": "https://www.dwmarkets.com",
+  "domain": "dwmarkets.com",
+  "hq": "Stamford, CT",
+  "type": "Lender/Debt Provider",
+  "tier": 4
+ },
+ {
+  "slug": "diamond-castle-holdings",
+  "name": "Diamond Castle Holdings",
+  "website": "https://www.dchold.com",
+  "domain": "dchold.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "dmc-capital-funding",
+  "name": "DMC Capital Funding",
+  "website": "https://www.dmccapitalfunding.com",
+  "domain": "dmccapitalfunding.com",
+  "hq": "New York, NY",
+  "type": "Growth/Expansion",
+  "tier": 4
+ },
+ {
+  "slug": "dn-partners",
+  "name": "DN Partners",
+  "website": "https://dnpartners.net",
+  "domain": "dnpartners.net",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "dubilier-company",
+  "name": "Dubilier & Company",
+  "website": "https://dubilier.com",
+  "domain": "dubilier.com",
+  "hq": "Stamford, CT",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "echelon-capital",
+  "name": "Echelon Capital",
+  "website": "https://www.echeloncapital.com",
+  "domain": "echeloncapital.com",
+  "hq": "Montgomery, IL",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "education-growth-partners",
+  "name": "Education Growth Partners",
+  "website": "https://www.edgrowth.com",
+  "domain": "edgrowth.com",
+  "hq": "Stamford, CT",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "eih-capital-advisors",
+  "name": "EIH Capital Advisors",
+  "website": "https://www.empireih.com",
+  "domain": "empireih.com",
+  "hq": "Franklin, TN",
+  "type": "Family Office",
+  "tier": 4
+ },
+ {
+  "slug": "elsewhere-partners",
+  "name": "Elsewhere Partners",
+  "website": "https://www.elsewhere.partners",
+  "domain": "elsewhere.partners",
+  "hq": "Austin, TX",
+  "type": "Growth/Expansion",
+  "tier": 4
+ },
+ {
+  "slug": "enhanced-capital-partners",
+  "name": "Enhanced Capital Partners",
+  "website": "https://www.enhancedcapital.com",
+  "domain": "enhancedcapital.com",
+  "hq": "New York, NY",
+  "type": "Asset Manager",
+  "tier": 4
+ },
+ {
+  "slug": "entourage-effect-capital",
+  "name": "Entourage Effect Capital",
+  "website": "https://www.entourageeffect.com",
+  "domain": "entourageeffect.com",
+  "hq": "Dallas, TX",
+  "type": "Venture Capital",
+  "tier": 4
+ },
+ {
+  "slug": "envest-private-equity",
+  "name": "Envest Private Equity",
+  "website": "https://www.envestcap.com",
+  "domain": "envestcap.com",
+  "hq": "Virginia Beach, VA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "equator-capital-partners",
+  "name": "Equator Capital Partners",
+  "website": "https://www.equatorcap.net",
+  "domain": "equatorcap.net",
+  "hq": "Chicago, IL",
+  "type": "Asset Manager",
+  "tier": 4
+ },
+ {
+  "slug": "equinox-capital",
+  "name": "Equinox Capital",
+  "website": "https://www.equinox-capital.com",
+  "domain": "equinox-capital.com",
+  "hq": "Greenwich, CT",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "eureka-equity-partners",
+  "name": "Eureka Equity Partners",
+  "website": "https://www.eurekaequity.com",
+  "domain": "eurekaequity.com",
+  "hq": "Philadelphia, PA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "evergreen-pacific-partners",
+  "name": "Evergreen Pacific Partners",
+  "website": "https://www.eppcapital.com",
+  "domain": "eppcapital.com",
+  "hq": "Seattle, WA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "exaltare-capital-management",
+  "name": "Exaltare Capital Management",
+  "website": "https://www.exaltarecapital.com",
+  "domain": "exaltarecapital.com",
+  "hq": "Dedham, MA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "fcf-partners",
+  "name": "FCF Partners",
+  "website": "https://www.fcffunds.com",
+  "domain": "fcffunds.com",
+  "hq": "Milwaukee, WI",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "fenway-partners",
+  "name": "Fenway Partners",
+  "website": "https://www.fenwaypartners.com",
+  "domain": "fenwaypartners.com",
+  "hq": "Westerly, RI",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "fenwick-brands",
+  "name": "Fenwick Brands",
+  "website": "https://www.fenwickbrands.com",
+  "domain": "fenwickbrands.com",
+  "hq": "Birmingham, AL",
+  "type": "Growth/Expansion",
+  "tier": 4
+ },
+ {
+  "slug": "firebird-management",
+  "name": "Firebird Management",
+  "website": "https://www.fbird.com",
+  "domain": "fbird.com",
+  "hq": "New York, NY",
+  "type": "Hedge Fund",
+  "tier": 4
+ },
+ {
+  "slug": "first-avenue-partners-family-office",
+  "name": "First Avenue Partners (Family Office)",
+  "website": "https://www.1stpartners.com",
+  "domain": "1stpartners.com",
+  "hq": "Nashville, TN",
+  "type": "Family Office",
+  "tier": 4
+ },
+ {
+  "slug": "flexis-capital",
+  "name": "Flexis Capital",
+  "website": "https://www.flexiscapital.com",
+  "domain": "flexiscapital.com",
+  "hq": "Miami, FL",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "ford-financial-fund",
+  "name": "Ford Financial Fund",
+  "website": "https://www.fordfundlp.com",
+  "domain": "fordfundlp.com",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "forest-hill-partners",
+  "name": "Forest Hill Partners",
+  "website": "https://www.foresthillpartners.com",
+  "domain": "foresthillpartners.com",
+  "hq": "Park Ridge, IL",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "founders-equity",
+  "name": "Founders Equity",
+  "website": "https://www.fequity.com",
+  "domain": "fequity.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "fox-paine",
+  "name": "Fox Paine",
+  "website": "https://www.foxpaine.com",
+  "domain": "foxpaine.com",
+  "hq": "Miami Beach, FL",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "freestone-partners",
+  "name": "Freestone Partners",
+  "website": "https://www.freestonepartners.com",
+  "domain": "freestonepartners.com",
+  "hq": "Houston, TX",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "fulham-co",
+  "name": "Fulham & Co.",
+  "website": "https://www.fulhamco.com",
+  "domain": "fulhamco.com",
+  "hq": "Wellesley, MA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "galen-partners",
+  "name": "Galen Partners",
+  "website": "https://www.galen.com",
+  "domain": "galen.com",
+  "hq": "Stamford, CT",
+  "type": "Growth/Expansion",
+  "tier": 4
+ },
+ {
+  "slug": "gf-capital-management-advisors",
+  "name": "GF Capital Management & Advisors",
+  "website": "https://www.gfcap.com",
+  "domain": "gfcap.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "global-leveraged-capital",
+  "name": "Global Leveraged Capital",
+  "website": "https://www.glcllc.com",
+  "domain": "glcllc.com",
+  "hq": "New York, NY",
+  "type": "Investment Bank",
+  "tier": 4
+ },
+ {
+  "slug": "gpi-capital",
+  "name": "GPI Capital",
+  "website": "https://gpicap.com",
+  "domain": "gpicap.com",
+  "hq": "New York, NY",
+  "type": "Growth/Expansion",
+  "tier": 4
+ },
+ {
+  "slug": "grail-partners",
+  "name": "Grail Partners",
+  "website": "https://www.grailpartners.com",
+  "domain": "grailpartners.com",
+  "hq": "San Francisco, CA",
+  "type": "Merchant Banking Firm",
+  "tier": 4
+ },
+ {
+  "slug": "granite-bridge-partners",
+  "name": "Granite Bridge Partners",
+  "website": "https://granitebridge.com",
+  "domain": "granitebridge.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "granite-partners-saint-cloud",
+  "name": "Granite Partners (Saint Cloud)",
+  "website": "https://www.granite.com",
+  "domain": "granite.com",
+  "hq": "Saint Cloud, MN",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "greenleaf-capital-partners",
+  "name": "Greenleaf Capital Partners",
+  "website": "https://www.greenleafcp.com",
+  "domain": "greenleafcp.com",
+  "hq": "Creve Coeur, MO",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "greenmont-capital-partners",
+  "name": "Greenmont Capital Partners",
+  "website": "https://www.greenmontcapital.com",
+  "domain": "greenmontcapital.com",
+  "hq": "Boulder, CO",
+  "type": "Impact Investing",
+  "tier": 4
+ },
+ {
+  "slug": "grotech-ventures",
+  "name": "Grotech Ventures",
+  "website": "https://www.grotech.com",
+  "domain": "grotech.com",
+  "hq": "Owings Mills, MD",
+  "type": "Venture Capital",
+  "tier": 4
+ },
+ {
+  "slug": "growcore-investments",
+  "name": "Growcore Investments",
+  "website": "https://www.growcoreinvest.com",
+  "domain": "growcoreinvest.com",
+  "hq": "Waltham, MA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "hale-capital-partners",
+  "name": "Hale Capital Partners",
+  "website": "https://www.halecapital.com",
+  "domain": "halecapital.com",
+  "hq": "New York, NY",
+  "type": "Venture Capital",
+  "tier": 4
+ },
+ {
+  "slug": "halyard-capital",
+  "name": "Halyard Capital",
+  "website": "https://www.halyard.com",
+  "domain": "halyard.com",
+  "hq": "Sarasota, FL",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "handson-global-management",
+  "name": "HandsOn Global Management",
+  "website": "https://www.hgmfund.com",
+  "domain": "hgmfund.com",
+  "hq": "Las Vegas, NV",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "hargett-hunter-capital-management",
+  "name": "Hargett Hunter Capital Management",
+  "website": "https://www.hargetthunter.com",
+  "domain": "hargetthunter.com",
+  "hq": "Raleigh, NC",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "harkness-capital-partners",
+  "name": "Harkness Capital Partners",
+  "website": "https://www.harknesscapital.com",
+  "domain": "harknesscapital.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "hawthorn-equity-partners",
+  "name": "Hawthorn Equity Partners",
+  "website": "https://www.hawthornep.com",
+  "domain": "hawthornep.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "hcp-company",
+  "name": "HCP & Company",
+  "website": "https://hcpcompany.com",
+  "domain": "hcpcompany.com",
+  "hq": "Chicago, IL",
+  "type": "Growth/Expansion",
+  "tier": 4
+ },
+ {
+  "slug": "healthpointcapital",
+  "name": "HealthpointCapital",
+  "website": "https://www.healthpointcapital.com",
+  "domain": "healthpointcapital.com",
+  "hq": "San Diego, CA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "heartland-industrial-partners",
+  "name": "Heartland Industrial Partners",
+  "website": "https://www.heartlandpartners.com",
+  "domain": "heartlandpartners.com",
+  "hq": "Stamford, CT",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "highcape-capital",
+  "name": "HighCape Capital",
+  "website": "https://www.highcape.com",
+  "domain": "highcape.com",
+  "hq": "Westport, CT",
+  "type": "Growth/Expansion",
+  "tier": 4
+ },
+ {
+  "slug": "highland-capital-management",
+  "name": "Highland Capital Management",
+  "website": "https://www.highlandcapital.com",
+  "domain": "highlandcapital.com",
+  "hq": "Dallas, TX",
+  "type": "Hedge Fund",
+  "tier": 4
+ },
+ {
+  "slug": "horizon-partners",
+  "name": "Horizon Partners",
+  "website": "https://www.horizonpartnersltd.com",
+  "domain": "horizonpartnersltd.com",
+  "hq": "Naples, FL",
+  "type": "Holding Company",
+  "tier": 4
+ },
+ {
+  "slug": "incyte-capital",
+  "name": "Incyte Capital",
+  "website": "https://www.incytecapital.com",
+  "domain": "incytecapital.com",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "infocommerce-partners",
+  "name": "Infocommerce Partners",
+  "website": "https://www.infocommercepartners.com",
+  "domain": "infocommercepartners.com",
+  "hq": "Danvers, MA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "innovahealth-partners",
+  "name": "InnovaHealth Partners",
+  "website": "https://www.innovahealthpartners.com",
+  "domain": "innovahealthpartners.com",
+  "hq": "New York, NY",
+  "type": "Growth/Expansion",
+  "tier": 4
+ },
+ {
+  "slug": "inoca-capital-partners",
+  "name": "Inoca Capital Partners",
+  "website": "https://www.inocacapital.com",
+  "domain": "inocacapital.com",
+  "hq": "Park City, UT",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "integral-capital-partners",
+  "name": "Integral Capital Partners",
+  "website": "https://www.icp.com",
+  "domain": "icp.com",
+  "hq": "Menlo Park, CA",
+  "type": "Growth/Expansion",
+  "tier": 4
+ },
+ {
+  "slug": "investmichigan-program",
+  "name": "InvestMichigan! Program",
+  "website": "https://www.investmichiganfund.com",
+  "domain": "investmichiganfund.com",
+  "hq": "Farmington Hills, MI",
+  "type": "Mezzanine",
+  "tier": 4
+ },
+ {
+  "slug": "ironwood-capital",
+  "name": "Ironwood Capital",
+  "website": "https://www.ironwoodcap.com",
+  "domain": "ironwoodcap.com",
+  "hq": "Avon, CT",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "ironwood-partners",
+  "name": "Ironwood Partners",
+  "website": "https://www.ironwood-partners.com",
+  "domain": "ironwood-partners.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "irving-investors",
+  "name": "Irving Investors",
+  "website": "https://www.irvinginvestors.com",
+  "domain": "irvinginvestors.com",
+  "hq": "Denver, CO",
+  "type": "Growth/Expansion",
+  "tier": 4
+ },
+ {
+  "slug": "ivy-capital-partners",
+  "name": "Ivy Capital Partners",
+  "website": "https://www.ivycapitalpartners.com",
+  "domain": "ivycapitalpartners.com",
+  "hq": "Montvale, NJ",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "jacobs-asset-management",
+  "name": "Jacobs Asset Management",
+  "website": "https://www.jampartners.com",
+  "domain": "jampartners.com",
+  "hq": "New York, NY",
+  "type": "Asset Manager",
+  "tier": 4
+ },
+ {
+  "slug": "jam-capital-partners",
+  "name": "JAM Capital Partners",
+  "website": "https://www.jamcapitalpartners.net",
+  "domain": "jamcapitalpartners.net",
+  "hq": "Saint Simons Island, GA",
+  "type": "Growth/Expansion",
+  "tier": 4
+ },
+ {
+  "slug": "jmc-capital-partners",
+  "name": "JMC Capital Partners",
+  "website": "https://www.jmccp.com",
+  "domain": "jmccp.com",
+  "hq": "Boston, MA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "junction-capital-partners",
+  "name": "Junction Capital Partners",
+  "website": "https://www.junctioncapitalpartners.com",
+  "domain": "junctioncapitalpartners.com",
+  "hq": "Houston, TX",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "key-bridge-partners",
+  "name": "Key Bridge Partners",
+  "website": "https://www.keybridgepartners.com",
+  "domain": "keybridgepartners.com",
+  "hq": "Bethesda, MD",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "lake-capital",
+  "name": "Lake Capital",
+  "website": "https://www.lakecapital.com",
+  "domain": "lakecapital.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "lake-pacific-partners",
+  "name": "Lake Pacific Partners",
+  "website": "https://www.lakepacific.com",
+  "domain": "lakepacific.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "larsen-maccoll-partners",
+  "name": "Larsen MacColl Partners",
+  "website": "https://www.larsenmaccoll.com",
+  "domain": "larsenmaccoll.com",
+  "hq": "Wayne, PA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "lasalle-capital",
+  "name": "LaSalle Capital",
+  "website": "https://www.lasallecapital.com",
+  "domain": "lasallecapital.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "llm-capital-partners",
+  "name": "LLM Capital Partners",
+  "website": "https://www.llmcapital.com",
+  "domain": "llmcapital.com",
+  "hq": "Boston, MA",
+  "type": "Growth/Expansion",
+  "tier": 4
+ },
+ {
+  "slug": "lmm-capital-partners",
+  "name": "LMM Capital Partners",
+  "website": "https://www.lmmcapital.com",
+  "domain": "lmmcapital.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "loft-growth-partners",
+  "name": "Loft Growth Partners",
+  "website": "https://loftgrowthpartners.com",
+  "domain": "loftgrowthpartners.com",
+  "hq": "Boulder, CO",
+  "type": "Growth/Expansion",
+  "tier": 4
+ },
+ {
+  "slug": "lombard-investments",
+  "name": "Lombard Investments",
+  "website": "https://www.lombardinvestments.com",
+  "domain": "lombardinvestments.com",
+  "hq": "San Francisco, CA",
+  "type": "Asset Manager",
+  "tier": 4
+ },
+ {
+  "slug": "lone-star-investment-advisors",
+  "name": "Lone Star Investment Advisors",
+  "website": "https://www.lonestarinvestmentadvisors.com",
+  "domain": "lonestarinvestmentadvisors.com",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "lowden-street-capital",
+  "name": "Lowden Street Capital",
+  "website": "https://www.lowdenstreet.com",
+  "domain": "lowdenstreet.com",
+  "hq": "Homewood, AL",
+  "type": "Family Office",
+  "tier": 4
+ },
+ {
+  "slug": "lubar-co",
+  "name": "Lubar & Co.",
+  "website": "https://www.lubar.com",
+  "domain": "lubar.com",
+  "hq": "Milwaukee, WI",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "maidstone-capital",
+  "name": "Maidstone Capital",
+  "website": "https://www.maidstonecapital.com",
+  "domain": "maidstonecapital.com",
+  "hq": "Charleston, SC",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "maxim-partners",
+  "name": "Maxim Partners",
+  "website": "https://www.maximpartnersllc.com",
+  "domain": "maximpartnersllc.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "medina-ventures",
+  "name": "Medina Ventures",
+  "website": "https://www.medinavc.com",
+  "domain": "medinavc.com",
+  "hq": "Coral Gables, FL",
+  "type": "Venture Capital",
+  "tier": 4
+ },
+ {
+  "slug": "merced-capital",
+  "name": "Merced Capital",
+  "website": "https://www.mercedcapital.com",
+  "domain": "mercedcapital.com",
+  "hq": "Minnetonka, MN",
+  "type": "Asset Manager",
+  "tier": 4
+ },
+ {
+  "slug": "meritage-funds",
+  "name": "Meritage Funds",
+  "website": "https://www.meritage.vc",
+  "domain": "meritage.vc",
+  "hq": "Arvada, CO",
+  "type": "Growth/Expansion",
+  "tier": 4
+ },
+ {
+  "slug": "mill-city-capital",
+  "name": "Mill City Capital",
+  "website": "https://www.millcitycapital.com",
+  "domain": "millcitycapital.com",
+  "hq": "Wayzata, MN",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "missionpoint-partners",
+  "name": "MissionPoint Partners",
+  "website": "https://www.mppgrp.com",
+  "domain": "mppgrp.com",
+  "hq": "Westport, CT",
+  "type": "Impact Investing",
+  "tier": 4
+ },
+ {
+  "slug": "mistral-equity-partners",
+  "name": "Mistral Equity Partners",
+  "website": "https://www.mistralequity.com",
+  "domain": "mistralequity.com",
+  "hq": "Palm Beach, FL",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "morgan-creek-capital-management",
+  "name": "Morgan Creek Capital Management",
+  "website": "https://www.morgancreekcap.com",
+  "domain": "morgancreekcap.com",
+  "hq": "Chapel Hill, NC",
+  "type": "Fund of Funds",
+  "tier": 4
+ },
+ {
+  "slug": "mountain-capital-management",
+  "name": "Mountain Capital Management",
+  "website": "https://www.mountainlp.com",
+  "domain": "mountainlp.com",
+  "hq": "Houston, TX",
+  "type": "Growth/Expansion",
+  "tier": 4
+ },
+ {
+  "slug": "navigator-partners",
+  "name": "Navigator Partners",
+  "website": "https://www.navigatorpartners.com",
+  "domain": "navigatorpartners.com",
+  "hq": "Summit, NJ",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "nca-partners",
+  "name": "NCA Partners",
+  "website": "https://www.nwcap.com",
+  "domain": "nwcap.com",
+  "hq": "Seattle, WA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "nch-capital",
+  "name": "NCH Capital",
+  "website": "https://www.nchcapital.com",
+  "domain": "nchcapital.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "new-capital-partners",
+  "name": "New Capital Partners",
+  "website": "https://www.newcapitalpartners.com",
+  "domain": "newcapitalpartners.com",
+  "hq": "Birmingham, AL",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "new-silk-route-growth-capital",
+  "name": "New Silk Route Growth Capital",
+  "website": "https://www.nsrpartners.com",
+  "domain": "nsrpartners.com",
+  "hq": "New York, NY",
+  "type": "Growth/Expansion",
+  "tier": 4
+ },
+ {
+  "slug": "new-vernon-capital",
+  "name": "New Vernon Capital",
+  "website": "https://www.new-vernon.com",
+  "domain": "new-vernon.com",
+  "hq": "Morristown, NJ",
+  "type": "Hedge Fund",
+  "tier": 4
+ },
+ {
+  "slug": "norris-equity-partners",
+  "name": "Norris Equity Partners",
+  "website": "https://www.norrisequitypartners.com",
+  "domain": "norrisequitypartners.com",
+  "hq": "South Bend, IN",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "north-american-funds",
+  "name": "North American Funds",
+  "website": "https://www.northamericanfund.com",
+  "domain": "northamericanfund.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "noson-lawen-partners",
+  "name": "Noson Lawen Partners",
+  "website": "https://www.nosonlawen.com",
+  "domain": "nosonlawen.com",
+  "hq": "New York, NY",
+  "type": "Growth/Expansion",
+  "tier": 4
+ },
+ {
+  "slug": "nrd-capital",
+  "name": "NRD Capital",
+  "website": "https://www.nrdcapital.com",
+  "domain": "nrdcapital.com",
+  "hq": "Atlanta, GA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "open-prairie-ventures",
+  "name": "Open Prairie Ventures",
+  "website": "https://www.openprairie.com",
+  "domain": "openprairie.com",
+  "hq": "Effingham, IL",
+  "type": "Asset Manager",
+  "tier": 4
+ },
+ {
+  "slug": "orkila-capital",
+  "name": "Orkila Capital",
+  "website": "https://www.orkilacapital.com",
+  "domain": "orkilacapital.com",
+  "hq": "New York, NY",
+  "type": "Growth/Expansion",
+  "tier": 4
+ },
+ {
+  "slug": "outcome-capital",
+  "name": "Outcome Capital",
+  "website": "https://www.outcomecapital.com",
+  "domain": "outcomecapital.com",
+  "hq": "Boston, MA",
+  "type": "Investment Bank",
+  "tier": 4
+ },
+ {
+  "slug": "outfitter-energy-capital",
+  "name": "Outfitter Energy Capital",
+  "website": "https://www.outfitterenergy.com",
+  "domain": "outfitterenergy.com",
+  "hq": "Houston, TX",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "pacific-growth-investors",
+  "name": "Pacific Growth Investors",
+  "website": "https://pginvestors.com",
+  "domain": "pginvestors.com",
+  "hq": "Torrance, CA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "pacifica-enterprises",
+  "name": "Pacifica Enterprises",
+  "website": "https://www.pemginc.com",
+  "domain": "pemginc.com",
+  "hq": "Rancho Santa Fe, CA",
+  "type": "Real Estate",
+  "tier": 4
+ },
+ {
+  "slug": "palisades-growth",
+  "name": "Palisades Growth",
+  "website": "https://www.palisadesgrowth.com",
+  "domain": "palisadesgrowth.com",
+  "hq": "Los Angeles, CA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "palladin-consumer-retail-partners",
+  "name": "Palladin Consumer Retail Partners",
+  "website": "https://www.pcrp.com",
+  "domain": "pcrp.com",
+  "hq": "Boston, MA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "parallax-capital-partners",
+  "name": "Parallax Capital Partners",
+  "website": "https://www.parallaxcap.com",
+  "domain": "parallaxcap.com",
+  "hq": "Laguna Hills, CA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "park-avenue-equity-partners",
+  "name": "Park Avenue Equity Partners",
+  "website": "https://www.pkave.com",
+  "domain": "pkave.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "park-street-capital",
+  "name": "Park Street Capital",
+  "website": "https://www.parkstreetcapital.com",
+  "domain": "parkstreetcapital.com",
+  "hq": "Boston, MA",
+  "type": "Fund of Funds",
+  "tier": 4
+ },
+ {
+  "slug": "paul-capital-partners",
+  "name": "Paul Capital Partners",
+  "website": "https://www.paulcap.com",
+  "domain": "paulcap.com",
+  "hq": "San Francisco, CA",
+  "type": "Fund of Funds",
+  "tier": 4
+ },
+ {
+  "slug": "pavonis-capital-partners",
+  "name": "Pavonis Capital Partners",
+  "website": "https://www.pavonisgroup.com",
+  "domain": "pavonisgroup.com",
+  "hq": "Stafford, TX",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "peachtree-equity-partners",
+  "name": "Peachtree Equity Partners",
+  "website": "https://www.peachtreeequity.com",
+  "domain": "peachtreeequity.com",
+  "hq": "Smyrna, GA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "permit-capital-advisors",
+  "name": "Permit Capital Advisors",
+  "website": "https://www.permitcapital.com",
+  "domain": "permitcapital.com",
+  "hq": "West Conshohocken, PA",
+  "type": "Asset Manager",
+  "tier": 4
+ },
+ {
+  "slug": "point72-hyperscale",
+  "name": "Point72 Hyperscale",
+  "website": "https://point72hyperscale.com",
+  "domain": "point72hyperscale.com",
+  "hq": "Menlo Park, CA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "pouschine-cook-capital-management",
+  "name": "Pouschine Cook Capital Management",
+  "website": "https://www.pouschinecook.com",
+  "domain": "pouschinecook.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "republic-financial-corporation",
+  "name": "Republic Financial Corporation",
+  "website": "https://www.republic-financial.com",
+  "domain": "republic-financial.com",
+  "hq": "Denver, CO",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "retail-restaurant-growth-capital",
+  "name": "Retail & Restaurant Growth Capital",
+  "website": "https://www.rrgc.us",
+  "domain": "rrgc.us",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "ridge-road-partners",
+  "name": "Ridge Road Partners",
+  "website": "https://www.ridgeroadpartners.com",
+  "domain": "ridgeroadpartners.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "river-capital",
+  "name": "River Capital",
+  "website": "https://www.river-capital.com",
+  "domain": "river-capital.com",
+  "hq": "Atlanta, GA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "riverlake-partners",
+  "name": "Riverlake Partners",
+  "website": "https://www.riverlakepartners.com",
+  "domain": "riverlakepartners.com",
+  "hq": "Portland, OR",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "rizvi-traverse-management",
+  "name": "Rizvi Traverse Management",
+  "website": "https://www.rizvitraverse.com",
+  "domain": "rizvitraverse.com",
+  "hq": "West Palm Beach, FL",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "sachs-capital",
+  "name": "Sachs Capital",
+  "website": "https://www.sachscapital.com",
+  "domain": "sachscapital.com",
+  "hq": "Potomac, MD",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "safanad",
+  "name": "Safanad",
+  "website": "https://safanad.com",
+  "domain": "safanad.com",
+  "hq": "New York, NY",
+  "type": "Real Estate",
+  "tier": 4
+ },
+ {
+  "slug": "sand-oak-capital-partners",
+  "name": "Sand Oak Capital Partners",
+  "website": "https://www.sandoak.com",
+  "domain": "sandoak.com",
+  "hq": "Sarasota, FL",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "sandbridge-capital",
+  "name": "Sandbridge Capital",
+  "website": "https://www.sandbridgecap.com",
+  "domain": "sandbridgecap.com",
+  "hq": "Los Angeles, CA",
+  "type": "Growth/Expansion",
+  "tier": 4
+ },
+ {
+  "slug": "sandler-capital-management",
+  "name": "Sandler Capital Management",
+  "website": "https://www.sandlercap.com",
+  "domain": "sandlercap.com",
+  "hq": "New York, NY",
+  "type": "Hedge Fund",
+  "tier": 4
+ },
+ {
+  "slug": "saugatuck-capital",
+  "name": "Saugatuck Capital",
+  "website": "https://www.saugatuckcapital.com",
+  "domain": "saugatuckcapital.com",
+  "hq": "Westport, CT",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "ser-capital-partners",
+  "name": "SER Capital Partners",
+  "website": "https://www.sercapitalpartners.com",
+  "domain": "sercapitalpartners.com",
+  "hq": "Redwood City, CA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "shackleton-equity-partners",
+  "name": "Shackleton Equity Partners",
+  "website": "https://www.shackletonequity.com",
+  "domain": "shackletonequity.com",
+  "hq": "El Segundo, CA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "sidereal-capital-group",
+  "name": "Sidereal Capital Group",
+  "website": "https://www.siderealcapital.com",
+  "domain": "siderealcapital.com",
+  "hq": "Summit, NJ",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "signal-equity-partners",
+  "name": "Signal Equity Partners",
+  "website": "https://www.signal-equity.com",
+  "domain": "signal-equity.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "silverhawk-capital-partners",
+  "name": "Silverhawk Capital Partners",
+  "website": "https://www.silverhawkcapitalpartners.com",
+  "domain": "silverhawkcapitalpartners.com",
+  "hq": "Greenwich, CT",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "small-business-community-capital",
+  "name": "Small Business Community Capital",
+  "website": "https://www.sbccfund.com",
+  "domain": "sbccfund.com",
+  "hq": "Stamford, CT",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "small-enterprise-assistance-funds",
+  "name": "Small Enterprise Assistance Funds",
+  "website": "https://www.seaf.com",
+  "domain": "seaf.com",
+  "hq": "Washington, DC",
+  "type": "Impact Investing",
+  "tier": 4
+ },
+ {
+  "slug": "solen-software-group",
+  "name": "Solen Software Group",
+  "website": "https://www.solensoftwaregroup.com",
+  "domain": "solensoftwaregroup.com",
+  "hq": "Salt Lake City, UT",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "solera-capital",
+  "name": "Solera Capital",
+  "website": "https://www.soleracapital.com",
+  "domain": "soleracapital.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "solis-capital-partners",
+  "name": "Solis Capital Partners",
+  "website": "https://www.soliscapital.com",
+  "domain": "soliscapital.com",
+  "hq": "Newport Beach, CA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "sonoma-brands-capital",
+  "name": "Sonoma Brands Capital",
+  "website": "https://www.sonomabrands.com",
+  "domain": "sonomabrands.com",
+  "hq": "Sonoma, CA",
+  "type": "Growth/Expansion",
+  "tier": 4
+ },
+ {
+  "slug": "spb-partners",
+  "name": "SPB Partners",
+  "website": "https://www.spbpartners.com",
+  "domain": "spbpartners.com",
+  "hq": "Santa Monica, CA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "staple-street-capital",
+  "name": "Staple Street Capital",
+  "website": "https://www.staplestreetcapital.com",
+  "domain": "staplestreetcapital.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "stella-point-capital",
+  "name": "Stella Point Capital",
+  "website": "https://www.stellapoint.com",
+  "domain": "stellapoint.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "stonecreek-capital",
+  "name": "StoneCreek Capital",
+  "website": "https://www.stonecreekcapital.com",
+  "domain": "stonecreekcapital.com",
+  "hq": "Fort Worth, TX",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "stratim-capital",
+  "name": "Stratim Capital",
+  "website": "https://stratimcapital.com",
+  "domain": "stratimcapital.com",
+  "hq": "San Francisco, CA",
+  "type": "Secondary Buyer",
+  "tier": 4
+ },
+ {
+  "slug": "talisman-capital-partners",
+  "name": "Talisman Capital Partners",
+  "website": "https://www.talismancp.com",
+  "domain": "talismancp.com",
+  "hq": "Columbus, OH",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "tano-capital",
+  "name": "Tano Capital",
+  "website": "https://www.greg2936.wixsite.com",
+  "domain": "greg2936.wixsite.com",
+  "hq": "San Mateo, CA",
+  "type": "Asset Manager",
+  "tier": 4
+ },
+ {
+  "slug": "teakwood-capital",
+  "name": "Teakwood Capital",
+  "website": "https://www.teakwoodcapital.com",
+  "domain": "teakwoodcapital.com",
+  "hq": "Coppell, TX",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "teall-capital",
+  "name": "Teall Capital",
+  "website": "https://www.teallse.com",
+  "domain": "teallse.com",
+  "hq": "Winston-Salem, NC",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "techquity-capital-management",
+  "name": "Techquity Capital Management",
+  "website": "https://www.techquitycap.com",
+  "domain": "techquitycap.com",
+  "hq": "Austin, TX",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "tecum-capital",
+  "name": "Tecum Capital",
+  "website": "https://www.tecum.com",
+  "domain": "tecum.com",
+  "hq": "Wexford, PA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "ten-coves-capital",
+  "name": "Ten Coves Capital",
+  "website": "https://www.tencoves.com",
+  "domain": "tencoves.com",
+  "hq": "Darien, CT",
+  "type": "Growth/Expansion",
+  "tier": 4
+ },
+ {
+  "slug": "tgp-investments",
+  "name": "TGP Investments",
+  "website": "https://www.tgpinvestments.com",
+  "domain": "tgpinvestments.com",
+  "hq": "Kansas City, MO",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "the-catalyst-group-houston",
+  "name": "The Catalyst Group (Houston)",
+  "website": "https://www.tcgfunds.com",
+  "domain": "tcgfunds.com",
+  "hq": "Houston, TX",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "the-gores-group",
+  "name": "The Gores Group",
+  "website": "https://www.gores.com",
+  "domain": "gores.com",
+  "hq": "Beverly Hills, CA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "the-sage-group-los-angeles",
+  "name": "The Sage Group (Los Angeles)",
+  "website": "https://www.sagellc.com",
+  "domain": "sagellc.com",
+  "hq": "Los Angeles, CA",
+  "type": "Investment Bank",
+  "tier": 4
+ },
+ {
+  "slug": "the-yucaipa-companies",
+  "name": "The Yucaipa Companies",
+  "website": "https://www.yucaipaco.com",
+  "domain": "yucaipaco.com",
+  "hq": "Los Angeles, CA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "three-cities-research",
+  "name": "Three Cities Research",
+  "website": "https://www.tcr-ny.com",
+  "domain": "tcr-ny.com",
+  "hq": "West Palm Beach, FL",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "torch-hill-investment-partners",
+  "name": "Torch Hill Investment Partners",
+  "website": "https://www.torchhill.com",
+  "domain": "torchhill.com",
+  "hq": "Washington, DC",
+  "type": "Growth/Expansion",
+  "tier": 4
+ },
+ {
+  "slug": "torch-lake-capital-partners",
+  "name": "Torch Lake Capital Partners",
+  "website": "https://www.torchlakecapital.com",
+  "domain": "torchlakecapital.com",
+  "hq": "Denver, CO",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "torque-capital-group",
+  "name": "Torque Capital Group",
+  "website": "https://www.torquecap.com",
+  "domain": "torquecap.com",
+  "hq": "Westport, CT",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "trc-capital-partners",
+  "name": "TRC Capital Partners",
+  "website": "https://www.trccapitalpartners.com",
+  "domain": "trccapitalpartners.com",
+  "hq": "Houston, TX",
+  "type": "Real Estate",
+  "tier": 4
+ },
+ {
+  "slug": "treadstone-partners",
+  "name": "Treadstone Partners",
+  "website": "https://www.treadstone.com",
+  "domain": "treadstone.com",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "trilogy-search-partners",
+  "name": "Trilogy Search Partners",
+  "website": "https://www.trilogy-search.com",
+  "domain": "trilogy-search.com",
+  "hq": "Mercer Island, WA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "trimaran-capital-partners",
+  "name": "Trimaran Capital Partners",
+  "website": "https://www.trimarancapital.com",
+  "domain": "trimarancapital.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "tuatara-capital",
+  "name": "Tuatara Capital",
+  "website": "https://www.tuataracapital.com",
+  "domain": "tuataracapital.com",
+  "hq": "New York, NY",
+  "type": "VC-Backed Company",
+  "tier": 4
+ },
+ {
+  "slug": "tulcan",
+  "name": "Tulcan",
+  "website": "https://www.tulcan.com",
+  "domain": "tulcan.com",
+  "hq": "Houston, TX",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "turnbridge-capital",
+  "name": "Turnbridge Capital",
+  "website": "https://www.turnbridgecapital.com",
+  "domain": "turnbridgecapital.com",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "turning-rock-partners",
+  "name": "Turning Rock Partners",
+  "website": "https://www.turningrockpartners.com",
+  "domain": "turningrockpartners.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "tvc-capital",
+  "name": "TVC Capital",
+  "website": "https://www.tvccapital.com",
+  "domain": "tvccapital.com",
+  "hq": "La Jolla, CA",
+  "type": "Growth/Expansion",
+  "tier": 4
+ },
+ {
+  "slug": "tvv-capital",
+  "name": "TVV Capital",
+  "website": "https://www.tvvcapital.com",
+  "domain": "tvvcapital.com",
+  "hq": "Nashville, TN",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "ultra-capital",
+  "name": "Ultra Capital",
+  "website": "https://www.ultracapital.com",
+  "domain": "ultracapital.com",
+  "hq": "Philadelphia, PA",
+  "type": "Impact Investing",
+  "tier": 4
+ },
+ {
+  "slug": "unc-kenan-flagler-private-equity-fund",
+  "name": "UNC Kenan-Flagler Private Equity Fund",
+  "website": "https://www.kfbspefund.com",
+  "domain": "kfbspefund.com",
+  "hq": "Chapel Hill, NC",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "union-capital",
+  "name": "Union Capital",
+  "website": "https://www.unioncapitalassociates.com",
+  "domain": "unioncapitalassociates.com",
+  "hq": "Greenwich, CT",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "unique-investment",
+  "name": "Unique Investment",
+  "website": "https://www.uniquepartners.com",
+  "domain": "uniquepartners.com",
+  "hq": "Costa Mesa, CA",
+  "type": "Growth/Expansion",
+  "tier": 4
+ },
+ {
+  "slug": "valero-capital-partners",
+  "name": "Valero Capital Partners",
+  "website": "https://www.valerocapital.com",
+  "domain": "valerocapital.com",
+  "hq": "Lowell, MA",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "vernon-park-capital",
+  "name": "Vernon & Park Capital",
+  "website": "https://vernonpark.com",
+  "domain": "vernonpark.com",
+  "hq": "Chicago, IL",
+  "type": "Venture Capital",
+  "tier": 4
+ },
+ {
+  "slug": "vertex-capital",
+  "name": "Vertex Capital",
+  "website": "https://www.vertex-capital.com",
+  "domain": "vertex-capital.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "verus-investment-partners",
+  "name": "Verus Investment Partners",
+  "website": "https://www.veruspartners.com",
+  "domain": "veruspartners.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "vicente-capital-partners",
+  "name": "Vicente Capital Partners",
+  "website": "https://www.vicentecapital.com",
+  "domain": "vicentecapital.com",
+  "hq": "Los Angeles, CA",
+  "type": "Growth/Expansion",
+  "tier": 4
+ },
+ {
+  "slug": "warson-capital-partners",
+  "name": "Warson Capital Partners",
+  "website": "https://www.warsoncapital.com",
+  "domain": "warsoncapital.com",
+  "hq": "Saint Louis, MO",
+  "type": "Investment Bank",
+  "tier": 4
+ },
+ {
+  "slug": "wexford-capital",
+  "name": "Wexford Capital",
+  "website": "https://www.wexford.com",
+  "domain": "wexford.com",
+  "hq": "West Palm Beach, FL",
+  "type": "Asset Manager",
+  "tier": 4
+ },
+ {
+  "slug": "wheelhouse-360",
+  "name": "Wheelhouse 360",
+  "website": "https://www.wheelhouse360.com",
+  "domain": "wheelhouse360.com",
+  "hq": "Stamford, CT",
+  "type": "Venture Capital",
+  "tier": 4
+ },
+ {
+  "slug": "whiterock-capital",
+  "name": "Whiterock Capital",
+  "website": "https://www.whiterockpe.com",
+  "domain": "whiterockpe.com",
+  "hq": "Austin, TX",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "wingate-partners",
+  "name": "Wingate Partners",
+  "website": "https://www.wingatepartners.com",
+  "domain": "wingatepartners.com",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "winona-capital-management",
+  "name": "Winona Capital Management",
+  "website": "https://www.winonacapital.com",
+  "domain": "winonacapital.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "winston-partners",
+  "name": "Winston Partners",
+  "website": "https://www.winstonpartners.com",
+  "domain": "winstonpartners.com",
+  "hq": "Arlington, VA",
+  "type": "Hedge Fund",
+  "tier": 4
+ },
+ {
+  "slug": "woodside-capital-partners-derry",
+  "name": "Woodside Capital Partners (Derry)",
+  "website": "https://www.woodsidemanagement.com",
+  "domain": "woodsidemanagement.com",
+  "hq": "Derry, NH",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "yenni-capital",
+  "name": "Yenni Capital",
+  "website": "https://www.yennicapital.com",
+  "domain": "yennicapital.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 4
+ },
+ {
+  "slug": "your-source-financial",
+  "name": "Your Source Financial",
+  "website": "https://www.ysfi.com",
+  "domain": "ysfi.com",
+  "hq": "Phoenix, AZ",
+  "type": "Asset Manager",
+  "tier": 4
+ },
+ {
+  "slug": "zephyr-management",
+  "name": "Zephyr Management",
+  "website": "https://www.zmlp.com",
+  "domain": "zmlp.com",
+  "hq": "New York, NY",
+  "type": "Asset Manager",
+  "tier": 4
+ }
+]

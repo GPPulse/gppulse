@@ -75,7 +75,7 @@ serve(async (req: Request): Promise<Response> => {
 
   const body = await req.json().catch(() => ({}));
   const limit = Number(body.limit ?? 25);
-  let q = supabase.from("pe_firm_sources").select("id, name, website_url, feed_url, news_path").eq("is_active", true).order("name").limit(limit);
+  let q = supabase.from("pe_firm_sources").select("id, name, website_url, feed_url, news_path").eq("is_active", true).eq("watchlist", false).order("name").limit(limit); // watchlist firms are discovered by firm-watch/
   if (!body.redo) q = q.is("discovered_at", null);
   const { data: firms, error } = await q;
   if (error) return new Response(JSON.stringify({ error: error.message }), { status: 500, headers: corsHeaders });

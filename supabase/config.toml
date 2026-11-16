@@ -44,3 +44,9 @@ verify_jwt = false
 
 [functions.scrape-form-d]
 verify_jwt = false
+
+[functions.firm-watch]
+verify_jwt = false
+
+[functions.inbound-email]
+verify_jwt = false

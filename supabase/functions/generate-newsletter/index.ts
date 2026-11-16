@@ -28,6 +28,7 @@ type DbArticle = {
   source_url: string | null;
   fund_size_relevant: boolean | null;
   relevance_score: number | null;
+  watchlist_firm?: string | null;
   published_at: string | null;
   scraped_at: string;
 };
@@ -288,7 +289,9 @@ serve(async (req: Request): Promise<Response> => {
 
     const yStart = new Date(todayStart); yStart.setDate(yStart.getDate() - 1);
     const tier = (a: DbArticle) => { const d = new Date(a.published_at ?? a.scraped_at); return d >= todayStart ? 2 : d >= yStart ? 1 : 0; };
-    articles.sort((a, b) => tier(b) - tier(a) || (b.relevance_score ?? 0) - (a.relevance_score ?? 0));
+    // Within a day, watchlist firms (true middle market) outrank everything else.
+    const onList = (a: DbArticle) => Number(Boolean(a.watchlist_firm));
+    articles.sort((a, b) => tier(b) - tier(a) || onList(b) - onList(a) || (b.relevance_score ?? 0) - (a.relevance_score ?? 0));
 
     const seen = new Set<string>();
     // Dedupe on title (and person for moves). Source is a feed name now, not a firm, so it's not a key.

@@ -6,7 +6,7 @@
 # Optional — set any of these and they are pushed as edge-function secrets:
 #   RESEND_API_KEY FIRECRAWL_API_KEY ANTHROPIC_API_KEY OPENAI_API_KEY OPENAI_BASE_URL AI_PROVIDER FRED_API_KEY
 #   NEWSLETTER_FROM NEWSLETTER_REPLY_TO NEWSLETTER_POSTAL_ADDRESS NEWSLETTER_EDITOR_NAME NEWSLETTER_EDITOR_TITLE
-#   SITE_URL RESEND_WEBHOOK_SECRET PIPELINE_SECRET AUTO_SEND
+#   SITE_URL RESEND_WEBHOOK_SECRET RESEND_INBOUND_WEBHOOK_SECRET PIPELINE_SECRET AUTO_SEND
 name: Deploy backend
 on:
   push:
@@ -31,7 +31,7 @@ jobs:
           : > .secrets.env
           for k in RESEND_API_KEY FIRECRAWL_API_KEY ANTHROPIC_API_KEY OPENAI_API_KEY OPENAI_BASE_URL AI_PROVIDER FRED_API_KEY \
                    NEWSLETTER_FROM NEWSLETTER_REPLY_TO NEWSLETTER_POSTAL_ADDRESS NEWSLETTER_EDITOR_NAME NEWSLETTER_EDITOR_TITLE \
-                   SITE_URL RESEND_WEBHOOK_SECRET PIPELINE_SECRET AUTO_SEND; do
+                   SITE_URL RESEND_WEBHOOK_SECRET RESEND_INBOUND_WEBHOOK_SECRET PIPELINE_SECRET AUTO_SEND; do
             v="${!k:-}"; [ -n "$v" ] && printf '%s=%s\n' "$k" "$v" >> .secrets.env
           done
           if [ -s .secrets.env ]; then supabase secrets set --project-ref "$PROJECT_REF" --env-file .secrets.env --yes; else echo "no secrets provided"; fi
@@ -51,5 +51,6 @@ jobs:
           NEWSLETTER_EDITOR_TITLE: ${{ secrets.NEWSLETTER_EDITOR_TITLE }}
           SITE_URL: ${{ secrets.SITE_URL }}
           RESEND_WEBHOOK_SECRET: ${{ secrets.RESEND_WEBHOOK_SECRET }}
+          RESEND_INBOUND_WEBHOOK_SECRET: ${{ secrets.RESEND_INBOUND_WEBHOOK_SECRET }}
           PIPELINE_SECRET: ${{ secrets.PIPELINE_SECRET }}
           AUTO_SEND: ${{ secrets.AUTO_SEND }}

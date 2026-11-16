@@ -1,0 +1,14 @@
+{
+  "name": "gppulse-firm-watch",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "discover": "node src/discover.mjs",
+    "crawl": "node src/crawl.mjs",
+    "test": "node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0",
+    "fast-xml-parser": "^4.5.0"
+  }
+}

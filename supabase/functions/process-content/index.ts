@@ -17,7 +17,19 @@ interface ProcessedArticle {
   estimated_publish_date: string | null;
 }
 
-async function processWithAI(content: string, title: string, apiKey: string): Promise<ProcessedArticle | null> {
+// Whole-phrase match of watchlist firm names in a headline or release. Names that are a single
+// word or very short only count next to a private-equity cue, to keep false matches out.
+function buildWatchlistMatcher(names: string[]): (text: string) => string | null {
+  const esc = (v: string) => v.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const entries = names.map((name) => {
+    const weak = name.trim().split(/\s+/).length === 1 || name.length < 9 || !/(capital|partners|equity|group|holdings|investments?|ventures|management|advisors|associates|industries|fund|company|&)/i.test(name);
+    return { name, weak, re: new RegExp(`(^|[^A-Za-z0-9])${esc(name).replace(/\\?&/g, "(&|and)").replace(/\s+/g, "\\s+")}([^A-Za-z0-9]|$)`, weak ? "" : "i") };
+  });
+  const cue = /private equity|investment firm|portfolio company|buyout|middle[- ]market|backed by|family office|private investment/i;
+  return (text) => entries.find((e) => e.re.test(text) && (!e.weak || cue.test(text)))?.name ?? null;
+}
+
+async function processWithAI(content: string, title: string, apiKey: string, watchlistFirm: string | null = null): Promise<ProcessedArticle | null> {
   try {
     const response = await (async () => {
       const __text = await chat("", `You are a private equity news analyst focused on NORTH AMERICAN LOWER MIDDLE MARKET (US and Canada, funds/deals under $1B) only. Today's date is ${new Date().toISOString().split('T')[0]}. Analyze the following article and provide:
@@ -38,6 +50,7 @@ CRITICAL FILTERING RULES — score 0 if ANY apply:
 - People moves at law firms, lawyers, accounting firms, consulting firms, recruiters, or ANY non-PE/non-investment-banking firm
 - "Partnerships" that are NOT equity transactions (cybersecurity partnerships, technology vendor partnerships, marketing partnerships, channel partnerships, strategic alliances that don't involve equity ownership)
 - Article is more than 7 days old
+- LARGE SPONSORS: if the sponsor's flagship fund is over $2B (upper middle market and up — e.g. Genstar, Audax, H.I.G., Clayton Dubilier & Rice, Platinum Equity, Clearlake, New Mountain, American Securities, Madison Dearborn, GTCR, Veritas) and no smaller sponsor is the buyer or seller, cap the relevance score at 35. Our readers run funds under $2B.
 - MEGA-CAP PE FIRMS (these are NOT lower middle market): Apollo, Blackstone, KKR, Carlyle, TPG, Ares, Bain Capital, Warburg Pincus, Advent International, Thoma Bravo, Vista Equity, Silver Lake, Hellman & Friedman, Leonard Green, General Atlantic, CVC Capital, EQT, Permira, Cinven, Apax, Brookfield Asset Management, Blue Owl. Score these 0 for fund_tracker and headline; may score >0 for market_insight only if the insight is broadly applicable.
 
 DEAL vs PARTNERSHIP distinction:
@@ -51,7 +64,7 @@ Respond in JSON format only:
   "fund_size_relevant": true/false,
   "relevance_score": 0-100,
   "estimated_publish_date": "YYYY-MM-DD" or null
-}`, `Title: ${title}\n\nContent: ${content}`, { temperature: 0.3, maxTokens: 500 });
+}`, `Title: ${title}\n\nContent: ${content}${watchlistFirm ? `\n\nEditor's note: ${watchlistFirm} is on our watchlist of US middle-market private equity firms (AUM under $2B). News about its deals, exits, fund closes and promotions is core coverage: set fund_size_relevant true, and score a genuine transaction, fund close or senior promotion at this firm 75 or higher.` : ""}`, { temperature: 0.3, maxTokens: 500 });
       return { ok: true, status: 200, json: async () => ({ choices: [{ message: { content: __text } }] }), text: async () => "" };
     })();
 
@@ -129,7 +142,7 @@ serve(async (req: Request): Promise<Response> => {
     // Fetch unprocessed scraped content
     const { data: content, error: contentError } = await supabase
       .from("scraped_content")
-      .select("*, pe_firm_sources(name, website_url)")
+      .select("*, pe_firm_sources(name, website_url, watchlist)")
       .eq("processed", false)
       .order("scraped_at", { ascending: true })
       .limit(limit);
@@ -150,6 +163,10 @@ serve(async (req: Request): Promise<Response> => {
     let processed = 0;
     let articlesCreated = 0;
 
+    // Watchlist firm names, for spotting them in wire releases and news-search items.
+    const { data: watchRows } = await supabase.from("pe_firm_sources").select("name").eq("watchlist", true).eq("is_active", true).limit(2000);
+    const matchWatchlist = buildWatchlistMatcher((watchRows ?? []).map((r: { name: string }) => r.name));
+
     for (const item of content) {
       try {
         // Cheap pre-check: if a near-identical title already became an article, skip the AI call entirely.
@@ -168,10 +185,14 @@ serve(async (req: Request): Promise<Response> => {
           }
         }
         // Process with AI
+        const watchlistFirm: string | null = item.pe_firm_sources?.watchlist
+          ? item.pe_firm_sources.name
+          : matchWatchlist(`${item.title ?? ""} ${(item.raw_content ?? "").slice(0, 1500)}`);
         const result = await processWithAI(
           item.raw_content || item.title || "",
           item.title || "Untitled",
-          lovableApiKey
+          lovableApiKey,
+          watchlistFirm
         );
 
         console.log(`AI result for "${item.title}": score=${result?.relevance_score}, category=${result?.category}`);
@@ -224,6 +245,7 @@ serve(async (req: Request): Promise<Response> => {
               category: result.category,
               fund_size_relevant: result.fund_size_relevant,
               relevance_score: result.relevance_score,
+              watchlist_firm: watchlistFirm,
               source: sourceName,
               source_url: item.url,
               original_content: item.raw_content,
