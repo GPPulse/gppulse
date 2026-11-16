@@ -129,7 +129,7 @@ serve(async (req: Request): Promise<Response> => {
       .from("pe_firm_sources")
       .select("*")
       .eq("is_active", true)
-      .eq("watchlist", false) // watchlist firms are crawled by firm-watch/ (GitHub Actions)
+      .eq("watchlist", false).eq("source_kind", "sponsor") // watchlist firms are crawled by firm-watch/ (GitHub Actions)
       .order("last_scraped_at", { ascending: true, nullsFirst: true })
       .limit(limit);
 

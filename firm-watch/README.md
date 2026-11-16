@@ -22,6 +22,19 @@ recently they did a deal (`watch_tier` 1 = last 12 months … 4 = none in 5 year
 | Email intake | `supabase/functions/inbound-email` | Resend calls it for mail sent to `watch@in.thegppulse.com`. Logs to `watch_inbox`; firm announcements also go to the classifier. |
 | Schedule | `.github/workflows/firm-watch.yml` | Daily crawl, Sunday retry of firms with no source, manual runs. |
 
+## Deals nobody announces
+
+Two more sources feed the same queue:
+
+- **Advisor and lender tombstones.** `data/advisors.json` lists M&A advisors and lenders
+  (`source_kind` advisor / lender). Discovery finds each one's closed-transactions page; the
+  crawl reads it with `extractTombstones` and queues new blocks. The classifier is told the
+  source is the advisor or lender on the deal, not the buyer.
+- **Portfolio watch** (`src/portfolio.mjs`). Finds each sponsor's portfolio page, stores the
+  company names on it, and on later runs sends new names to the Editor's Desk as `overheard`
+  items with status `submitted`. These are inferences. They are never published automatically.
+  A swing of more than three additions is treated as a redesign and only re-baselined.
+
 The first time a firm is crawled its archive is recorded as already seen and only items
 from the last 10 days are queued. The crawler identifies itself as `GPPulseBot`, obeys
 robots.txt and makes two or three requests per firm per day.

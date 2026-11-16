@@ -276,3 +276,101 @@ export function nameMatcher(firms) {
 }
 
 export const itemKey = (firmSlug, title) => `${firmSlug}|${title.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().split(' ').slice(0, 12).join(' ')}`;
+
+// ---------- tombstones (advisor and lender "closed transactions" pages) ----------
+
+const DEAL_RE = /\b(has|have) been (acquired|sold|recapitalized)|\b(was|were) (acquired|sold|recapitalized)|\bacquired by\b|\bsold to\b|\bsale (of|to)\b|\brecapitaliz|\bportfolio company of\b|\bmerged with\b|\bmerger with\b|\bacquisition of\b|\bhas acquired\b|\bhas (completed|received|closed|partnered)\b|\b(investment|financing|refinancing|credit facility|unitranche|senior debt|growth capital|majority investment|minority investment) (from|by|for|to|in)\b|\b(sell|buy)-?side advis|\badvis[eo]r to\b|\bled by\b|\bagent\b.*\b(acquisition|buyout|recapitalization)\b/i;
+
+const fnv = (s) => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0).toString(36); };
+
+// A tombstone is a small repeated block ("Acme has been acquired by Beta, a portfolio company
+// of Gamma"). They often have no link of their own and use logos for the names, so image alt
+// text is folded into the wording and each block gets a stable address derived from its text.
+export function extractTombstones(html, pageUrl) {
+  const $ = cheerio.load(html);
+  $('nav, header, footer, script, style, noscript, form, [role="navigation"], .menu, .nav, .footer, .header, .pagination, .breadcrumb').remove();
+  $('img[alt]').each((_, el) => { const alt = clean($(el).attr('alt')).replace(/\s*logo\s*$/i, ''); if (alt.length >= 2 && alt.length <= 80) $(el).replaceWith(` ${alt} `); });
+  // Block elements run together once tags are stripped; keep a space between them.
+  $('p, div, li, h1, h2, h3, h4, h5, h6, span, td, br, figcaption').each((_, el) => { $(el).append(' '); });
+  const out = new Map();
+  const taken = new Set();
+  const says = (node) => { const t = clean($(node).text()); return t.length >= 25 && t.length <= 320 && DEAL_RE.test(t); };
+  for (const el of $('body *').toArray().slice(0, 6000)) {
+    if (taken.has(el) || !says(el)) continue;
+    const text = clean($(el).text());
+    if (/\b(we|our|us)\b/i.test(text)) continue; // prose about the firm, not a transaction
+    // Several deal statements inside means this is the grid, not a tombstone; go deeper.
+    if ($(el).children().toArray().filter(says).length >= 2) continue;
+    $(el).find('*').each((_, d) => { taken.add(d); });
+    let url = null;
+    const a = el.tagName === 'a' ? $(el) : $(el).find('a[href]').first().length ? $(el).find('a[href]').first() : $(el).closest('a[href]');
+    if (a.length) { try { const u = new URL(a.attr('href'), pageUrl).href.split('#')[0]; if (sameSite(u, pageUrl) && u.replace(/\/$/, '') !== pageUrl.replace(/\/$/, '') && !SKIP_PATH.test(u)) url = u; } catch { /* no usable link */ } }
+    const title = text.replace(/\s*(view (details|transaction|case study)|read more|learn more|details)\s*$/i, '').slice(0, 220);
+    const key = title.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+    if (!url) url = `${pageUrl.split('#')[0]}#t-${fnv(key)}`;
+    if (![...out.values()].some((o) => o.key === key)) out.set(url, { url, title, date: parseDate(text.match(/\b(20\d{2}-\d{2}-\d{2}|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[a-z]*\.?\s+\d{1,2},?\s+\d{4})\b/i)?.[0]), key });
+  }
+  return [...out.values()].map(({ key, ...rest }) => rest).slice(0, 200);
+}
+
+// ---------- portfolio pages ----------
+
+const NOT_A_COMPANY = /^(portfolio|current|realized|exited|active|prior|past|all|view|learn|read|more|industr|sector|filter|our|home|about|team|contact|news|investments?|companies|status|website|visit|search|menu|close|back|next|previous|select|show|load|see|click|skip|privacy|terms|careers?|login|log in|subscribe|follow|share|linkedin|twitter|facebook|criteria|strategy|approach|overview|headquarters|year|acquired|invested|sold|platform|add-?on|category|type|fund|page|image|photo|icon|logo|arrow|placeholder)\b/i;
+
+export const normName = (s) => s.toLowerCase().replace(/&amp;/g, '&').replace(/\b(inc|llc|l\.l\.c|corp|corporation|co|company|ltd|lp|holdings|group)\b\.?/g, ' ').replace(/[^a-z0-9]+/g, ' ').trim();
+
+// Company names on a sponsor's portfolio page: logo alt text, card headings, and links out to
+// company sites or to per-company pages. Deliberately broad; the daily comparison is what matters.
+export function extractPortfolio(html, pageUrl) {
+  const $ = cheerio.load(html);
+  $('nav, header, footer, script, style, noscript, form, [role="navigation"], .menu, .nav, .footer, .header, .pagination, .breadcrumb').remove();
+  const names = new Map();
+  const add = (raw) => {
+    const name = clean(raw).replace(/\s*(logo|website|\(opens in a new (tab|window)\))\s*$/i, '').replace(/^logo (of|for)\s+/i, '').trim();
+    if (name.length < 2 || name.length > 60 || !/[A-Za-z]/.test(name) || name.split(' ').length > 6 || NOT_A_COMPANY.test(name) || /[.!?:]$/.test(name) || /^\d+$/.test(name)) return;
+    const key = normName(name);
+    if (key.length >= 2 && !names.has(key)) names.set(key, name);
+  };
+  const pagePath = new URL(pageUrl).pathname.replace(/\/$/, '');
+  $('img[alt]').each((_, el) => add($(el).attr('alt')));
+  $('h2, h3, h4, h5').each((_, el) => add($(el).text()));
+  $('a[href]').each((_, el) => {
+    let u; try { u = new URL($(el).attr('href'), pageUrl); } catch { return; }
+    const external = !sameSite(u.href, pageUrl) && !/linkedin|twitter|facebook|instagram|youtube|x\.com|google\.|vimeo/i.test(u.hostname);
+    const child = sameSite(u.href, pageUrl) && pagePath && u.pathname.startsWith(pagePath + '/') && u.pathname.replace(/\/$/, '') !== pagePath;
+    if (external || child) add($(el).text() || $(el).attr('title') || $(el).attr('aria-label') || '');
+  });
+  return [...names.values()];
+}
+
+// Compare today's portfolio names with the stored ones. Returns what to store and which
+// additions are worth showing an editor. A big swing means the page was redesigned or failed
+// to load, not that the firm did ten deals overnight.
+export function diffPortfolio(oldNames, newNames) {
+  if (!oldNames || !oldNames.length) return { store: newNames, added: [], reason: 'baseline' };
+  if (newNames.length < Math.max(3, oldNames.length * 0.5)) return { store: oldNames, added: [], reason: 'page looked incomplete; kept previous list' };
+  const oldKeys = new Set(oldNames.map(normName));
+  const newKeys = new Set(newNames.map(normName));
+  const added = newNames.filter((n) => !oldKeys.has(normName(n)));
+  const removed = oldNames.filter((n) => !newKeys.has(normName(n)));
+  if (!added.length && !removed.length) return { store: oldNames, added: [], reason: 'unchanged' };
+  if (added.length > 3 || added.length + removed.length > Math.max(4, oldNames.length * 0.2)) return { store: newNames, added: [], reason: 'large change; treated as a redesign' };
+  return { store: newNames, added, removed, reason: 'changed' };
+}
+
+// Links on a home page that look like the page we want (by link text or path).
+export function findLinks(html, baseUrl, textRe, pathRe) {
+  const $ = cheerio.load(html);
+  const hits = new Map();
+  $('a[href]').each((_, el) => {
+    let u; try { u = new URL($(el).attr('href'), baseUrl); } catch { return; }
+    const href = u.href.split('#')[0];
+    if (!sameSite(href, baseUrl) || SKIP_PATH.test(href) || u.pathname === '/' || u.pathname.split('/').filter(Boolean).length > 2) return;
+    const text = clean($(el).text());
+    let score = 0;
+    if (pathRe.test(u.pathname)) score += 2;
+    if (text.length <= 40 && textRe.test(text)) score += 2;
+    if (score >= 2 && (hits.get(href) || 0) < score) hits.set(href, score);
+  });
+  return [...hits.entries()].sort((a, b) => b[1] - a[1] || a[0].length - b[0].length).map(([u]) => u).slice(0, 4);
+}

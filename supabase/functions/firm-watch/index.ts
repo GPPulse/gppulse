@@ -15,6 +15,7 @@ import { getStaff, isInternalCall, unauthorized } from "../_shared/auth.ts";
 //   items       -> { items: [{ firm_id, url, title, content, published_at, source_name, category_hint, seen_only }] }
 //                  seen_only rows are archive entries recorded so they are never reported as new;
 //                  they skip the classifier.
+//   portfolio   -> { firms: [{ id, portfolio_url, names }], signals: [{ headline, body, url }] }
 //   crawled     -> { firm_ids: [...] } stamps last_scraped_at
 
 const corsHeaders = {
@@ -38,8 +39,8 @@ serve(async (req: Request): Promise<Response> => {
         const rows: unknown[] = [];
         for (let from = 0; ; from += 1000) {
           const { data, error } = await supabase.from("pe_firm_sources")
-            .select("id, name, website_url, domain, watch_tier, news_url, feed_url, discovered_at, last_scraped_at, linkedin_url, signup_page, signup_provider, subscribed_at, discovery_note")
-            .eq("watchlist", true).eq("is_active", true).order("watch_tier").order("name").range(from, from + 999);
+            .select("id, name, website_url, domain, watchlist, source_kind, watch_tier, news_url, feed_url, deals_url, portfolio_url, portfolio_names, portfolio_checked_at, discovered_at, last_scraped_at, linkedin_url, signup_page, signup_provider, subscribed_at, discovery_note")
+            .or("watchlist.eq.true,source_kind.in.(advisor,lender)").eq("is_active", true).order("watch_tier").order("name").range(from, from + 999);
           if (error) throw new Error(error.message);
           rows.push(...(data ?? []));
           if ((data ?? []).length < 1000) break;
@@ -51,7 +52,7 @@ serve(async (req: Request): Promise<Response> => {
         // Idempotent load of firm-watch/data/firms.json. Firms already tracked are matched on
         // domain and flagged; new ones are inserted. Discovery state is only reset the first
         // time a firm joins the watchlist.
-        const list = ((body.firms ?? []) as Array<{ name: string; website: string; domain: string; hq?: string; type?: string; tier?: number }>).filter((f) => f?.name && f?.website && f?.domain);
+        const list = ((body.firms ?? []) as Array<{ name: string; website: string; domain: string; hq?: string; type?: string; tier?: number; kind?: string }>).filter((f) => f?.name && f?.website && f?.domain);
         const existing = new Map<string, { id: string; watchlist: boolean; watch_tier: number | null }>();
         for (let from = 0; ; from += 1000) {
           const { data, error } = await supabase.from("pe_firm_sources").select("id, domain, watchlist, watch_tier").range(from, from + 999);
@@ -63,7 +64,9 @@ serve(async (req: Request): Promise<Response> => {
         const fresh: Record<string, unknown>[] = [];
         for (const f of list) {
           const hit = existing.get(f.domain);
-          if (!hit) { fresh.push({ name: f.name, website_url: f.website, domain: f.domain, headquarters: f.hq ?? null, firm_type: f.type ?? null, watchlist: true, watch_tier: f.tier ?? 4 }); continue; }
+          const kind = f.kind === "advisor" || f.kind === "lender" ? f.kind : "sponsor";
+          if (!hit) { fresh.push({ name: f.name, website_url: f.website, domain: f.domain, headquarters: f.hq ?? null, firm_type: f.type ?? null, watchlist: kind === "sponsor", watch_tier: kind === "sponsor" ? f.tier ?? 4 : null, source_kind: kind }); continue; }
+          if (kind !== "sponsor") continue; // an advisor or lender already tracked is left as it is
           if (hit.watchlist && hit.watch_tier === (f.tier ?? 4)) continue;
           const patch: Record<string, unknown> = { watchlist: true, watch_tier: f.tier ?? 4, firm_type: f.type ?? null };
           if (!hit.watchlist) patch.discovered_at = null;
@@ -86,9 +89,9 @@ serve(async (req: Request): Promise<Response> => {
           const news_path = f.news_url ? (() => { try { return new URL(f.news_url!).pathname; } catch { return null; } })() : null;
           const { error } = await supabase.from("pe_firm_sources").update({
             news_url: f.news_url ?? null, news_path, feed_url: f.feed_url ?? null, linkedin_url: f.linkedin_url ?? null,
-            signup_page: f.signup_page ?? null, signup_provider: f.signup_provider ?? null,
+            signup_page: f.signup_page ?? null, signup_provider: f.signup_provider ?? null, deals_url: f.deals_url ?? null,
             discovered_at: new Date().toISOString(), discovery_note: (f.note ?? "").slice(0, 300),
-          }).eq("id", f.id).eq("watchlist", true);
+          }).eq("id", f.id);
           if (!error) updated++;
         }
         return json({ updated });
@@ -134,6 +137,31 @@ serve(async (req: Request): Promise<Response> => {
           queued += (data ?? []).filter((r: { processed: boolean }) => !r.processed).length;
         }
         return json({ created, queued });
+      }
+
+      case "portfolio": {
+        // Daily portfolio-page comparison. `firms` carries the list of company names to store for
+        // each sponsor; `signals` are additions worth an editor's eye. Signals are inferences, so
+        // they go to the Editor's Desk as submitted items and are never published automatically.
+        const firms = (body.firms ?? []) as Array<{ id: string; portfolio_url?: string | null; names?: string[] | null }>;
+        const now = new Date().toISOString();
+        for (const f of firms) {
+          if (!f.id) continue;
+          const patch: Record<string, unknown> = { portfolio_checked_at: now };
+          if (f.portfolio_url !== undefined) patch.portfolio_url = f.portfolio_url;
+          if (Array.isArray(f.names)) patch.portfolio_names = f.names.slice(0, 600);
+          await supabase.from("pe_firm_sources").update(patch).eq("id", f.id);
+        }
+        const signals = (body.signals ?? []) as Array<{ headline: string; body: string; url: string }>;
+        let filed = 0;
+        for (const sig of signals.slice(0, 50)) {
+          if (!sig?.headline) continue;
+          const { data: dup } = await supabase.from("editor_items").select("id").eq("headline", sig.headline.slice(0, 200)).limit(1);
+          if (dup?.length) continue;
+          const { error } = await supabase.from("editor_items").insert({ kind: "overheard", headline: sig.headline.slice(0, 200), body: (sig.body ?? "").slice(0, 1000), url: sig.url ?? null, attribution: "GP Pulse firm watch", status: "submitted" });
+          if (error) console.error("firm-watch portfolio signal", error.message); else filed++;
+        }
+        return json({ updated: firms.length, filed });
       }
 
       case "crawled": {

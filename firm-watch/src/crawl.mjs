@@ -6,7 +6,7 @@
 //   node src/crawl.mjs [--tier 2] [--limit 50] [--no-gnews] [--gnews-tier 2] [--dry]
 import { appendFile } from 'node:fs/promises';
 import * as cheerio from 'cheerio';
-import { get, pool, sleep, allowed, extractItems, parseFeed, looksLikeFeed, classify, RELEVANT, nameMatcher } from './lib.mjs';
+import { get, pool, sleep, allowed, extractItems, extractTombstones, parseFeed, looksLikeFeed, classify, RELEVANT, nameMatcher } from './lib.mjs';
 import { api, chunk } from './api.mjs';
 
 const args = process.argv.slice(2);
@@ -24,7 +24,7 @@ export function triage(items, { firstCrawl, freshDays = 10, now = Date.now() }) 
   const queue = [], seenOnly = [];
   for (const it of items) {
     const age = daysAgo(it.date, now);
-    const kind = classify(it.title, it.summary);
+    const kind = it.kind || classify(it.title, it.summary);
     const fresh = firstCrawl ? age !== null && age <= freshDays : age === null || age <= freshDays;
     (fresh && RELEVANT.has(kind) ? queue : seenOnly).push({ ...it, kind });
   }
@@ -53,6 +53,11 @@ async function readFirm(firm) {
       if (res.ok) found.push(...extractItems(res.body, res.url).map((i) => ({ ...i, via: 'firm site' }))); else failed++;
     }
   }
+  // Advisors and lenders: every block on the closed-transactions page is a deal by definition.
+  if (firm.deals_url && (await allowed(firm.deals_url))) {
+    const res = await get(firm.deals_url);
+    if (res.ok) found.push(...extractTombstones(res.body, res.url).map((i) => { const k = classify(i.title); return { ...i, kind: RELEVANT.has(k) ? k : 'platform', via: 'tombstone' }; })); else failed++;
+  }
   return { firm, found, failed: failed > 0 && !found.length };
 }
 
@@ -77,8 +82,8 @@ async function googleNews(firms) {
 async function main() {
   let { firms } = await api('firms');
   firms = firms.filter((f) => (f.watch_tier ?? 4) <= Number(opt('tier', 4)));
-  const crawlable = firms.filter((f) => f.news_url || f.feed_url).slice(0, Number(opt('limit', 1e9)));
-  console.log(`Watchlist: ${firms.length} firms, ${crawlable.length} with a news page or feed`);
+  const crawlable = firms.filter((f) => f.news_url || f.feed_url || f.deals_url).slice(0, Number(opt('limit', 1e9)));
+  console.log(`${firms.filter((f) => f.watchlist).length} watchlist sponsors and ${firms.filter((f) => !f.watchlist).length} advisors/lenders; ${crawlable.length} with something to read`);
 
   const read = (await pool(crawlable, 8, readFirm)).filter((r) => r?.firm);
   const failing = read.filter((r) => r.failed).map((r) => r.firm.name);
@@ -97,7 +102,7 @@ async function main() {
   }
 
   if (!flag('no-gnews')) {
-    const active = firms.filter((f) => (f.watch_tier ?? 4) <= Number(opt('gnews-tier', 2)));
+    const active = firms.filter((f) => f.watchlist && (f.watch_tier ?? 4) <= Number(opt('gnews-tier', 2)));
     console.log(`Searching Google News for the ${active.length} most active firms`);
     const news = await googleNews(active);
     const fresh = new Set();
@@ -108,7 +113,7 @@ async function main() {
   }
 
   // Full text for what is going to the classifier, so it has more than a headline to read.
-  await pool(queue.filter((i) => i.via !== undefined && !i.via.startsWith('Google News')), 6, async (it) => {
+  await pool(queue.filter((i) => i.via !== undefined && !i.via.startsWith('Google News') && !i.url.includes('#t-')), 6, async (it) => {
     if (!(await allowed(it.url))) return;
     const res = await get(it.url);
     if (res.ok) it.content = articleText(res.body);
@@ -122,7 +127,9 @@ async function main() {
 
   const row = (i, seen_only) => ({
     firm_id: i.firm.id, url: i.url, title: i.title, seen_only,
-    content: seen_only ? null : [i.content || i.summary || i.title, `\n[Watchlist firm: ${i.firm.name}. Found via ${i.via}.]`].join(''),
+    content: seen_only ? null : [i.content || i.summary || i.title, i.firm.watchlist
+      ? `\n[Watchlist firm: ${i.firm.name}. Found via ${i.via}.]`
+      : `\n[Source: ${i.firm.name}, ${i.firm.source_kind === 'lender' ? 'a middle-market lender' : 'an M&A advisor'}, from its own ${i.via === 'tombstone' ? 'list of closed transactions' : 'site'}. ${i.firm.name} is the ${i.firm.source_kind === 'lender' ? 'lender' : 'advisor'} on the deal, not the buyer.]`].join(''),
     published_at: i.date ? new Date(i.date.length === 10 ? i.date + 'T12:00:00Z' : i.date).toISOString() : null,
     source_name: i.firm.name, category_hint: HINT[i.kind] || null,
   });

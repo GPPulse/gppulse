@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { scanHome, extractItems, parseFeed, parseDate, parseRobots, classify, nameMatcher, itemKey } from '../src/lib.mjs';
+import { scanHome, extractItems, parseFeed, parseDate, parseRobots, classify, nameMatcher, itemKey, extractTombstones, extractPortfolio, diffPortfolio, findLinks } from '../src/lib.mjs';
 import { triage, articleText } from '../src/crawl.mjs';
 
 const fx = (n) => readFileSync(new URL(`./fixtures/${n}`, import.meta.url), 'utf8');
@@ -109,4 +109,40 @@ test('article text extraction', () => {
 
 test('same headline from site and wire collapses to one key', () => {
   assert.equal(itemKey('x', 'Centre Partners Acquires Acme Foods'), itemKey('x', 'Centre Partners acquires Acme Foods!'));
+});
+
+test('tombstones: one item per deal block, logos read as names, non-deals and boilerplate skipped', () => {
+  const items = extractTombstones(fx('tombstones.html'), 'https://bank.example/transactions/');
+  assert.deepEqual(items.map((i) => i.title), [
+    'Acme Fasteners has been acquired by Huron Capital Sell-side advisor',
+    'Beta Pumps a portfolio company of Align Capital Partners, has acquired Delta Flow Controls',
+    'Gamma Foods has been recapitalized by Centre Partners March 4, 2026',
+  ]);
+  assert.equal(items[1].url, 'https://bank.example/transactions/beta-pumps/');
+  assert.match(items[0].url, /^https:\/\/bank\.example\/transactions\/#t-[a-z0-9]+$/);
+  assert.equal(items[2].date, '2026-03-04');
+  const again = extractTombstones(fx('tombstones.html'), 'https://bank.example/transactions/');
+  assert.equal(again[0].url, items[0].url, 'addresses are stable between runs');
+});
+
+test('portfolio page: company names only', () => {
+  const names = extractPortfolio(fx('portfolio.html'), 'https://www.huroncapital.com/portfolio/');
+  assert.deepEqual(names.sort(), ['Albireo Energy', 'Horsepower Automotive Group', 'Rampart Exterior Services', 'Sciens Water', 'The Exigent Group']);
+});
+
+test('portfolio comparison: small additions are signals, big swings and bad loads are not', () => {
+  const old = ['Albireo Energy', 'The Exigent Group', 'Rampart Exterior Services', 'Horsepower Automotive Group', 'Sciens Water', 'Acme Co.'];
+  assert.equal(diffPortfolio(null, old).reason, 'baseline');
+  assert.deepEqual(diffPortfolio(old, [...old, 'Delta Flow Controls']).added, ['Delta Flow Controls']);
+  assert.deepEqual(diffPortfolio(old, [...old.slice(0, 5), 'ACME Company']).added, [], 'same company, different suffix');
+  assert.equal(diffPortfolio(old, ['A1 Corp', 'B2 Corp', 'C3 Corp', 'D4 Corp', 'E5 Corp', 'F6 Corp']).reason, 'large change; treated as a redesign');
+  const bad = diffPortfolio(old, ['Albireo Energy']);
+  assert.deepEqual(bad.store, old);
+  assert.deepEqual(bad.added, []);
+});
+
+test('finding the portfolio and transactions links on a home page', () => {
+  const html = '<a href="/portfolio/">Portfolio</a><a href="/team/">Team</a><a href="/our-transactions">Transactions</a><a href="/news/2026/x/y">Deals of the week in review</a>';
+  assert.deepEqual(findLinks(html, 'https://x.com/', /^(portfolio|investments|companies|our companies)$/i, /\/(portfolio|investments|companies)/i), ['https://x.com/portfolio/']);
+  assert.deepEqual(findLinks(html, 'https://x.com/', /transactions|tombstones|track record|deals/i, /\/(transactions|deals|tombstones)/i), ['https://x.com/our-transactions']);
 });
