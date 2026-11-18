@@ -5,11 +5,20 @@
 // treats them like any other source. Subscription-confirmation emails are logged with
 // their confirmation link and are not sent to the classifier.
 //
+// Forwards: a firm email forwarded from one of the editors' own inboxes (WATCH_FORWARDERS,
+// comma-separated addresses or @domains; default cschlotman@littlejohncapital.com) is credited
+// to the firm that originally sent it. Forwards from anyone else are logged but never treated
+// as firm mail, so nobody can put words in a firm's mouth by mailing the inbox.
+//
 // Secrets: RESEND_API_KEY, RESEND_INBOUND_WEBHOOK_SECRET (signing secret of the
 // email.received webhook). verify_jwt is off; the Svix signature authenticates the call.
 // Webhook and receiving domain (in.thegppulse.com) were created in Resend on 2026-11-16.
 
+import { cleanSubject, findForwarded } from "./forwarded.ts";
+
 const env = (k: string) => Deno.env.get(k) ?? "";
+const forwarders = (env("WATCH_FORWARDERS") || "cschlotman@littlejohncapital.com").toLowerCase().split(",").map((s) => s.trim()).filter(Boolean);
+const isForwarder = (addr: string) => forwarders.some((f) => (f.startsWith("@") ? addr.endsWith(f) : addr === f));
 
 async function verifySvix(req: Request, body: string): Promise<boolean> {
   const secret = env("RESEND_INBOUND_WEBHOOK_SECRET");
@@ -29,8 +38,11 @@ async function verifySvix(req: Request, body: string): Promise<boolean> {
   });
 }
 
-const stripHtml = (h: string) =>
-  h.replace(/<(script|style)[\s\S]*?<\/\1>/gi, " ").replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
+// Strips HTML to text, keeping a line break at block tags, so forward header lines stay separate.
+const stripHtmlLines = (h: string) =>
+  h.replace(/<(script|style)[\s\S]*?<\/\1>/gi, " ").replace(/<(br|\/p|\/div|\/tr|\/li|\/h\d)[^>]*>/gi, "\n").replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/g, " ").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&amp;/g, "&")
+    .replace(/[ \t]+/g, " ").replace(/ *\n */g, "\n").replace(/\n{3,}/g, "\n\n").trim();
 
 async function db(path: string, init: RequestInit = {}) {
   const key = env("SUPABASE_SERVICE_ROLE_KEY");
@@ -55,25 +67,40 @@ Deno.serve(async (req: Request): Promise<Response> => {
   const email = await res.json();
 
   const fromHeader: string = email.headers?.from ?? email.from ?? "";
-  const address: string = (fromHeader.match(/<([^>]+)>/)?.[1] ?? email.from ?? "").toLowerCase();
-  const display = fromHeader.replace(/<[^>]+>/, "").replace(/"/g, "").trim();
-  const senderDomain = address.split("@")[1] ?? "";
-  const subject: string = (email.subject ?? "(no subject)").trim();
+  const envelope: string = (fromHeader.match(/<([^>]+)>/)?.[1] ?? email.from ?? "").toLowerCase();
+  let address = envelope;
+  let display = fromHeader.replace(/<[^>]+>/, "").replace(/"/g, "").trim();
+  let subject: string = (email.subject ?? "(no subject)").trim();
   const html: string = email.html ?? "";
-  const text: string = (email.text ?? stripHtml(html)).slice(0, 6000);
+  // Stripped HTML keeps line breaks at block tags so forward headers stay on their own lines.
+  const fullText: string = email.text ?? stripHtmlLines(html);
+  let text: string = fullText.slice(0, 6000);
   const messageId: string = email.message_id ?? email.id;
 
-  // Match the sender to a watchlist firm: exact domain, then parent domain (news.firm.com -> firm.com).
+  // A forward from an editor: use the original sender, subject and body.
+  const fwd = isForwarder(envelope) ? findForwarded(subject, fullText) : null;
+  const forwardedBy = fwd ? envelope : null;
+  if (fwd) {
+    address = fwd.address;
+    display = fwd.display;
+    subject = fwd.subject ?? cleanSubject(subject);
+    text = fwd.body.slice(0, 6000);
+  }
+  const senderDomain = address.split("@")[1] ?? "";
+
+  // Match the sender to a tracked firm (watchlist sponsor, advisor or lender): exact domain, then
+  // parent domain (news.firm.com -> firm.com).
+  const tracked = "or=(watchlist.eq.true,source_kind.in.(advisor,lender))&is_active=is.true";
   const parts = senderDomain.split(".");
   const candidates = [senderDomain, parts.slice(-2).join(".")].filter((d, i, a) => d && a.indexOf(d) === i);
-  let firm: { id: string; name: string } | null = null;
+  let firm: { id: string; name: string; source_kind: string } | null = null;
   if (candidates.length) {
-    const r = await db(`pe_firm_sources?select=id,name&watchlist=is.true&domain=in.(${candidates.map((d) => `"${d}"`).join(",")})&limit=1`);
+    const r = await db(`pe_firm_sources?select=id,name,source_kind&${tracked}&domain=in.(${candidates.map((d) => `"${d}"`).join(",")})&limit=1`);
     firm = r.ok ? (await r.json())[0] ?? null : null;
   }
   // Mailing-list tools often send from their own domains; fall back to the display name.
-  if (!firm && display.length >= 6) {
-    const r = await db(`pe_firm_sources?select=id,name&watchlist=is.true&name=ilike.${encodeURIComponent(display.replace(/[*%,()]/g, " "))}&limit=1`);
+  if (!firm && display.length >= 6 && !isForwarder(address)) {
+    const r = await db(`pe_firm_sources?select=id,name,source_kind&${tracked}&name=ilike.${encodeURIComponent(display.replace(/[*%,()]/g, " "))}&limit=1`);
     firm = r.ok ? (await r.json())[0] ?? null : null;
   }
 
@@ -85,7 +112,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
   const log = await db("watch_inbox?on_conflict=message_id", {
     method: "POST",
     headers: { prefer: "resolution=ignore-duplicates,return=representation" },
-    body: JSON.stringify({ firm_id: firm?.id ?? null, message_id: messageId, from_address: address, from_name: display || null, subject: subject.slice(0, 300), kind: isConfirm ? "confirm" : "news", confirm_url: isConfirm ? confirmLink : null }),
+    body: JSON.stringify({ firm_id: firm?.id ?? null, message_id: messageId, from_address: address, from_name: (forwardedBy ? `${display || address} (forwarded by ${forwardedBy})` : display) || null, subject: subject.slice(0, 300), kind: isConfirm ? "confirm" : "news", confirm_url: isConfirm ? confirmLink : null }),
   });
   if (!log.ok) return new Response(`log failed: ${await log.text()}`, { status: 500 });
   const isNew = ((await log.json()) as unknown[]).length > 0;
@@ -97,12 +124,16 @@ Deno.serve(async (req: Request): Promise<Response> => {
       headers: { prefer: "resolution=ignore-duplicates,return=minimal" },
       body: JSON.stringify({
         source_id: firm.id, url: firstLink ?? `https://thegppulse.com/inbox/${encodeURIComponent(messageId)}`,
-        title: subject.slice(0, 300), raw_content: `${text}\n[Watchlist firm: ${firm.name}. Received on the firm's own mailing list.]`,
+        title: subject.slice(0, 300), raw_content: `${text}\n[${
+          firm.source_kind === "advisor" || firm.source_kind === "lender"
+            ? `Source: ${firm.name}, ${firm.source_kind === "lender" ? "a middle-market lender" : "an M&A advisor"}, from its own mailing list. ${firm.name} is the ${firm.source_kind} on any deal it announces, not the buyer.`
+            : `Watchlist firm: ${firm.name}. Received on the firm's own mailing list.`
+        }]`,
         source_name: firm.name, published_at: email.created_at ?? new Date().toISOString(), scraped_at: new Date().toISOString(),
       }),
     });
-    // First real email from a firm proves the subscription is live.
-    await db(`pe_firm_sources?id=eq.${firm.id}&subscribed_at=is.null`, { method: "PATCH", body: JSON.stringify({ subscribed_at: new Date().toISOString() }) });
+    // First real email from a firm proves the watch inbox's own subscription is live (a forward doesn't).
+    if (!forwardedBy) await db(`pe_firm_sources?id=eq.${firm.id}&subscribed_at=is.null`, { method: "PATCH", body: JSON.stringify({ subscribed_at: new Date().toISOString() }) });
   }
-  return new Response(JSON.stringify({ ok: true, firm: firm?.name ?? null, kind: isConfirm ? "confirm" : "news" }), { headers: { "content-type": "application/json" } });
+  return new Response(JSON.stringify({ ok: true, firm: firm?.name ?? null, forwarded_by: forwardedBy, kind: isConfirm ? "confirm" : "news" }), { headers: { "content-type": "application/json" } });
 });
