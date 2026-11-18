@@ -4,7 +4,7 @@
 // and Apple Mail. Works on plain text; callers pass the HTML stripped to text when there is
 // no text part.
 
-export type Forwarded = { address: string; display: string; subject: string | null; body: string };
+export type Forwarded = { address: string; display: string; subject: string | null; sentAt: string | null; body: string };
 
 const FWD_SUBJECT = /^\s*((fwd?|fw|wg|tr|rv)\s*:\s*)+/i;
 const MARKERS = [
@@ -48,11 +48,15 @@ export function findForwarded(subject: string, text: string): Forwarded | null {
 
   const afterFrom = region.slice(fm.index + fm[0].length);
   const subj = afterFrom.slice(0, 600).match(/(?:^|\n|\s)(?:\*\*)?(?:subject|betreff|objet|asunto)(?:\*\*)?\s*:\s*([^\n]+?)(?=\n|\s+(?:to|cc|date|sent|from)\s*:|$)/i)?.[1]?.trim() ?? null;
+  // When the original was sent (Outlook "Sent:", Gmail/Apple "Date:"), so an old deal isn't dated today.
+  const sentRaw = afterFrom.slice(0, 600).match(/(?:^|\n|\s)(?:\*\*)?(?:sent|date|gesendet|envoy[ée]|enviado)(?:\*\*)?\s*:\s*([^\n]+?)(?=\n|\s+(?:to|cc|subject|from)\s*:|$)/i)?.[1] ?? "";
+  const sentMs = Date.parse(sentRaw.replace(/\s+at\s+/i, " ").replace(/\s*\(.*?\)\s*$/, "").trim());
+  const sentAt = Number.isFinite(sentMs) ? new Date(sentMs).toISOString() : null;
   // The forwarded message starts after the header block: the first blank line after From:,
   // or, when stripped HTML has flattened everything onto one line, right after the Subject value.
   let body = afterFrom;
   const blank = afterFrom.search(/\n\s*\n/);
   if (blank >= 0 && blank < 800) body = afterFrom.slice(blank);
   else if (subj) body = afterFrom.slice(afterFrom.indexOf(subj) + subj.length);
-  return { address: who.address, display: who.display, subject: subj ? cleanSubject(subj) : null, body: body.trim() };
+  return { address: who.address, display: who.display, subject: subj ? cleanSubject(subj) : null, sentAt, body: body.trim() };
 }

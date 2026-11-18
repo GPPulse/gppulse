@@ -8708,5 +8708,15 @@
   "type": "PE/Buyout",
   "tier": 2,
   "list": "contacts-2026-02"
+ },
+ {
+  "slug": "kirtland-capital-partners",
+  "name": "Kirtland Capital Partners",
+  "website": "https://www.kirtlandcapital.com",
+  "domain": "kirtlandcapital.com",
+  "hq": "Willoughby Hills, OH",
+  "type": "PE/Buyout",
+  "tier": 2,
+  "list": "forwarded-2026-11"
  }
 ]

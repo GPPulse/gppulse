@@ -115,7 +115,17 @@ Deno.serve(async (req: Request): Promise<Response> => {
     body: JSON.stringify({ firm_id: firm?.id ?? null, message_id: messageId, from_address: address, from_name: (forwardedBy ? `${display || address} (forwarded by ${forwardedBy})` : display) || null, subject: subject.slice(0, 300), kind: isConfirm ? "confirm" : "news", confirm_url: isConfirm ? confirmLink : null }),
   });
   if (!log.ok) return new Response(`log failed: ${await log.text()}`, { status: 500 });
-  const isNew = ((await log.json()) as unknown[]).length > 0;
+  let isNew = ((await log.json()) as unknown[]).length > 0;
+  // A re-delivered email that was logged before it could be matched (e.g. a forward that arrived
+  // before forward handling shipped) is matched now and goes on to the classifier.
+  if (!isNew && firm) {
+    const upd = await db(`watch_inbox?message_id=eq.${encodeURIComponent(messageId)}&firm_id=is.null`, {
+      method: "PATCH",
+      headers: { prefer: "return=representation" },
+      body: JSON.stringify({ firm_id: firm.id, from_address: address, from_name: (forwardedBy ? `${display || address} (forwarded by ${forwardedBy})` : display) || null, subject: subject.slice(0, 300) }),
+    });
+    isNew = upd.ok && ((await upd.json()) as unknown[]).length > 0;
+  }
 
   // Only mail from a known firm goes to the classifier; anything else stays in the log for the editor.
   if (isNew && firm && !isConfirm) {
@@ -129,7 +139,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
             ? `Source: ${firm.name}, ${firm.source_kind === "lender" ? "a middle-market lender" : "an M&A advisor"}, from its own mailing list. ${firm.name} is the ${firm.source_kind} on any deal it announces, not the buyer.`
             : `Watchlist firm: ${firm.name}. Received on the firm's own mailing list.`
         }]`,
-        source_name: firm.name, published_at: email.created_at ?? new Date().toISOString(), scraped_at: new Date().toISOString(),
+        source_name: firm.name, published_at: fwd?.sentAt ?? email.created_at ?? new Date().toISOString(), scraped_at: new Date().toISOString(),
       }),
     });
     // First real email from a firm proves the watch inbox's own subscription is live (a forward doesn't).
