@@ -118,8 +118,8 @@ function ScoreboardView({ sb, weekly }: { sb?: Scoreboard | null; weekly?: boole
 function Ticker({ quotes }: { quotes: MarketQuote[] }) {
   if (!quotes?.length) return null;
   return (
-    <div className="grid grid-cols-3 sm:grid-cols-5 border-y-2 border-foreground bg-secondary divide-x divide-border/40">
-      {quotes.slice(0, 5).map((q) => {
+    <div className="grid grid-cols-3 sm:grid-cols-6 border-b-2 border-foreground bg-secondary divide-x divide-border/40">
+      {quotes.slice(0, 6).map((q) => {
         const isRate = q.unit === "percent" || q.unit === "bps";
         const up = q.change >= 0;
         return (
@@ -292,6 +292,8 @@ export function IssueView({ content: c, issueNumber, date, className, compact }:
         <p className="font-mono text-[11px] text-muted-foreground text-right leading-relaxed">No. {issueNumber}<br />{dateStr}</p>
       </header>
 
+      <Ticker quotes={c.market_data} />
+
       <div className={cn("space-y-8 py-7", compact && "space-y-6 py-5")}>
         {c.editors_note && (
           <section className="px-6 md:px-8">
@@ -325,12 +327,7 @@ export function IssueView({ content: c, issueNumber, date, className, compact }:
           </section>
         )}
         <Items title="Jobs" sub="open seats in the LMM" items={c.jobs} />
-        {c.market_data?.length > 0 && (
-          <section className="px-6 md:px-8">
-            <Label sub="close">The tape</Label>
-            <Ticker quotes={c.market_data} />
-          </section>
-        )}
+
         {c.closing_line && (
           <section className="px-6 md:px-8">
             <p className="font-serif text-[15px] leading-relaxed">{c.closing_line}</p>
