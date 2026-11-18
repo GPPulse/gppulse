@@ -81,9 +81,12 @@ serve(async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   try {
     const results = await Promise.all([
+      // The strip at the top of every issue, in this order. HY spread rides along for the editorial pass.
       yahoo("^GSPC", "S&P 500"),
+      yahoo("^DJI", "DJIA"),
+      yahoo("^IXIC", "NASDAQ"),
       yahoo("^RUT", "Russell 2000"),
-      yahoo("^TNX", "10Y UST", "percent"),
+      yahoo("^TNX", "10Y Treasury", "percent"),
       sofr(),
       hySpread(),
     ]);

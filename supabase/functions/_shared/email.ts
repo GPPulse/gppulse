@@ -156,8 +156,8 @@ function marketTicker(quotes: MarketQuote[]): string {
       </td>`;
     })
     .join("");
-  return `<tr><td style="padding:0 28px;">
-    <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:${SOFT};border-top:2px solid ${RULE};border-bottom:1px solid #d9d9d6;"><tr>${cells}</tr></table>
+  return `<tr><td style="padding:0;">
+    <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:${SOFT};border-bottom:2px solid ${RULE};"><tr>${cells}</tr></table>
   </td></tr>`;
 }
 
@@ -374,6 +374,8 @@ export function renderIssueEmail(c: NewsletterContentV2, o: IssueEmailOptions): 
       </tr></table>
     </td></tr>
 
+    ${marketTicker(c.market_data)}
+
     ${greeting ? `<tr><td style="padding:22px 28px 0 28px;font-family:${SANS};font-size:14px;color:${MUTED};">${greeting}</td></tr>` : ""}
 
     ${editorsNote(c, o)}
@@ -389,7 +391,7 @@ export function renderIssueEmail(c: NewsletterContentV2, o: IssueEmailOptions): 
     ${editorItems("Overheard", undefined, c.overheard)}
     ${theRead(c)}
     ${editorItems("Jobs", "open seats in the LMM", c.jobs)}
-    ${c.market_data?.length ? sectionLabel("The tape", "close") + marketTicker(c.market_data) : ""}
+
 
     ${c.closing_line ? `<tr><td style="padding:26px 28px 0 28px;font-family:${SERIF};font-size:15px;line-height:1.55;color:${INK};">${escapeHtml(c.closing_line)}<br><span style="font-family:${SANS};font-size:13px;color:${MUTED};">— ${escapeHtml(o.editorName)}, ${escapeHtml(o.editorTitle)}</span></td></tr>` : ""}
 

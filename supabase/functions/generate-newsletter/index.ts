@@ -268,7 +268,7 @@ ${fmtArt(input.pulse) || "(none)"}
 READ CANDIDATES (for the_read; index into THIS list):
 ${fmtArt(input.readCandidates) || "(none)"}
 
-TICKER (context only — do not lead with it): ${fmtQuotes || "n/a"}
+TICKER (printed at the top of the issue; context only — do not lead the Lede or subject with it): ${fmtQuotes || "n/a"}
 
 EDITOR-SUBMITTED ITEMS (already written; context only):
 ${fmtItems || "(none)"}
