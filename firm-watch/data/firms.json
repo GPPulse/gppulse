@@ -7738,5 +7738,975 @@
   "hq": "New York, NY",
   "type": "Asset Manager",
   "tier": 4
+ },
+ {
+  "slug": "cap91-partners",
+  "name": "CAP91 Partners",
+  "website": "https://www.cap91.com",
+  "domain": "cap91.com",
+  "hq": "Richmond, VA",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "freestone-capital-management",
+  "name": "Freestone Capital Management",
+  "website": "https://www.freestonecapital.com",
+  "domain": "freestonecapital.com",
+  "hq": "Seattle, WA",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "lang-partners",
+  "name": "Lang Partners",
+  "website": "https://www.lang-partners.com",
+  "domain": "lang-partners.com",
+  "hq": "Dallas, TX",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "promontory-point-capital",
+  "name": "Promontory Point Capital",
+  "website": "https://www.promcp.com",
+  "domain": "promcp.com",
+  "hq": "Milwaukee, WI",
+  "type": "PE/Buyout",
+  "tier": 2,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "gottesman-company",
+  "name": "Gottesman Company",
+  "website": "https://www.gottesman-company.com",
+  "domain": "gottesman-company.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "747-capital-llc",
+  "name": "747 Capital LLC",
+  "website": "https://www.747capital.com",
+  "domain": "747capital.com",
+  "hq": "New York, NY",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "banner-ridge-partners",
+  "name": "Banner Ridge Partners",
+  "website": "https://www.bannerridge.com",
+  "domain": "bannerridge.com",
+  "hq": "New York, NY",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "focus-strategies-merchant-investments",
+  "name": "Focus Strategies Merchant Investments",
+  "website": "https://www.fsmillc.com",
+  "domain": "fsmillc.com",
+  "hq": "Austin, TX",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "headway-capital-partners",
+  "name": "Headway Capital Partners",
+  "website": "https://www.headwaycap.com",
+  "domain": "headwaycap.com",
+  "hq": "Concord, MA",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "ocean-avenue-capital-partners",
+  "name": "Ocean Avenue Capital Partners",
+  "website": "https://www.oceanavenuecapital.com",
+  "domain": "oceanavenuecapital.com",
+  "hq": "Santa Monica, CA",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "partners-edge-fund",
+  "name": "Partners Edge Fund",
+  "website": "https://www.pefpgh.com",
+  "domain": "pefpgh.com",
+  "hq": "Pittsburg, PA",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "rcp-advisors",
+  "name": "RCP Advisors",
+  "website": "https://www.rcpadvisors.com",
+  "domain": "rcpadvisors.com",
+  "hq": "Chicago, IL",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "trident",
+  "name": "Trident",
+  "website": "https://www.trident.co",
+  "domain": "trident.co",
+  "hq": "New York, NY",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "tri-w-group",
+  "name": "Tri-W Group",
+  "website": "https://www.triwgroup.com",
+  "domain": "triwgroup.com",
+  "hq": "Columbus, OH",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "trt-holdings",
+  "name": "TRT Holdings",
+  "website": "https://www.trtholdings.com",
+  "domain": "trtholdings.com",
+  "hq": "Dallas, TX",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "northwood-ventures",
+  "name": "Northwood Ventures",
+  "website": "https://www.northwoodventures.com",
+  "domain": "northwoodventures.com",
+  "hq": "Celebration, FL",
+  "type": "PE/Buyout",
+  "tier": 2,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "bpea-private-equity",
+  "name": "BPEA Private Equity",
+  "website": "https://www.bpea-pe.com",
+  "domain": "bpea-pe.com",
+  "hq": null,
+  "type": "PE/Buyout",
+  "tier": 2,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "footprint-capital",
+  "name": "Footprint Capital",
+  "website": "https://www.footprintcapital.com",
+  "domain": "footprintcapital.com",
+  "hq": null,
+  "type": "PE/Buyout",
+  "tier": 2,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "kensington-park-capital",
+  "name": "Kensington Park Capital",
+  "website": "https://www.kensingtonpark.com",
+  "domain": "kensingtonpark.com",
+  "hq": null,
+  "type": "PE/Buyout",
+  "tier": 2,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "transition-capital-partners",
+  "name": "Transition Capital Partners",
+  "website": "https://www.tcplp.com",
+  "domain": "tcplp.com",
+  "hq": null,
+  "type": "PE/Buyout",
+  "tier": 2,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "a-g-hill-partners",
+  "name": "A.G. Hill Partners",
+  "website": "https://www.aghillpartners.com",
+  "domain": "aghillpartners.com",
+  "hq": "Dallas, TX",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "abrams-capital",
+  "name": "Abrams Capital",
+  "website": "https://www.abramscapital.com",
+  "domain": "abramscapital.com",
+  "hq": null,
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "ace-company",
+  "name": "ACE & Company",
+  "website": "https://www.aceandcompany.com",
+  "domain": "aceandcompany.com",
+  "hq": "New York, NY",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "align-collaborate",
+  "name": "Align Collaborate",
+  "website": "https://www.aligncollaborate.com",
+  "domain": "aligncollaborate.com",
+  "hq": "Dallas, TX",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "altera-investments",
+  "name": "Altera Investments",
+  "website": "https://www.alteraprivate.com",
+  "domain": "alteraprivate.com",
+  "hq": "Atlanta, GA",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "ariet-capital-llc",
+  "name": "Ariet Capital, LLC",
+  "website": "https://www.arietcapital.com",
+  "domain": "arietcapital.com",
+  "hq": "Austin, TX",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "bowside-capital",
+  "name": "Bowside Capital",
+  "website": "https://www.bowsidecapital.com",
+  "domain": "bowsidecapital.com",
+  "hq": "Boston, MA",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "brandywine-group-advisors",
+  "name": "Brandywine Group Advisors",
+  "website": "https://www.bganyc.com",
+  "domain": "bganyc.com",
+  "hq": "New York, NY",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "brick-street-holdings",
+  "name": "Brick Street Holdings",
+  "website": "https://www.brickstreetfund.com",
+  "domain": "brickstreetfund.com",
+  "hq": "Waco, TX",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "ch-investment-partners",
+  "name": "CH Investment Partners",
+  "website": "https://www.chinvestments.com",
+  "domain": "chinvestments.com",
+  "hq": "Dallas, TX",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "cypress-creek-partners",
+  "name": "Cypress Creek Partners",
+  "website": "https://www.cypresscreekpartners.com",
+  "domain": "cypresscreekpartners.com",
+  "hq": "Austin, TX",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "dashmore-capital",
+  "name": "Dashmore Capital",
+  "website": "https://www.dashmorecapital.com",
+  "domain": "dashmorecapital.com",
+  "hq": null,
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "first-haven-capital",
+  "name": "First Haven Capital",
+  "website": "https://www.firsthaven.com",
+  "domain": "firsthaven.com",
+  "hq": "New York, NY",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "fulton-asset-management",
+  "name": "Fulton Asset Management",
+  "website": "https://www.fultonasset.com",
+  "domain": "fultonasset.com",
+  "hq": "Chicago, IL",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "grandview-partners",
+  "name": "Grandview Partners",
+  "website": "https://www.grandviewpartnersfund.com",
+  "domain": "grandviewpartnersfund.com",
+  "hq": "Columbus, OH",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "granite-associates",
+  "name": "Granite Associates",
+  "website": "https://www.granitelp.com",
+  "domain": "granitelp.com",
+  "hq": null,
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "granite-holdings",
+  "name": "Granite Holdings",
+  "website": "https://www.graniteholdings.com",
+  "domain": "graniteholdings.com",
+  "hq": "Atlanta, GA",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "green-hills-partners",
+  "name": "Green Hills Partners",
+  "website": "https://www.greenhills-partners.com",
+  "domain": "greenhills-partners.com",
+  "hq": "Nashville, TN",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "guilford-company",
+  "name": "Guilford Company",
+  "website": "https://www.guilfordco.com",
+  "domain": "guilfordco.com",
+  "hq": "Richmond, VA",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "hicks-equity-partners",
+  "name": "Hicks Equity Partners",
+  "website": "https://www.hicksholdings.com",
+  "domain": "hicksholdings.com",
+  "hq": "Dallas, TX",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "hunter-creek-advisors-llc",
+  "name": "Hunter Creek Advisors LLC",
+  "website": "https://www.huntercreekllc.com",
+  "domain": "huntercreekllc.com",
+  "hq": "New York, NY",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "icp-group",
+  "name": "ICP Group",
+  "website": "https://www.icpgp.com",
+  "domain": "icpgp.com",
+  "hq": "Dallas, TX",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "jones-boys-ventures",
+  "name": "Jones Boys Ventures",
+  "website": "https://www.jonesboysventures.com",
+  "domain": "jonesboysventures.com",
+  "hq": "Dallas, TX",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "kline-hill-partners",
+  "name": "Kline Hill Partners",
+  "website": "https://www.klinehill.com",
+  "domain": "klinehill.com",
+  "hq": "Greenwich, CT",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "lakeview-capital",
+  "name": "Lakeview Capital",
+  "website": "https://www.lakeviewcapitalinc.com",
+  "domain": "lakeviewcapitalinc.com",
+  "hq": "Birmingham, MI",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "las-aguilas-enterprises",
+  "name": "Las Aguilas Enterprises",
+  "website": "https://www.la-hq.com",
+  "domain": "la-hq.com",
+  "hq": "San Antonio, TX",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "liberty-mutual-investments",
+  "name": "Liberty Mutual Investments",
+  "website": "https://www.lmi.com",
+  "domain": "lmi.com",
+  "hq": "Boston, MA",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "moore-capital-management",
+  "name": "Moore Capital Management",
+  "website": "https://www.moorecap.co.uk",
+  "domain": "moorecap.co.uk",
+  "hq": null,
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "movendo-capital",
+  "name": "Movendo Capital",
+  "website": "https://www.movendocapital.com",
+  "domain": "movendocapital.com",
+  "hq": "Chicago, IL",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "pa-capital",
+  "name": "PA Capital",
+  "website": "https://www.pacapital.com",
+  "domain": "pacapital.com",
+  "hq": "Richmond, VA",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "perot-holdings",
+  "name": "Perot Holdings",
+  "website": "https://www.perot.com",
+  "domain": "perot.com",
+  "hq": null,
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "portage-partners",
+  "name": "Portage Partners",
+  "website": "https://www.portagepartners.com",
+  "domain": "portagepartners.com",
+  "hq": "New York, NY",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "prolign-capital",
+  "name": "Prolign Capital",
+  "website": "https://www.proligncapital.com",
+  "domain": "proligncapital.com",
+  "hq": "Conshohocken, PA",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "revolution-group-llc",
+  "name": "Revolution Group, LLC",
+  "website": "https://www.revolutiongroupllc.com",
+  "domain": "revolutiongroupllc.com",
+  "hq": "Austin, TX",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "rwr-investments",
+  "name": "RWR Investments",
+  "website": "https://www.rwrinvestments.com",
+  "domain": "rwrinvestments.com",
+  "hq": "Dallas, TX",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "siguler-guff-company-lp",
+  "name": "Siguler Guff & Company, LP.",
+  "website": "https://www.sigulerguff.com",
+  "domain": "sigulerguff.com",
+  "hq": "Boston, MA",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "solamere-capital",
+  "name": "Solamere Capital",
+  "website": "https://www.solamerecapital.com",
+  "domain": "solamerecapital.com",
+  "hq": "Boston, MA",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "sope-creek-capital",
+  "name": "Sope Creek Capital",
+  "website": "https://www.sopecreekcap.com",
+  "domain": "sopecreekcap.com",
+  "hq": "Charlotte, NC",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "sopris-capital",
+  "name": "Sopris Capital",
+  "website": "https://www.sopriscapital.com",
+  "domain": "sopriscapital.com",
+  "hq": "Dallas, TX",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "spectrum-financial",
+  "name": "Spectrum Financial",
+  "website": "https://www.spectrum-fs.com",
+  "domain": "spectrum-fs.com",
+  "hq": "Omaha, NE",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "thrivent-private-investments",
+  "name": "Thrivent Private Investments",
+  "website": "https://www.thrivent.com",
+  "domain": "thrivent.com",
+  "hq": "Minneapolis, MN",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "tiff-investment-management",
+  "name": "TIFF Investment Management",
+  "website": "https://www.tiff.org",
+  "domain": "tiff.org",
+  "hq": "Boston, MA",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "tower-3-investments",
+  "name": "Tower 3 Investments",
+  "website": "https://www.tower3invest.com",
+  "domain": "tower3invest.com",
+  "hq": "Richmond, VA",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "umb-private-investments",
+  "name": "UMB Private Investments",
+  "website": "https://www.umb.com",
+  "domain": "umb.com",
+  "hq": "Kansas City, MO",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "unity-hunt",
+  "name": "Unity Hunt",
+  "website": "https://www.unityhunt.com",
+  "domain": "unityhunt.com",
+  "hq": "Dallas, TX",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "zwick-partners",
+  "name": "Zwick Partners",
+  "website": "https://www.broadtreepartners.com",
+  "domain": "broadtreepartners.com",
+  "hq": "Charlotte, NC",
+  "type": "Institutional Investor",
+  "tier": 3,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "affinity-ventures",
+  "name": "Affinity Ventures",
+  "website": "https://www.affinityventures.com",
+  "domain": "affinityventures.com",
+  "hq": "Albuquerque, NM",
+  "type": "PE/Buyout",
+  "tier": 2,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "bayshore-growth-partners",
+  "name": "Bayshore Growth Partners",
+  "website": "https://www.bayshoregp.com",
+  "domain": "bayshoregp.com",
+  "hq": null,
+  "type": "PE/Buyout",
+  "tier": 2,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "caddo-lake",
+  "name": "Caddo Lake",
+  "website": "https://www.caddolakecapital.com",
+  "domain": "caddolakecapital.com",
+  "hq": null,
+  "type": "PE/Buyout",
+  "tier": 2,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "bluewater-equity-partners",
+  "name": "Bluewater Equity Partners",
+  "website": "https://www.bluewaterep.com",
+  "domain": "bluewaterep.com",
+  "hq": null,
+  "type": "PE/Buyout",
+  "tier": 2,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "catalur-capital-management",
+  "name": "Catalur Capital Management",
+  "website": "https://www.catalur.com",
+  "domain": "catalur.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "clearview-capital",
+  "name": "Clearview Capital",
+  "website": "https://www.clearviewcap.com",
+  "domain": "clearviewcap.com",
+  "hq": "Brentwood, TN",
+  "type": "PE/Buyout",
+  "tier": 2,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "covey-equity",
+  "name": "Covey Equity",
+  "website": "https://www.coveyequity.com",
+  "domain": "coveyequity.com",
+  "hq": null,
+  "type": "PE/Buyout",
+  "tier": 2,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "davidson-kempner",
+  "name": "Davidson Kempner",
+  "website": "https://www.dkp.com",
+  "domain": "dkp.com",
+  "hq": "New York, NY",
+  "type": "PE/Buyout",
+  "tier": 2,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "samson-capital-group",
+  "name": "Samson Capital Group",
+  "website": "https://www.samsoncg.com",
+  "domain": "samsoncg.com",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 2,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "transition-equity-partners",
+  "name": "Transition Equity Partners",
+  "website": "https://www.olympusventures.com",
+  "domain": "olympusventures.com",
+  "hq": "Chicago, IL",
+  "type": "PE/Buyout",
+  "tier": 2,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "beacon-hill-equity-group",
+  "name": "Beacon Hill Equity Group",
+  "website": "https://www.beaconhillequitygroup.com",
+  "domain": "beaconhillequitygroup.com",
+  "hq": null,
+  "type": "PE/Buyout",
+  "tier": 2,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "gp-ventures",
+  "name": "GP Ventures",
+  "website": "https://www.gp-ventures.com",
+  "domain": "gp-ventures.com",
+  "hq": null,
+  "type": "PE/Buyout",
+  "tier": 2,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "graham-capital-investments",
+  "name": "Graham Capital Investments",
+  "website": "https://www.grahampartners.net",
+  "domain": "grahampartners.net",
+  "hq": "Newtown Square, PA",
+  "type": "PE/Buyout",
+  "tier": 2,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "jetty-rock-capital",
+  "name": "Jetty Rock Capital",
+  "website": "https://www.jettyrockcapital.com",
+  "domain": "jettyrockcapital.com",
+  "hq": null,
+  "type": "PE/Buyout",
+  "tier": 2,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "kca-capital",
+  "name": "KCA Capital",
+  "website": "https://www.kcacapital.com",
+  "domain": "kcacapital.com",
+  "hq": null,
+  "type": "PE/Buyout",
+  "tier": 2,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "pine-street-capital-partners",
+  "name": "Pine Street Capital Partners",
+  "website": "https://www.pinecap.com",
+  "domain": "pinecap.com",
+  "hq": null,
+  "type": "PE/Buyout",
+  "tier": 2,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "pnc-erieview-capital",
+  "name": "PNC Erieview Capital",
+  "website": "https://www.pncerieview.com",
+  "domain": "pncerieview.com",
+  "hq": null,
+  "type": "PE/Buyout",
+  "tier": 2,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "slane-hill",
+  "name": "Slane Hill",
+  "website": "https://www.slanehillcap.com",
+  "domain": "slanehillcap.com",
+  "hq": "Cincinnati, OH",
+  "type": "PE/Buyout",
+  "tier": 2,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "summit-partners",
+  "name": "Summit Partners",
+  "website": "https://www.summitpartners.com",
+  "domain": "summitpartners.com",
+  "hq": null,
+  "type": "PE/Buyout",
+  "tier": 2,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "tremissis-growth-capital",
+  "name": "Tremissis Growth Capital",
+  "website": "https://www.tremissis.capital",
+  "domain": "tremissis.capital",
+  "hq": "Dallas, TX",
+  "type": "PE/Buyout",
+  "tier": 2,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "tricap-partners",
+  "name": "TriCap Partners",
+  "website": "https://www.tricappartners.com",
+  "domain": "tricappartners.com",
+  "hq": "Miami, FL",
+  "type": "PE/Buyout",
+  "tier": 2,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "alvarez-marsal-capital-partners",
+  "name": "Alvarez & Marsal Capital Partners",
+  "website": "https://www.a-mcapital.com",
+  "domain": "a-mcapital.com",
+  "hq": null,
+  "type": "PE/Buyout",
+  "tier": 2,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "caymus-equity",
+  "name": "Caymus Equity",
+  "website": "https://www.caymusequity.com",
+  "domain": "caymusequity.com",
+  "hq": null,
+  "type": "PE/Buyout",
+  "tier": 2,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "falcon-affiliates",
+  "name": "Falcon Affiliates",
+  "website": "https://www.falconaffiliates.com",
+  "domain": "falconaffiliates.com",
+  "hq": null,
+  "type": "PE/Buyout",
+  "tier": 2,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "imb-development-corporation",
+  "name": "IMB Development Corporation",
+  "website": "https://www.imbdc.com",
+  "domain": "imbdc.com",
+  "hq": null,
+  "type": "PE/Buyout",
+  "tier": 2,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "jamestown-capital",
+  "name": "Jamestown Capital",
+  "website": "https://www.jamestown-capital.com",
+  "domain": "jamestown-capital.com",
+  "hq": null,
+  "type": "PE/Buyout",
+  "tier": 2,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "maritime-partners",
+  "name": "Maritime Partners",
+  "website": "https://www.maritimepartnersllc.com",
+  "domain": "maritimepartnersllc.com",
+  "hq": null,
+  "type": "PE/Buyout",
+  "tier": 2,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "metric-point-capital-llc",
+  "name": "Metric Point Capital, LLC",
+  "website": "https://www.metricpoint.com",
+  "domain": "metricpoint.com",
+  "hq": null,
+  "type": "PE/Buyout",
+  "tier": 2,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "scott-capital-partners",
+  "name": "Scott Capital Partners",
+  "website": "https://www.scottcap.net",
+  "domain": "scottcap.net",
+  "hq": null,
+  "type": "PE/Buyout",
+  "tier": 2,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "treaty-oak-equity",
+  "name": "Treaty Oak Equity",
+  "website": "https://www.treatyoakequity.com",
+  "domain": "treatyoakequity.com",
+  "hq": null,
+  "type": "PE/Buyout",
+  "tier": 2,
+  "list": "contacts-2026-02"
+ },
+ {
+  "slug": "zwick-partners-lp",
+  "name": "Zwick Partners LP",
+  "website": "https://www.zwickpartners.com",
+  "domain": "zwickpartners.com",
+  "hq": null,
+  "type": "PE/Buyout",
+  "tier": 2,
+  "list": "contacts-2026-02"
  }
 ]
