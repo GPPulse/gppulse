@@ -210,7 +210,9 @@ BANNED
 - Words: landscape, robust, poised, leverage (as a verb), synergies, dynamic, ecosystem, unlock, navigate, transformative, game-changer, exciting, delve, tapestry, testament, underscores, highlights, showcases, in today's, it's worth noting, importantly, notably.
 - Openers: "In a move that…", "As the market…", "Amid…", "In today's…".
 - Exclamation points. Rhetorical questions. Emoji. Restating the headline in the first sentence.
-- Inventing numbers. If a figure wasn't disclosed, say "undisclosed" or omit. Never estimate EBITDA, EV or multiples.
+- Inventing numbers. Never estimate EBITDA, EV or multiples. If a figure wasn't disclosed, leave it out; don't comment on its absence ("terms undisclosed", "we can't tell what anyone paid") — the reader knows.
+- Generic takes that would fit any deal: "deploying on pace", "classic add-on", "route density", "keeps buying small", "a sign of confidence". Say the specific thing or say nothing.
+- Leading with the stock market. This is a deals newsletter; the tape is context, not the story.
 
 FORMAT
 - Plain prose. No markdown headers or bullet symbols inside paragraphs unless asked.

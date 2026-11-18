@@ -1,0 +1,360 @@
+[
+ {
+  "name": "ACHR News",
+  "website": "https://www.achrnews.com",
+  "domain": "achrnews.com",
+  "kind": "trade",
+  "beat": "HVAC contracting"
+ },
+ {
+  "name": "Contractor Magazine",
+  "website": "https://www.contractormag.com",
+  "domain": "contractormag.com",
+  "kind": "trade",
+  "beat": "plumbing & mechanical"
+ },
+ {
+  "name": "Plumbing & Mechanical",
+  "website": "https://www.pmmag.com",
+  "domain": "pmmag.com",
+  "kind": "trade",
+  "beat": "plumbing & mechanical"
+ },
+ {
+  "name": "Waste360",
+  "website": "https://www.waste360.com",
+  "domain": "waste360.com",
+  "kind": "trade",
+  "beat": "waste & recycling"
+ },
+ {
+  "name": "Waste Today",
+  "website": "https://www.wastetodaymagazine.com",
+  "domain": "wastetodaymagazine.com",
+  "kind": "trade",
+  "beat": "waste & recycling"
+ },
+ {
+  "name": "Recycling Today",
+  "website": "https://www.recyclingtoday.com",
+  "domain": "recyclingtoday.com",
+  "kind": "trade",
+  "beat": "recycling"
+ },
+ {
+  "name": "Waste Dive",
+  "website": "https://www.wastedive.com",
+  "domain": "wastedive.com",
+  "kind": "trade",
+  "beat": "waste & recycling"
+ },
+ {
+  "name": "Landscape Management",
+  "website": "https://www.landscapemanagement.net",
+  "domain": "landscapemanagement.net",
+  "kind": "trade",
+  "beat": "landscaping"
+ },
+ {
+  "name": "Lawn & Landscape",
+  "website": "https://www.lawnandlandscape.com",
+  "domain": "lawnandlandscape.com",
+  "kind": "trade",
+  "beat": "landscaping"
+ },
+ {
+  "name": "PCT Online",
+  "website": "https://www.pctonline.com",
+  "domain": "pctonline.com",
+  "kind": "trade",
+  "beat": "pest control"
+ },
+ {
+  "name": "SDM Magazine",
+  "website": "https://www.sdmmag.com",
+  "domain": "sdmmag.com",
+  "kind": "trade",
+  "beat": "security & fire alarm"
+ },
+ {
+  "name": "Security Sales & Integration",
+  "website": "https://www.securitysales.com",
+  "domain": "securitysales.com",
+  "kind": "trade",
+  "beat": "security integration"
+ },
+ {
+  "name": "Becker's Dental + DSO Review",
+  "website": "https://www.beckersdental.com",
+  "domain": "beckersdental.com",
+  "kind": "trade",
+  "beat": "dental practices"
+ },
+ {
+  "name": "Becker's ASC Review",
+  "website": "https://www.beckersasc.com",
+  "domain": "beckersasc.com",
+  "kind": "trade",
+  "beat": "surgery centers"
+ },
+ {
+  "name": "Veterinary Practice News",
+  "website": "https://www.veterinarypracticenews.com",
+  "domain": "veterinarypracticenews.com",
+  "kind": "trade",
+  "beat": "veterinary"
+ },
+ {
+  "name": "Autobody News",
+  "website": "https://www.autobodynews.com",
+  "domain": "autobodynews.com",
+  "kind": "trade",
+  "beat": "collision repair"
+ },
+ {
+  "name": "FenderBender",
+  "website": "https://www.fenderbender.com",
+  "domain": "fenderbender.com",
+  "kind": "trade",
+  "beat": "collision repair"
+ },
+ {
+  "name": "Ratchet+Wrench",
+  "website": "https://www.ratchetandwrench.com",
+  "domain": "ratchetandwrench.com",
+  "kind": "trade",
+  "beat": "auto repair"
+ },
+ {
+  "name": "Transport Topics",
+  "website": "https://www.ttnews.com",
+  "domain": "ttnews.com",
+  "kind": "trade",
+  "beat": "trucking & logistics"
+ },
+ {
+  "name": "FreightWaves",
+  "website": "https://www.freightwaves.com",
+  "domain": "freightwaves.com",
+  "kind": "trade",
+  "beat": "freight & logistics"
+ },
+ {
+  "name": "DC Velocity",
+  "website": "https://www.dcvelocity.com",
+  "domain": "dcvelocity.com",
+  "kind": "trade",
+  "beat": "warehousing & logistics"
+ },
+ {
+  "name": "Supply Chain Dive",
+  "website": "https://www.supplychaindive.com",
+  "domain": "supplychaindive.com",
+  "kind": "trade",
+  "beat": "supply chain"
+ },
+ {
+  "name": "The Fabricator",
+  "website": "https://www.thefabricator.com",
+  "domain": "thefabricator.com",
+  "kind": "trade",
+  "beat": "metal fabrication"
+ },
+ {
+  "name": "Modern Machine Shop",
+  "website": "https://www.mmsonline.com",
+  "domain": "mmsonline.com",
+  "kind": "trade",
+  "beat": "machining"
+ },
+ {
+  "name": "Plastics News",
+  "website": "https://www.plasticsnews.com",
+  "domain": "plasticsnews.com",
+  "kind": "trade",
+  "beat": "plastics"
+ },
+ {
+  "name": "Packaging Dive",
+  "website": "https://www.packagingdive.com",
+  "domain": "packagingdive.com",
+  "kind": "trade",
+  "beat": "packaging"
+ },
+ {
+  "name": "Food Business News",
+  "website": "https://www.foodbusinessnews.net",
+  "domain": "foodbusinessnews.net",
+  "kind": "trade",
+  "beat": "food manufacturing"
+ },
+ {
+  "name": "Food Dive",
+  "website": "https://www.fooddive.com",
+  "domain": "fooddive.com",
+  "kind": "trade",
+  "beat": "food & beverage"
+ },
+ {
+  "name": "Manufacturing Dive",
+  "website": "https://www.manufacturingdive.com",
+  "domain": "manufacturingdive.com",
+  "kind": "trade",
+  "beat": "manufacturing"
+ },
+ {
+  "name": "GovCon Wire",
+  "website": "https://www.govconwire.com",
+  "domain": "govconwire.com",
+  "kind": "trade",
+  "beat": "government services"
+ },
+ {
+  "name": "Washington Technology",
+  "website": "https://www.washingtontechnology.com",
+  "domain": "washingtontechnology.com",
+  "kind": "trade",
+  "beat": "government IT services"
+ },
+ {
+  "name": "Construction Dive",
+  "website": "https://www.constructiondive.com",
+  "domain": "constructiondive.com",
+  "kind": "trade",
+  "beat": "construction"
+ },
+ {
+  "name": "Roofing Contractor",
+  "website": "https://www.roofingcontractor.com",
+  "domain": "roofingcontractor.com",
+  "kind": "trade",
+  "beat": "roofing"
+ },
+ {
+  "name": "Electrical Contractor",
+  "website": "https://www.ecmag.com",
+  "domain": "ecmag.com",
+  "kind": "trade",
+  "beat": "electrical contracting"
+ },
+ {
+  "name": "Insurance Journal",
+  "website": "https://www.insurancejournal.com",
+  "domain": "insurancejournal.com",
+  "kind": "trade",
+  "beat": "insurance brokerage"
+ },
+ {
+  "name": "Accounting Today",
+  "website": "https://www.accountingtoday.com",
+  "domain": "accountingtoday.com",
+  "kind": "trade",
+  "beat": "accounting firms"
+ },
+ {
+  "name": "CPA Practice Advisor",
+  "website": "https://www.cpapracticeadvisor.com",
+  "domain": "cpapracticeadvisor.com",
+  "kind": "trade",
+  "beat": "accounting firms"
+ },
+ {
+  "name": "RIABiz",
+  "website": "https://www.riabiz.com",
+  "domain": "riabiz.com",
+  "kind": "trade",
+  "beat": "wealth management"
+ },
+ {
+  "name": "WealthManagement.com",
+  "website": "https://www.wealthmanagement.com",
+  "domain": "wealthmanagement.com",
+  "kind": "trade",
+  "beat": "wealth management"
+ },
+ {
+  "name": "Modern Distribution Management",
+  "website": "https://www.mdm.com",
+  "domain": "mdm.com",
+  "kind": "trade",
+  "beat": "industrial distribution"
+ },
+ {
+  "name": "Staffing Industry Analysts",
+  "website": "https://www.staffingindustry.com",
+  "domain": "staffingindustry.com",
+  "kind": "trade",
+  "beat": "staffing"
+ },
+ {
+  "name": "Home Health Care News",
+  "website": "https://www.homehealthcarenews.com",
+  "domain": "homehealthcarenews.com",
+  "kind": "trade",
+  "beat": "home health"
+ },
+ {
+  "name": "Hospice News",
+  "website": "https://www.hospicenews.com",
+  "domain": "hospicenews.com",
+  "kind": "trade",
+  "beat": "hospice"
+ },
+ {
+  "name": "Behavioral Health Business",
+  "website": "https://www.bhbusiness.com",
+  "domain": "bhbusiness.com",
+  "kind": "trade",
+  "beat": "behavioral health"
+ },
+ {
+  "name": "Skilled Nursing News",
+  "website": "https://www.skillednursingnews.com",
+  "domain": "skillednursingnews.com",
+  "kind": "trade",
+  "beat": "skilled nursing"
+ },
+ {
+  "name": "ChannelE2E",
+  "website": "https://www.channele2e.com",
+  "domain": "channele2e.com",
+  "kind": "trade",
+  "beat": "MSPs & IT services"
+ },
+ {
+  "name": "Healthcare Dive",
+  "website": "https://www.healthcaredive.com",
+  "domain": "healthcaredive.com",
+  "kind": "trade",
+  "beat": "healthcare services"
+ },
+ {
+  "name": "Utility Dive",
+  "website": "https://www.utilitydive.com",
+  "domain": "utilitydive.com",
+  "kind": "trade",
+  "beat": "utility services"
+ },
+ {
+  "name": "Restaurant Dive",
+  "website": "https://www.restaurantdive.com",
+  "domain": "restaurantdive.com",
+  "kind": "trade",
+  "beat": "restaurants & franchising"
+ },
+ {
+  "name": "Aviation Week",
+  "website": "https://www.aviationweek.com",
+  "domain": "aviationweek.com",
+  "kind": "trade",
+  "beat": "aerospace"
+ },
+ {
+  "name": "Google News \u2014 LMM deal sweep",
+  "website": "https://news.google.com/lmm-sweep",
+  "domain": "news.google.com",
+  "kind": "trade",
+  "beat": "local and regional press",
+  "sweep": true
+ }
+]

@@ -79,11 +79,47 @@ async function googleNews(firms) {
   return out;
 }
 
+// Phrases that only show up in lower-middle-market deal coverage. Local business journals,
+// small-town papers and trade sites write these up; the PE trade press mostly does not.
+export const SWEEP_QUERIES = [
+  '"a portfolio company of" acquires',
+  '"a portfolio company of" acquired',
+  '"add-on acquisition" private equity',
+  '"family-owned" acquired "private equity"',
+  '"founder-owned" "private equity" partnership',
+  '"recapitalization" "private equity" company',
+  '"independent sponsor" acquisition',
+  '"lower middle market" acquisition',
+  '"strategic partnership with" "private equity firm"',
+  '"majority investment" "private equity" company',
+  '"growth investment from" private equity',
+  '"has been acquired by" "backed by"',
+];
+const PE_WORDS = /(private equity|portfolio company|capital partners|equity partners|independent sponsor|recapitali[sz]|backed by|investment firm|growth investment|majority investment|add-on)/i;
+
+async function sweep(firm, days = 2) {
+  const out = [];
+  for (const q of SWEEP_QUERIES) {
+    const res = await get(`https://news.google.com/rss/search?q=${encodeURIComponent(`${q} when:${days}d`)}&hl=en-US&gl=US&ceid=US:en`, { accept: 'application/rss+xml,application/xml,text/xml,*/*' });
+    await sleep(900);
+    if (!looksLikeFeed(res)) continue;
+    for (const it of parseFeed(res.body).slice(0, 25)) {
+      const title = it.title.replace(/\s+-\s+[^-]+$/, '');
+      if ((daysAgo(it.date) ?? 99) > days + 1) continue;
+      if (!PE_WORDS.test(`${title} ${it.summary || ''}`) && !PE_WORDS.test(q)) continue;
+      const kind = classify(title, it.summary);
+      if (RELEVANT.has(kind) || /acqui|invest|recapitali|partnership/i.test(title)) out.push({ ...it, title, kind: RELEVANT.has(kind) ? kind : 'platform', firm, via: `Google News — ${it.source || 'local press'}` });
+    }
+  }
+  const seen = new Set();
+  return out.filter((i) => { const k = i.title.toLowerCase().slice(0, 60); if (seen.has(k)) return false; seen.add(k); return true; });
+}
+
 async function main() {
   let { firms } = await api('firms');
   firms = firms.filter((f) => (f.watch_tier ?? 4) <= Number(opt('tier', 4)));
-  const crawlable = firms.filter((f) => f.news_url || f.feed_url || f.deals_url).slice(0, Number(opt('limit', 1e9)));
-  console.log(`${firms.filter((f) => f.watchlist).length} watchlist sponsors and ${firms.filter((f) => !f.watchlist).length} advisors/lenders; ${crawlable.length} with something to read`);
+  const crawlable = firms.filter((f) => (f.news_url || f.feed_url || f.deals_url) && !/\/lmm-sweep$/.test(f.website_url || '')).slice(0, Number(opt('limit', 1e9)));
+  console.log(`${firms.filter((f) => f.watchlist).length} watchlist sponsors, ${firms.filter((f) => f.source_kind === 'advisor' || f.source_kind === 'lender').length} advisors/lenders, ${firms.filter((f) => f.source_kind === 'trade').length} trade sources; ${crawlable.length} with something to read`);
 
   const read = (await pool(crawlable, 8, readFirm)).filter((r) => r?.firm);
   const failing = read.filter((r) => r.failed).map((r) => r.firm.name);
@@ -96,7 +132,9 @@ async function main() {
   const queue = [], seenOnly = [];
   for (const r of read) {
     const fresh = [...new Map(r.found.filter((i) => unknown.has(i.url)).map((i) => [i.url, i])).values()];
+    // Trade publications: deals only (their people moves are not PE news).
     const t = triage(fresh, { firstCrawl: !r.firm.last_scraped_at });
+    if (r.firm.source_kind === 'trade') { t.seenOnly.push(...t.queue.filter((i) => i.kind === 'people' || i.kind === 'fund')); t.queue = t.queue.filter((i) => i.kind !== 'people' && i.kind !== 'fund'); }
     queue.push(...t.queue.map((i) => ({ ...i, firm: r.firm })));
     seenOnly.push(...t.seenOnly.map((i) => ({ ...i, firm: r.firm })));
   }
@@ -110,6 +148,18 @@ async function main() {
     // Skip coverage of a headline the firm's own site already gave us this run.
     const have = new Set(queue.map((i) => `${i.firm.id}|${i.title.toLowerCase().slice(0, 50)}`));
     for (const it of news) if (fresh.has(it.url) && !have.has(`${it.firm.id}|${it.title.toLowerCase().slice(0, 50)}`)) { have.add(`${it.firm.id}|${it.title.toLowerCase().slice(0, 50)}`); queue.push(it); }
+  }
+
+  // Phrase sweep across local and trade press, filed under the sweep source.
+  const sweepFirm = firms.find((f) => f.source_kind === 'trade' && /\/lmm-sweep$/.test(f.website_url || ''));
+  if (sweepFirm && !flag('no-gnews')) {
+    const found = await sweep(sweepFirm);
+    const fresh = new Set();
+    for (const part of chunk([...new Set(found.map((i) => i.url))], 200)) (await api('check', { urls: part })).unknown.forEach((u) => fresh.add(u));
+    const have = new Set(queue.map((i) => i.title.toLowerCase().slice(0, 50)));
+    let n = 0;
+    for (const it of found) if (fresh.has(it.url) && !have.has(it.title.toLowerCase().slice(0, 50))) { have.add(it.title.toLowerCase().slice(0, 50)); queue.push(it); n++; }
+    console.log(`LMM phrase sweep: ${found.length} hits, ${n} new`);
   }
 
   // Full text for what is going to the classifier, so it has more than a headline to read.
@@ -129,7 +179,9 @@ async function main() {
     firm_id: i.firm.id, url: i.url, title: i.title, seen_only,
     content: seen_only ? null : [i.content || i.summary || i.title, i.firm.watchlist
       ? `\n[Watchlist firm: ${i.firm.name}. Found via ${i.via}.]`
-      : `\n[Source: ${i.firm.name}, ${i.firm.source_kind === 'lender' ? 'a middle-market lender' : 'an M&A advisor'}, from its own ${i.via === 'tombstone' ? 'list of closed transactions' : 'site'}. ${i.firm.name} is the ${i.firm.source_kind === 'lender' ? 'lender' : 'advisor'} on the deal, not the buyer.]`].join(''),
+      : i.firm.source_kind === 'trade'
+        ? `\n[Source: ${i.via?.startsWith('Google News') ? i.via.replace(/^Google News — /, '') : `${i.firm.name}, a trade publication covering ${i.firm.firm_type || 'one industry'}`}. Trade and local press cover lower-middle-market deals the PE press misses. Name the buyer and the target from the text; ${i.firm.name.startsWith('Google News') ? 'the search engine' : 'the publication'} is not a party to the deal. If no private equity firm, independent sponsor or PE-backed company is a party, this is not a PE deal.]`
+        : `\n[Source: ${i.firm.name}, ${i.firm.source_kind === 'lender' ? 'a middle-market lender' : 'an M&A advisor'}, from its own ${i.via === 'tombstone' ? 'list of closed transactions' : 'site'}. ${i.firm.name} is the ${i.firm.source_kind === 'lender' ? 'lender' : 'advisor'} on the deal, not the buyer.]`].join(''),
     published_at: i.date ? new Date(i.date.length === 10 ? i.date + 'T12:00:00Z' : i.date).toISOString() : null,
     source_name: i.firm.name, category_hint: HINT[i.kind] || null,
   });

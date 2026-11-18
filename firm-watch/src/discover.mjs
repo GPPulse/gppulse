@@ -16,6 +16,8 @@ const flag = (n) => args.includes(`--${n}`);
 const opt = (n) => (args.includes(`--${n}`) ? args[args.indexOf(`--${n}`) + 1] : null);
 
 const GUESS_PAGES = ['/news', '/press', '/press-releases', '/news-insights', '/media', '/newsroom', '/insights', '/news-and-insights'];
+// The Google News sweep is a search, not a site; crawl.mjs handles it.
+export const isSweep = (f) => /\/lmm-sweep$/.test(f.website_url || '');
 const GUESS_FEEDS = ['/feed/', '/rss.xml', '/news/feed/', '/feed.xml'];
 // Advisors and lenders list closed deals on a page of their own.
 const GUESS_DEALS = ['/transactions', '/our-transactions', '/recent-transactions', '/closed-transactions', '/deals', '/experience', '/portfolio', '/investments', '/track-record'];
@@ -87,6 +89,7 @@ const csv = (rows) => rows.map((r) => r.map((c) => `"${String(c ?? '').replace(/
 
 async function main() {
   let { firms } = await api('firms');
+  firms = firms.filter((f) => !isSweep(f));
   let todo = firms.filter((f) => flag('all') || !f.discovered_at || (flag('retry') && !f.news_url && !f.feed_url && !f.deals_url));
   if (opt('tier')) todo = todo.filter((f) => (f.watch_tier ?? 4) <= Number(opt('tier')));
   if (opt('limit')) todo = todo.slice(0, Number(opt('limit')));

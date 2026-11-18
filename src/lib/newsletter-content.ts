@@ -35,6 +35,35 @@ export interface DealRow {
   source_url: string | null;
   editor_take?: string | null;
   featured?: boolean;
+  // v2.1: what the release leaves out
+  platform?: string | null;
+  advisors?: string | null;
+  lender?: string | null;
+  seller_type?: string | null;
+  hq_state?: string | null;
+  found_via?: string | null;
+  below_radar?: boolean;
+  file?: string[];
+}
+
+/** A deal or signal nobody announced: banker tombstone, trade/local press, portfolio page, filing. */
+export interface RadarItem {
+  headline: string;
+  body: string | null;
+  found_via: string;      // display label, e.g. "Banker tombstone"
+  source: string;
+  source_url: string | null;
+  confirmed: boolean;     // false = a signal (e.g. new name on a portfolio page), worded as such
+  file?: string[];
+}
+
+export interface Scoreboard {
+  window_days: number;
+  banks: { name: string; n: number; latest: string }[];
+  platforms: { platform: string; sponsor: string; n: number; latest: string[] }[];
+  sponsors: { sponsor: string; n: number }[];
+  sectors: { sector: string; this_week: number; weekly_avg: number }[];
+  radar: { below: number; total: number } | null;
 }
 
 export interface FundRow {
@@ -86,6 +115,8 @@ export interface NewsletterContentV2 {
   editors_note: EditorsNote | null;
   market_data: MarketQuote[];
   by_the_numbers: Stat[];
+  below_radar?: RadarItem[];
+  scoreboard?: Scoreboard | null;
   top_headlines: Article[];
   deal_tracker: DealRow[];
   fund_tracker: FundRow[];
@@ -105,6 +136,8 @@ export function emptyContent(edition: NewsletterContentV2["edition"] = "daily"):
     editors_note: null,
     market_data: [],
     by_the_numbers: [],
+    below_radar: [],
+    scoreboard: null,
     top_headlines: [],
     deal_tracker: [],
     fund_tracker: [],

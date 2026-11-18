@@ -334,6 +334,8 @@ export function extractPortfolio(html, pageUrl) {
     const name = clean(raw).replace(/\s*(logo|website|\(opens in a new (tab|window)\))\s*$/i, '').replace(/^logo (of|for)\s+/i, '').trim();
     if (name.length < 2 || name.length > 60 || !/[A-Za-z]/.test(name) || name.split(' ').length > 6 || NOT_A_COMPANY.test(name) || /[.!?:]$/.test(name) || /^\d+$/.test(name)) return;
     // Dates, labels with a colon, bare web addresses and UI text are not company names.
+    // Hashed file names and CMS ids ("e28b8c848da2809091cc818d8f") are not companies either.
+    if (/^[0-9a-f]{12,}$/i.test(name.replace(/[-_\s]/g, '')) || (/\d/.test(name) && !/\s/.test(name) && name.length >= 14 && (name.match(/\d/g) || []).length >= 4)) return;
     if (/^[-–•|]/.test(name) || /:\s|:\/\/|^www\.|\.(com|net|org|io|co)\b\/?$/i.test(name) || /\b(login|log in|sign in|go to|click|image|exit date|investment date|since \d{4})\b/i.test(name)) return;
     if (/^(?:(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\.?\s+)?(?:\d{1,2},?\s+)?(?:19|20)\d{2}$/i.test(name) || /^q[1-4]\s+(19|20)\d{2}$/i.test(name) || /^funds?(\s+[ivx\d]+)?$/i.test(name)) return;
     const key = normName(name);

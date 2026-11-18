@@ -12,6 +12,8 @@ import {
   FundRow,
   MarketQuote,
   NewsletterContentV2,
+  RadarItem,
+  Scoreboard,
   Stat,
 } from "./content.ts";
 
@@ -84,7 +86,57 @@ const takeLine = (label: string, text: string) => `
     </td>
   </tr></table>`;
 
+// "The file": what our archive says about the parties. Small, mono, factual.
+const fileBlock = (lines?: string[]) =>
+  lines?.length
+    ? `<div style="margin-top:7px;background:${SOFT};padding:7px 10px;">
+        <span style="font-family:${MONO};font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:${MUTED};font-weight:700;">The file</span>
+        ${lines.map((l) => `<div style="font-family:${SANS};font-size:12.5px;line-height:1.45;color:#333;margin-top:2px;">${escapeHtml(l)}</div>`).join("")}
+      </div>`
+    : "";
+
 // ---- sections ----------------------------------------------------------------
+
+function belowRadar(items: RadarItem[] | undefined): string {
+  if (!items?.length) return "";
+  const rows = items
+    .map((r, i) => {
+      const take = (r as RadarItem & { take?: string }).take;
+      return `
+      <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin-top:${i === 0 ? 0 : 14}px;border-bottom:1px solid #e3e3e0;"><tr>
+        <td valign="top" style="padding-bottom:12px;">
+          <div style="margin-bottom:6px;">${chip(r.found_via, true)}${r.confirmed ? "" : chip("Unconfirmed")}</div>
+          <div style="font-family:${SANS};font-size:15.5px;line-height:1.4;font-weight:700;color:${INK};">${link(r.source_url, r.headline)}</div>
+          ${r.body ? `<div style="font-family:${SANS};font-size:13.5px;line-height:1.5;color:#333;margin-top:5px;">${escapeHtml(r.body)}</div>` : ""}
+          ${take ? takeLine("Our read", take) : ""}
+          ${fileBlock(r.file)}
+          <div style="font-family:${MONO};font-size:10px;color:${MUTED};margin-top:6px;">Found at: ${escapeHtml(r.source)}</div>
+        </td>
+      </tr></table>`;
+    })
+    .join("");
+  return sectionLabel("Below the radar", "no press release, no wire story — found by us") + body(rows);
+}
+
+function scoreboard(sb: Scoreboard | null | undefined, weekly = false): string {
+  if (!sb) return "";
+  const col = (title: string, rows: string[]) => rows.length
+    ? `<td width="50%" valign="top" style="padding:0 12px 10px 0;">
+        <div style="font-family:${MONO};font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:${MUTED};font-weight:700;margin-bottom:4px;">${escapeHtml(title)}</div>
+        ${rows.map((r) => `<div style="font-family:${SANS};font-size:13px;line-height:1.5;color:${INK};border-bottom:1px solid #e3e3e0;padding:3px 0;">${r}</div>`).join("")}
+      </td>` : "";
+  const n = (x: number) => `<span style="font-family:${MONO};font-weight:700;float:right;">${x}</span>`;
+  const sponsors = col("Busiest sponsors", sb.sponsors.map((s) => `${escapeHtml(s.sponsor)}${n(s.n)}`));
+  const banks = col("Banks posting closings", sb.banks.map((b) => `${escapeHtml(b.name)}${n(b.n)}`));
+  const plats = col("Platforms stacking add-ons", sb.platforms.map((p) => `${escapeHtml(p.platform)} <span style="color:${MUTED};">(${escapeHtml(p.sponsor)})</span>${n(p.n)}`));
+  const sectors = weekly ? col("Sector pace: week vs 4-wk avg", sb.sectors.filter((s) => s.this_week || s.weekly_avg).map((s) => `${escapeHtml(s.sector)}<span style="font-family:${MONO};float:right;"><b>${s.this_week}</b> vs ${s.weekly_avg}</span>`)) : "";
+  const cells = [sponsors, banks, plats, sectors].filter(Boolean);
+  if (!cells.length) return "";
+  const rowsHtml: string[] = [];
+  for (let i = 0; i < cells.length; i += 2) rowsHtml.push(`<tr>${cells[i]}${cells[i + 1] ?? `<td width="50%"></td>`}</tr>`);
+  const sub = sb.radar?.total ? `last ${sb.window_days} days · ${sb.radar.total} deals tracked · ${sb.radar.below} had no press release` : `last ${sb.window_days} days`;
+  return sectionLabel("The scoreboard", sub) + body(`<table width="100%" cellpadding="0" cellspacing="0" role="presentation">${rowsHtml.join("")}</table>`);
+}
 
 function marketTicker(quotes: MarketQuote[]): string {
   if (!quotes?.length) return "";
@@ -166,21 +218,25 @@ function dealTracker(deals: DealRow[], weekly = false): string {
       if (d.enterprise_value_millions) facts.push(`EV ${fmtMillions(d.enterprise_value_millions)}`);
       if (d.ebitda_millions) facts.push(`EBITDA ${fmtMillions(d.ebitda_millions)}`);
       if (d.ev_ebitda_multiple) facts.push(fmtMultiple(d.ev_ebitda_multiple));
-      if (!d.figures_disclosed && !d.enterprise_value_millions) facts.push("terms undisclosed");
-      const verb = d.deal_type === "exit" ? "exits" : d.deal_type === "add-on" ? "adds on" : d.deal_type === "recap" ? "recaps" : "acquires";
+      if (d.hq_state) facts.push(d.hq_state);
+      if (d.seller_type && d.seller_type !== "unknown") facts.push(`${d.seller_type}-owned seller`.replace("sponsor-owned seller", "sponsor seller").replace("corporate-owned seller", "corporate carve-out"));
+      const verb = d.deal_type === "exit" ? "exits" : d.deal_type === "add-on" ? "adds on" : d.deal_type === "recap" ? "recaps" : d.deal_type === "growth" ? "invests in" : "acquires";
+      const parties = [d.advisors ? `Advisors: ${d.advisors}` : "", d.lender ? `Debt: ${d.lender}` : ""].filter(Boolean).join("  ·  ");
       return `
       <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin-top:${i === 0 ? 0 : 14}px;border-bottom:1px solid #e3e3e0;"><tr>
         <td valign="top" style="padding-bottom:12px;">
           <div style="margin-bottom:6px;">${chip(DEAL_TYPE_LABEL[d.deal_type] ?? "Deal", d.featured)}${d.featured ? chip("Deal of the day", true) : ""}</div>
-          <div style="font-family:${SANS};font-size:15px;line-height:1.4;color:${INK};"><strong>${escapeHtml(d.sponsor)}</strong> ${verb} ${link(d.source_url, d.target)}</div>
+          <div style="font-family:${SANS};font-size:15px;line-height:1.4;color:${INK};"><strong>${escapeHtml(d.sponsor)}</strong> ${verb} ${link(d.source_url, d.target)}${d.platform && d.deal_type === "add-on" ? ` <span style="color:${MUTED};">via ${escapeHtml(d.platform)}</span>` : ""}</div>
           <div style="font-family:${MONO};font-size:11px;color:${MUTED};margin-top:3px;">${escapeHtml(facts.join("  ·  "))}</div>
           ${d.summary ? `<div style="font-family:${SANS};font-size:13.5px;line-height:1.5;color:#333;margin-top:5px;">${escapeHtml(d.summary)}</div>` : ""}
+          ${parties ? `<div style="font-family:${SANS};font-size:12.5px;color:#333;margin-top:4px;">${escapeHtml(parties)}</div>` : ""}
           ${d.editor_take ? takeLine("Our read", d.editor_take) : ""}
+          ${fileBlock(d.file)}
         </td>
       </tr></table>`;
     })
     .join("");
-  return sectionLabel(weekly ? "This week's deals" : "Deal tracker", weekly ? `${deals.length} tracked · ${deals.filter((d) => d.ev_ebitda_multiple).length} with disclosed multiples` : "disclosed figures only") + body(rows);
+  return sectionLabel(weekly ? "This week's deals" : "Deal tracker", weekly ? `${deals.length} tracked · ${deals.filter((d) => d.ev_ebitda_multiple).length} with disclosed multiples` : "announced today, with our file on each") + body(rows);
 }
 
 function fundTracker(funds: FundRow[], weekly = false): string {
@@ -194,7 +250,7 @@ function fundTracker(funds: FundRow[], weekly = false): string {
           : "size undisclosed";
       return `<tr>
         <td valign="top" style="padding:9px 0;border-bottom:1px solid #e3e3e0;font-family:${SANS};font-size:14px;line-height:1.4;color:${INK};">
-          ${link(f.source_url, `${f.firm} — ${f.fund_name}`)}
+          ${/sec form d/i.test(f.source) ? chip("SEC filing") : ""}${link(f.source_url, `${f.firm} — ${f.fund_name}`)}
           <div style="font-family:${SANS};font-size:12.5px;color:#333;margin-top:2px;">${escapeHtml([f.strategy, f.headquarters].filter(Boolean).join(" · "))}</div>
         </td>
         <td valign="top" width="150" align="right" style="padding:9px 0;border-bottom:1px solid #e3e3e0;">
@@ -310,7 +366,7 @@ export function renderIssueEmail(c: NewsletterContentV2, o: IssueEmailOptions): 
       <table width="100%" cellpadding="0" cellspacing="0" role="presentation"><tr>
         <td valign="bottom">
           <div style="font-family:${SANS};font-size:22px;font-weight:800;letter-spacing:-0.02em;color:${INK};">THE GP PULSE</div>
-          <div style="font-family:${MONO};font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:${MUTED};margin-top:2px;">${c.edition === "weekly" ? `<span style="background:${INK};color:#fff;padding:2px 6px;">Week in review</span>` : "Lower middle market, every weekday"}</div>
+          <div style="font-family:${MONO};font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:${MUTED};margin-top:2px;">${c.edition === "weekly" ? `<span style="background:${INK};color:#fff;padding:2px 6px;">Week in review</span>` : "The LMM deals nobody announced"}</div>
         </td>
         <td valign="bottom" align="right" style="font-family:${MONO};font-size:11px;color:${MUTED};line-height:1.6;">
           No. ${o.issueNumber}<br>${escapeHtml(dateStr)}<br><a href="${escapeHtml(o.webUrl)}" style="color:${MUTED};">Read online</a>
@@ -318,21 +374,22 @@ export function renderIssueEmail(c: NewsletterContentV2, o: IssueEmailOptions): 
       </tr></table>
     </td></tr>
 
-    ${marketTicker(c.market_data)}
-
     ${greeting ? `<tr><td style="padding:22px 28px 0 28px;font-family:${SANS};font-size:14px;color:${MUTED};">${greeting}</td></tr>` : ""}
 
     ${editorsNote(c, o)}
     ${byTheNumbers(c.by_the_numbers)}
-    ${headlines(c.top_headlines)}
+    ${belowRadar(c.below_radar)}
     ${dealTracker(c.deal_tracker, c.edition === "weekly")}
     ${editorItems("On the market", "processes we're hearing about", c.on_the_market, true)}
+    ${scoreboard(c.scoreboard, c.edition === "weekly")}
     ${fundTracker(c.fund_tracker, c.edition === "weekly")}
+    ${headlines(c.top_headlines)}
     ${peopleMoves(c.people_moves)}
     ${marketPulse(c.market_pulse)}
     ${editorItems("Overheard", undefined, c.overheard)}
     ${theRead(c)}
     ${editorItems("Jobs", "open seats in the LMM", c.jobs)}
+    ${c.market_data?.length ? sectionLabel("The tape", "close") + marketTicker(c.market_data) : ""}
 
     ${c.closing_line ? `<tr><td style="padding:26px 28px 0 28px;font-family:${SERIF};font-size:15px;line-height:1.55;color:${INK};">${escapeHtml(c.closing_line)}<br><span style="font-family:${SANS};font-size:13px;color:${MUTED};">— ${escapeHtml(o.editorName)}, ${escapeHtml(o.editorTitle)}</span></td></tr>` : ""}
 

@@ -61,6 +61,12 @@ jobs:
         if: github.event.schedule != '43 6 * * 0' && !startsWith(github.event.inputs.job, 'discover')
         run: node src/portfolio.mjs ${{ github.event.schedule == '43 6 * * 0' && '--retry' || '' }}
 
+      # New borrowers in lower-middle-market BDCs' latest 10-Q/10-K: unannounced financings.
+      - name: BDC filings watch
+        if: github.event.schedule != '43 6 * * 0' && !startsWith(github.event.inputs.job, 'discover')
+        continue-on-error: true
+        run: node src/bdc.mjs
+
       - name: Keep the hand-off lists (LinkedIn pages, mailing-list forms, firms to review)
         if: always()
         uses: actions/upload-artifact@v4
