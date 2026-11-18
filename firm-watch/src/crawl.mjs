@@ -99,11 +99,15 @@ const PE_WORDS = /(private equity|portfolio company|capital partners|equity part
 
 async function sweep(firm, days = 2) {
   const out = [];
+  const statuses = {};
+  let raw = 0;
   for (const q of SWEEP_QUERIES) {
     const res = await get(`https://news.google.com/rss/search?q=${encodeURIComponent(`${q} when:${days}d`)}&hl=en-US&gl=US&ceid=US:en`, { accept: 'application/rss+xml,application/xml,text/xml,*/*' });
     await sleep(900);
+    statuses[res.status] = (statuses[res.status] || 0) + 1;
     if (!looksLikeFeed(res)) continue;
     for (const it of parseFeed(res.body).slice(0, 25)) {
+      raw++;
       const title = it.title.replace(/\s+-\s+[^-]+$/, '');
       if ((daysAgo(it.date) ?? 99) > days + 1) continue;
       if (!PE_WORDS.test(`${title} ${it.summary || ''}`) && !PE_WORDS.test(q)) continue;
@@ -111,6 +115,7 @@ async function sweep(firm, days = 2) {
       if (RELEVANT.has(kind) || /acqui|invest|recapitali|partnership/i.test(title)) out.push({ ...it, title, kind: RELEVANT.has(kind) ? kind : 'platform', firm, via: `Google News — ${it.source || 'local press'}` });
     }
   }
+  console.log(`LMM phrase sweep: HTTP ${JSON.stringify(statuses)}, ${raw} feed items read`);
   const seen = new Set();
   return out.filter((i) => { const k = i.title.toLowerCase().slice(0, 60); if (seen.has(k)) return false; seen.add(k); return true; });
 }
@@ -139,17 +144,6 @@ async function main() {
     seenOnly.push(...t.seenOnly.map((i) => ({ ...i, firm: r.firm })));
   }
 
-  if (!flag('no-gnews')) {
-    const active = firms.filter((f) => f.watchlist && (f.watch_tier ?? 4) <= Number(opt('gnews-tier', 2)));
-    console.log(`Searching Google News for the ${active.length} most active firms`);
-    const news = await googleNews(active);
-    const fresh = new Set();
-    for (const part of chunk([...new Set(news.map((i) => i.url))], 200)) (await api('check', { urls: part })).unknown.forEach((u) => fresh.add(u));
-    // Skip coverage of a headline the firm's own site already gave us this run.
-    const have = new Set(queue.map((i) => `${i.firm.id}|${i.title.toLowerCase().slice(0, 50)}`));
-    for (const it of news) if (fresh.has(it.url) && !have.has(`${it.firm.id}|${it.title.toLowerCase().slice(0, 50)}`)) { have.add(`${it.firm.id}|${it.title.toLowerCase().slice(0, 50)}`); queue.push(it); }
-  }
-
   // Phrase sweep across local and trade press, filed under the sweep source.
   const sweepFirm = firms.find((f) => f.source_kind === 'trade' && /\/lmm-sweep$/.test(f.website_url || ''));
   if (sweepFirm && !flag('no-gnews')) {
@@ -160,6 +154,17 @@ async function main() {
     let n = 0;
     for (const it of found) if (fresh.has(it.url) && !have.has(it.title.toLowerCase().slice(0, 50))) { have.add(it.title.toLowerCase().slice(0, 50)); queue.push(it); n++; }
     console.log(`LMM phrase sweep: ${found.length} hits, ${n} new`);
+  }
+
+  if (!flag('no-gnews')) {
+    const active = firms.filter((f) => f.watchlist && (f.watch_tier ?? 4) <= Number(opt('gnews-tier', 2)));
+    console.log(`Searching Google News for the ${active.length} most active firms`);
+    const news = await googleNews(active);
+    const fresh = new Set();
+    for (const part of chunk([...new Set(news.map((i) => i.url))], 200)) (await api('check', { urls: part })).unknown.forEach((u) => fresh.add(u));
+    // Skip coverage of a headline the firm's own site already gave us this run.
+    const have = new Set(queue.map((i) => `${i.firm.id}|${i.title.toLowerCase().slice(0, 50)}`));
+    for (const it of news) if (fresh.has(it.url) && !have.has(`${it.firm.id}|${it.title.toLowerCase().slice(0, 50)}`)) { have.add(`${it.firm.id}|${it.title.toLowerCase().slice(0, 50)}`); queue.push(it); }
   }
 
   // Full text for what is going to the classifier, so it has more than a headline to read.

@@ -42,10 +42,11 @@ async function sec(url, accept = 'application/json') {
 
 // ---------- parsing ----------
 
-const decode = (s) => s.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'").replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)));
+const decode = (s) => s.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'").replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n))).replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCharCode(parseInt(h, 16))).replace(/&nbsp;/g, ' ');
 
 // Instrument words: where the issuer name ends and the security description starts.
-const INSTRUMENT = /(?:,|\s-\s|\s–\s|\|)\s*(?=(?:first|second|1st|2nd|senior|junior|sub(?:ordinated)?|secured|unsecured|term|delayed|ddtl|revolv|revolver|unitranche|preferred|common|class\s|series\s|warrant|member|membership|llc units|lp units|units|equity|notes?\b|loan|debt|stock|shares|interest|options?|convertible|promissory|incremental|capex|acquisition|last out|first out|structured|total)\b)/i;
+const INSTRUMENT = /(?:,|\s*[-–—]\s|\s[-–—]\s*|[–—]|\|)\s*(?=(?:first|second|1st|2nd|senior|junior|sub(?:ordinated)?|secured|unsecured|term|delayed|ddtl|revolv|revolver|unitranche|preferred|common|class\s|series\s|warrant|member|membership|llc units|lp units|units|equity|notes?\b|loan|debt|stock|shares|interest|options?|convertible|promissory|incremental|capex|acquisition|last out|first out|structured|total)\b)/i;
+const TRAILING = /\s+(?:(?:first|second|1st|2nd)\s+lien\b.*|(?:senior\s+)?(?:secured\s+)?(?:term|revolving|revolver|delayed draw|ddtl|incremental)(?:\s+[a-z0-9]{1,2})?\s+(?:loan|debt|facility|note)s?\b.*|term debt\b.*|line of credit\b.*|preferred (?:stock|equity|units)\b.*|common (?:stock|equity|units)\b.*|(?:class|series)\s+[a-z0-9]+\s+(?:units|shares|preferred|common)\b.*|warrants?\b.*|unitranche\b.*|subordinated\b.*)$/i;
 const LEGAL = /,?\s*\b(inc|llc|l\.l\.c|lp|l\.p|ltd|corp|corporation|co|company|holdings?|holdco|intermediate|parent|topco|buyer|acquisition(?:co| corp)?|midco|group|opco|bidco|purchaser|borrower|investco|investors|aggregator|blocker)\b\.?/gi;
 
 /** "Acme Industrial Holdings, LLC, First Lien Term Loan, SOFR+6.00%" → "Acme Industrial Holdings, LLC" */
@@ -56,6 +57,9 @@ export function issuerOf(identifier) {
   const cut = s.search(INSTRUMENT);
   let name = cut > 2 ? s.slice(0, cut) : s.split(/\s[-–|]\s|,\s(?=\d)|\s\(/)[0];
   name = name.replace(/\s*\((?:[^)]*)\)\s*$/, '').replace(/[,;:\s]+$/, '').trim();
+  // Instrument words run straight on after the name with no separator: "AdCellerant LLC Term A Loan".
+  name = name.replace(TRAILING, '').replace(/[,;:\s\u2013\u2014-]+$/, '').trim();
+  if (/^(inc|llc|l\.l\.c|lp|l\.p|ltd|corp|co|company|holdings?)\.?$/i.test(name)) return null;
   if (name.length < 3 || /^(total|subtotal|cash|money market|short[- ]term|u\.?s\.? treasury|other|investments?|portfolio)\b/i.test(name)) return null;
   return name.slice(0, 120);
 }

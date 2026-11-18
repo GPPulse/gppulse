@@ -7,6 +7,12 @@ test('issuer name is cut from the instrument description', () => {
   assert.equal(issuerOf('Investment, Identifier [Axis]: Brightline Pest Services, Inc. - Delayed Draw Term Loan'), 'Brightline Pest Services, Inc.');
   assert.equal(issuerOf('River City Fabrication LP, Preferred Equity (12,500 units)'), 'River City Fabrication LP');
   assert.equal(issuerOf('Total Investments'), null);
+  assert.equal(issuerOf('Extrude Hone, LLC &#x2013; Term Debt'), 'Extrude Hone, LLC');
+  assert.equal(issuerOf('Extrude Hone, LLC &#x2013; Preferred Stock'), 'Extrude Hone, LLC');
+  assert.equal(issuerOf('Defiance Integrated Technologies, Inc.&#x2014;Term Debt'), 'Defiance Integrated Technologies, Inc.');
+  assert.equal(issuerOf('AdCellerant LLC Term A Loan'), 'AdCellerant LLC');
+  assert.equal(issuerOf('The Companion Brands Company LLC First Lien Secured Term Loan'), 'The Companion Brands Company LLC');
+  assert.equal(issuerOf('LLC &#x2013; Term Debt'), null);
   assert.equal(issuerOfMember('main:AcmeIndustrialHoldingsLLCMember'), 'Acme Industrial Holdings LLC');
 });
 
