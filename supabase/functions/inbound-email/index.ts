@@ -98,6 +98,14 @@ Deno.serve(async (req: Request): Promise<Response> => {
     const r = await db(`pe_firm_sources?select=id,name,source_kind&${tracked}&domain=in.(${candidates.map((d) => `"${d}"`).join(",")})&limit=1`);
     firm = r.ok ? (await r.json())[0] ?? null : null;
   }
+  // A parent company's mail system can send for a subsidiary (KippsDeSanto mails from
+  // kippsdesanto@cm.capitalone.com). When the mailbox name is itself a tracked firm, that firm wins.
+  const local = (address.split("@")[0] ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  if (local.length >= 6 && !/^(info|news|newsletter|marketing|contact|update|updates|noreply|donotreply|nonreply|communications?|team|admin|hello|mail|mailer|email|events|ibmarketing)$/.test(local)) {
+    const r = await db(`pe_firm_sources?select=id,name,source_kind&${tracked}&name=ilike.${encodeURIComponent(local)}*&limit=2`);
+    const hits = r.ok ? ((await r.json()) as Array<{ id: string; name: string; source_kind: string }>) : [];
+    if (hits.length === 1 && hits[0].id !== firm?.id) firm = hits[0];
+  }
   // Mailing-list tools often send from their own domains; fall back to the display name.
   if (!firm && display.length >= 6 && !isForwarder(address)) {
     const r = await db(`pe_firm_sources?select=id,name,source_kind&${tracked}&name=ilike.${encodeURIComponent(display.replace(/[*%,()]/g, " "))}&limit=1`);
@@ -125,6 +133,13 @@ Deno.serve(async (req: Request): Promise<Response> => {
       body: JSON.stringify({ firm_id: firm.id, from_address: address, from_name: (forwardedBy ? `${display || address} (forwarded by ${forwardedBy})` : display) || null, subject: subject.slice(0, 300) }),
     });
     isNew = upd.ok && ((await upd.json()) as unknown[]).length > 0;
+  }
+  // Still unmatched: record who really sent the forward, so the editor can see which firm to add.
+  if (!isNew && !firm && forwardedBy) {
+    await db(`watch_inbox?message_id=eq.${encodeURIComponent(messageId)}&firm_id=is.null`, {
+      method: "PATCH",
+      body: JSON.stringify({ from_address: address, from_name: `${display || address} (forwarded by ${forwardedBy})`, subject: subject.slice(0, 300) }),
+    });
   }
 
   // Only mail from a known firm goes to the classifier; anything else stays in the log for the editor.

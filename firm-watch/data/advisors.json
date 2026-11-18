@@ -6852,5 +6852,11 @@
   "domain": "rsmus.com",
   "kind": "advisor",
   "list": "contacts-2026-02"
+ },
+ {
+  "name": "Croft & Bender",
+  "website": "https://www.croft-bender.com",
+  "domain": "croft-bender.com",
+  "kind": "advisor"
  }
 ]
