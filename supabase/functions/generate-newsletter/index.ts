@@ -3,14 +3,17 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { aiConfigured, chat, HOUSE_STYLE, parseJSON } from "../_shared/ai.ts";
 import { getStaff, isInternalCall, unauthorized } from "../_shared/auth.ts";
 import { CONFIG } from "../_shared/config.ts";
+import { dealContext, DealContext, fileLines, FOUND_VIA_LABEL, FoundVia, intelText, isBelowRadar, marketIntel } from "../_shared/intel.ts";
 import {
   Article,
   DealRow,
   EditorItem,
   emptyContent,
+  fmtMillions,
   FundRow,
   MarketQuote,
   NewsletterContentV2,
+  RadarItem,
   Stat,
 } from "../_shared/content.ts";
 
@@ -89,6 +92,8 @@ interface ExtractedDeal {
   deal_type: DealRow["deal_type"]; sector: string | null;
   enterprise_value_millions: number | null; ebitda_millions: number | null; ev_ebitda_multiple: number | null;
   figures_disclosed: boolean; one_line: string;
+  platform?: string | null; seller_type?: string | null; hq_state?: string | null;
+  advisors?: string | null; lender?: string | null;
 }
 interface ExtractedFund {
   index: number; firm: string; fund_name: string; status: FundRow["status"]; strategy: string | null;
@@ -110,11 +115,17 @@ RULES
 - Figures: ONLY what the text states. If EV, EBITDA or multiple is not explicitly stated, use null and figures_disclosed=false. Never infer or estimate. "Undisclosed" means null.
 - Convert stated figures to millions USD (e.g. "$1.2 billion" → 1200).
 - sector: one of Industrials, Business Services, Healthcare, Technology, Consumer, Financial Services, Energy, Aerospace & Defense, Infrastructure, Other.
-- one_line: 1 sentence, max 28 words, factual, no adjectives. What was bought, by whom, from whom if stated, and what the company does.
+- Some items come from an M&A advisor's or lender's list of closed deals, or from trade/local press. The advisor, lender or publication is NOT the buyer. On add-ons, the sponsor is the PE firm that owns the acquiring company ("Ecowaste Solutions, a portfolio company of Kinderhook" → sponsor Kinderhook Industries, platform Ecowaste Solutions). If no sponsor can be identified from the text, skip the item.
+- platform: on add-ons, the acquiring portfolio company. Otherwise null.
+- seller_type: founder (founder/family/owner-operated), sponsor (another PE firm sold), corporate (carve-out from a company), management, or null if not stated.
+- hq_state: two-letter US state of the target if stated, else null.
+- advisors: named M&A advisors with their side, e.g. "MelCap Partners (sell-side)". Null if none named.
+- lender: named debt providers, e.g. "o15 Capital (unitranche)". Null if none named.
+- one_line: 1 sentence, max 28 words, factual, no adjectives. What was bought, by whom, from whom if stated, and what the company does. Include the city/state if stated.
 
-Return ONLY a JSON array: [{"index":1,"sponsor":"","target":"","deal_type":"platform|add-on|exit|recap|growth|carve-out|secondary|other","sector":"","enterprise_value_millions":null,"ebitda_millions":null,"ev_ebitda_multiple":null,"figures_disclosed":false,"one_line":""}]`;
+Return ONLY a JSON array: [{"index":1,"sponsor":"","target":"","platform":null,"deal_type":"platform|add-on|exit|recap|growth|carve-out|secondary|other","sector":"","enterprise_value_millions":null,"ebitda_millions":null,"ev_ebitda_multiple":null,"figures_disclosed":false,"seller_type":null,"hq_state":null,"advisors":null,"lender":null,"one_line":""}]`;
   try {
-    const text = await chat(apiKey, system, ctx, { temperature: 0.1, maxTokens: 2500 });
+    const text = await chat(apiKey, system, ctx, { temperature: 0.1, maxTokens: 4000 });
     return parseJSON<ExtractedDeal[]>(text) ?? [];
   } catch (e) {
     console.error("deal extraction failed", e);
@@ -127,7 +138,7 @@ async function extractFunds(articles: DbArticle[], apiKey: string): Promise<Extr
   const ctx = articles.map((a, i) => `[${i + 1}] ${a.title}\n${a.summary ?? ""}\nSource: ${a.source}`).join("\n\n");
   const system = `You extract structured fundraising records from private equity news.
 
-For each item about a fund launch, first close, final close or oversubscribed close by a firm whose vehicle is under $1B, return one record. Skip anything over $1B, non-North American, or not about a fund.
+For each item about a fund launch, first close, final close or oversubscribed close by a firm whose vehicle is under $1B, return one record. Skip anything over $1B, non-North American, or not about a fund. Equity funds only (buyout, growth, independent-sponsor, SBIC equity): skip CLOs, credit/lending funds, real estate, infrastructure and venture.
 
 RULES
 - Figures ONLY as stated, in millions USD. Unknown → null. Never estimate.
@@ -156,6 +167,7 @@ interface EditorialOutput {
   by_the_numbers: Stat[];
   headline_takes: { index: number; why_it_matters: string }[];
   deal_takes: { index: number; take: string }[];
+  radar_takes: { index: number; take: string }[];
   featured_deal_index: number | null;
   market_pulse_takes: { index: number; why_it_matters: string }[];
   the_read: { index: number; take: string } | null;
@@ -169,55 +181,80 @@ async function editorialPass(
     quotes: MarketQuote[];
     headlines: DbArticle[];
     deals: DealRow[];
+    radar: RadarItem[];
     funds: FundRow[];
     people: DbArticle[];
     pulse: DbArticle[];
+    readCandidates: DbArticle[];
     editorItems: EditorItem[];
+    intel: string;
     weekNarrative: string | null;
     weekStats: string | null;
   },
   apiKey: string,
 ): Promise<EditorialOutput | null> {
   const fmtArt = (list: DbArticle[]) => list.map((a, i) => `[${i + 1}] ${a.title}\n    ${a.summary ?? ""}\n    (${a.source})`).join("\n");
+  const fmtFile = (f?: string[]) => (f?.length ? `\n    THE FILE: ${f.join(" | ")}` : "");
   const fmtDeals = input.deals
-    .map((d, i) => `[${i + 1}] ${d.sponsor} → ${d.target} | ${d.deal_type} | ${d.sector ?? "sector n/d"} | EV ${d.enterprise_value_millions ?? "n/d"}M | EBITDA ${d.ebitda_millions ?? "n/d"}M | ${d.ev_ebitda_multiple ?? "n/d"}x\n    ${d.summary ?? ""}`)
+    .map((d, i) => `[${i + 1}] ${d.sponsor} → ${d.target}${d.platform ? ` (add-on to ${d.platform})` : ""} | ${d.deal_type} | ${d.sector ?? "sector n/d"}${d.hq_state ? ` | ${d.hq_state}` : ""}${d.seller_type ? ` | seller: ${d.seller_type}` : ""} | EV ${d.enterprise_value_millions ?? "n/d"}M | EBITDA ${d.ebitda_millions ?? "n/d"}M | ${d.ev_ebitda_multiple ?? "n/d"}x${d.advisors ? ` | advisors: ${d.advisors}` : ""}${d.lender ? ` | lender: ${d.lender}` : ""} | found via: ${d.found_via ?? "n/d"}\n    ${d.summary ?? ""}${fmtFile(d.file)}`)
+    .join("\n");
+  const fmtRadar = input.radar
+    .map((r, i) => `[${i + 1}] (${r.found_via}${r.confirmed ? "" : ", UNCONFIRMED signal"}) ${r.headline}\n    ${r.body ?? ""}${fmtFile(r.file)}`)
     .join("\n");
   const fmtFunds = input.funds
-    .map((f, i) => `[${i + 1}] ${f.firm} — ${f.fund_name} | ${f.status} | target ${f.target_millions ?? "n/d"}M | raised ${f.raised_millions ?? "n/d"}M | ${f.strategy ?? ""}`)
+    .map((f, i) => `[${i + 1}] ${f.firm} — ${f.fund_name} | ${f.status} | target ${f.target_millions ?? "n/d"}M | raised ${f.raised_millions ?? "n/d"}M | ${f.strategy ?? ""} | source: ${f.source}`)
     .join("\n");
   const fmtQuotes = input.quotes.map((q) => `${q.name}: ${q.price} (${q.change >= 0 ? "+" : ""}${q.unit === "percent" ? `${Math.round(q.change * 100)}bp` : `${q.changePercent.toFixed(2)}%`})`).join(", ");
   const fmtItems = input.editorItems.map((e) => `- (${e.kind}) ${e.headline}${e.body ? ` — ${e.body}` : ""}`).join("\n");
 
   const system = `${HOUSE_STYLE}
 
-You are writing today's issue of The GP Pulse (${input.edition === "weekly" ? "Friday week-in-review edition" : "daily edition"}) for ${input.dateLabel}. You have the day's raw material below. Produce the editorial layer.
+You are writing today's issue of The GP Pulse (${input.edition === "weekly" ? "Friday week-in-review edition" : "daily edition"}) for ${input.dateLabel}.
+
+WHAT THIS NEWSLETTER IS. The one place a lower-middle-market GP ($2–25M EBITDA deals, sub-$1B funds) sees the deals nobody announced and the context nobody else has. PE Hub, PitchBook News, Axios Pro and Mergers & Acquisitions already reprint press releases and markets. We do not compete on that. Our edge, in order:
+  1. BELOW THE RADAR: deals and signals we found with no press release (banker tombstones, trade and local press, portfolio pages, SEC filings).
+  2. THE FILE: what our archive says about each party — the sponsor's pace, the platform's add-on count, which banks keep closing with them, which fund they're investing from.
+  3. PATTERNS across our own tracker: sponsors on a run, platforms stacking add-ons, sectors running hot vs. their own pace, banks with a busy month, founder vs. sponsor sellers.
+
+HARD RULES
+- The Lede is built on 1, 2 or 3 above. Never open on the stock market, rates or the ticker. Macro may appear in at most one sentence, and only if you tie it to a specific deal or lender in today's material. If public markets are the only thing you can say, you have the wrong story.
+- The subject line names a company, a sponsor, a platform or a count from our data. Never an index level, a yield, or "markets". Prefer a below-the-radar deal or a pattern. Bad: "Russell down 4.2%, 10Y at 5.1%, and deals still printed". Good: "Kinderhook's waste roll-up quietly added two more", "Three Midwest towing deals, none announced", "The banks that closed 9 LMM deals this week".
+- Never write filler about missing numbers ("terms undisclosed", "we can't tell what anyone paid", "pricing undisclosed so the arbitrage is unverifiable"). The reader knows LMM deals rarely disclose. Say something only when there is something to say.
+- Deal takes and radar takes must use a fact from THE FILE, the advisor/lender, the seller type, the geography, or the platform history. A take that would fit any deal ("deploying on pace", "classic add-on", "route density") is banned. If you have nothing specific, skip the deal — fewer takes is better.
+- UNCONFIRMED signals (new names on a portfolio page) are described as exactly that: "now listed on X's portfolio page; we found no announcement". Never state a deal closed on the strength of a signal.
+- Use only figures that appear in the material. Never estimate.
 ${input.edition === "weekly" ? `
-FRIDAY RULES. This is the keeper issue readers save. The Lede is 3–4 paragraphs and is about the PATTERN across the week, not one deal: where multiples cleared by sector, who was buying vs. selling, what the lenders did, which fund closes say something about LP appetite. Open with the single number that best summarizes the week. The subject line should read as a weekly verdict ("The week LMM industrials repriced to 7x"). By the numbers must use the computed week stats. Deal takes: write one for every deal with a disclosed multiple; skip the rest.` : ""}
+FRIDAY RULES. The keeper issue. The Lede is 3–4 paragraphs on the PATTERN across the week from OUR DATA (the Scoreboard numbers below): who was busiest, which platforms stacked add-ons, which banks closed the most, which sectors ran above their own pace, how many deals were below the radar. Open with the single number that best summarizes the week. Subject reads as a weekly verdict built on our data.` : ""}
 
 OUTPUT (JSON only, no prose outside it):
 {
-  "subject": "Email subject. 6–10 words. Specific, concrete, lowercase except proper nouns. The single most interesting fact or tension of the day. No 'GP Pulse', no date, no colon-cliché. Examples of the register: 'Two industrial recaps at 7x, and a lender blinked', 'Sub-$500M funds are closing faster than Q1'.",
-  "preheader": "One sentence, max 90 chars, that extends the subject without repeating it.",
+  "subject": "6–10 words, lowercase except proper nouns, per the rules above.",
+  "preheader": "One sentence, max 90 chars, extending the subject without repeating it.",
   "editors_note": {
-    "headline": "The Lede headline. 5–9 words. A claim, not a topic.",
-    "paragraphs": ["2–3 paragraphs, 50–90 words each. Pick the ONE thing that matters most today for a lower middle market GP and explain the mechanism: what it does to multiples, leverage, exit timing, LP appetite, or sourcing. Cite specific numbers from the material. End with a conviction-tagged call ('Our read: …' / 'High conviction: …' / 'Watch: …'). If the material is thin, say so plainly and write about the pattern across the last few days instead of forcing significance."]
+    "headline": "5–9 words. A claim, not a topic.",
+    "paragraphs": ["2–3 paragraphs, 50–90 words each. One story, explained by mechanism: what it says about sourcing, add-on strategy, seller behavior, lender appetite, or exits in the LMM. Use THE FILE facts and the scoreboard counts. End with a conviction-tagged call ('Our read: …' / 'High conviction: …' / 'Watch: …')."]
   },
-  "by_the_numbers": [ {"value":"7.2x","label":"short label","context":"optional 8–12 words"} ],  // exactly 3 stats pulled from today's material or the ticker. Real figures only; if fewer than 3 real figures exist, return fewer.
-  "headline_takes": [ {"index":1,"why_it_matters":"1–2 sentences. The implication for a $2–25M EBITDA investor, not a restatement."} ],  // one per headline
-  "deal_takes": [ {"index":1,"take":"1–2 sentences. What the deal says about the buyer's thesis, the price if disclosed, or the sector. Skip deals with nothing to say — fewer takes is fine."} ],
-  "featured_deal_index": 1,  // the most instructive deal for the reader, or null
-  "market_pulse_takes": [ {"index":1,"why_it_matters":"1 sentence translating the macro item into LMM terms: leverage cost, lender appetite, exit windows."} ],
-  "the_read": {"index": 1, "take": "2–3 sentences on why this one piece (from headlines or macro) is worth 15 minutes, and what to take from it."} or null,
-  "closing_line": "One sentence sign-off. Dry, human, specific to today. No platitudes."
+  "by_the_numbers": [ {"value":"7","label":"short label","context":"8–12 words"} ],  // exactly 3, from OUR data (scoreboard, tracker counts, disclosed figures) — not the ticker.
+  "headline_takes": [ {"index":1,"why_it_matters":"1–2 sentences for a $2–25M EBITDA investor."} ],
+  "radar_takes": [ {"index":1,"take":"1–2 sentences: why this deal or signal matters, using THE FILE."} ],
+  "deal_takes": [ {"index":1,"take":"1–2 sentences, specific, per the rules."} ],
+  "featured_deal_index": 1,  // most instructive deal in DEALS, or null
+  "market_pulse_takes": [ {"index":1,"why_it_matters":"1 sentence in LMM terms."} ],
+  "the_read": {"index": 1, "take": "2–3 sentences on why READ CANDIDATE [index] is worth 15 minutes. Describe THAT item, not another."} or null,
+  "closing_line": "One dry, specific sign-off sentence. No platitudes, no markets jokes."
 }`;
 
-  const user = `TICKER: ${fmtQuotes || "n/a"}
+  const user = `BELOW THE RADAR (no press release found):
+${fmtRadar || "(none today)"}
 
-HEADLINES:
-${fmtArt(input.headlines) || "(none)"}
-
-DEALS:
+DEALS (announced):
 ${fmtDeals || "(none)"}
+
+SCOREBOARD (our tracker, last 30 days):
+${input.intel || "(not available)"}
+
+NON-DEAL HEADLINES:
+${fmtArt(input.headlines) || "(none)"}
 
 FUNDS:
 ${fmtFunds || "(none)"}
@@ -225,15 +262,20 @@ ${fmtFunds || "(none)"}
 PEOPLE MOVES:
 ${fmtArt(input.people) || "(none)"}
 
-MACRO / CREDIT:
+MACRO / CREDIT (context only):
 ${fmtArt(input.pulse) || "(none)"}
 
-EDITOR-SUBMITTED ITEMS (processes, overheard, jobs — already written, do not rewrite; use for context only):
+READ CANDIDATES (for the_read; index into THIS list):
+${fmtArt(input.readCandidates) || "(none)"}
+
+TICKER (context only — do not lead with it): ${fmtQuotes || "n/a"}
+
+EDITOR-SUBMITTED ITEMS (already written; context only):
 ${fmtItems || "(none)"}
-${input.weekStats ? `\nTHIS WEEK (computed from the tracker — use these numbers in By the numbers and the Lede):\n${input.weekStats}` : ""}${input.weekNarrative ? `\nWEEKLY INDEX NARRATIVE (for Friday context):\n${input.weekNarrative}` : ""}`;
+${input.weekStats ? `\nTHIS WEEK (computed from the tracker):\n${input.weekStats}` : ""}${input.weekNarrative ? `\nWEEKLY INDEX NARRATIVE:\n${input.weekNarrative}` : ""}`;
 
   try {
-    const text = await chat(apiKey, system, user, { temperature: 0.55, maxTokens: 3500, tier: "editorial" });
+    const text = await chat(apiKey, system, user, { temperature: 0.5, maxTokens: 4500, tier: "editorial" });
     const out = parseJSON<EditorialOutput>(text);
     if (!out?.editors_note?.paragraphs?.length) return null;
     return out;
@@ -313,20 +355,48 @@ serve(async (req: Request): Promise<Response> => {
     };
     const text = (a: DbArticle) => `${a.title} ${a.summary ?? ""}`.toLowerCase();
 
-    const headlines = take(articles.filter((a) => {
-      if (a.category !== "headline" && !(a.category === "deal_flow" && (a.relevance_score ?? 0) >= 70)) return false;
-      const t = text(a); return !isMegaFirm(t) && !hasNonPEPattern(t) && !isPartnershipNotDeal(t);
-    }), 5);
+    // Deals first and generously: coverage of the deals is the product. Headlines are what's left
+    // that is not a deal (a deal headline would just repeat the tracker).
     const dealArticles = take(articles.filter((a) => {
       if (a.category !== "deal_flow" && a.category !== "headline") return false;
       const t = text(a); return !isMegaFirm(t) && !hasNonPEPattern(t) && !isPartnershipNotDeal(t);
-    }), 8);
+    }), 16);
+    const headlines = take(articles.filter((a) => {
+      if (a.category !== "headline") return false;
+      const t = text(a); return !isMegaFirm(t) && !hasNonPEPattern(t);
+    }), 4);
     const fundArticles = take(articles.filter((a) => a.category === "fund_tracker" && a.fund_size_relevant !== false && !isMegaFirm(text(a))), 6);
     const people = take(articles.filter((a) => { if (a.category !== "people_moves") return false; const t = text(a); return !hasNonPEOrg(t) && !isMegaFirm(t) && !hasNonPEPattern(t); }), 6);
-    const pulse = take(articles.filter((a) => a.category === "market_insight"), 3);
+    // Macro & credit only when it carries data. Sell-side guides, vendor op-eds and webinars are not news.
+    const FLUFF = /\b(guide|how to|step[- ]by[- ]step|what is|tips|checklist|webinar|podcast|e-?book|white ?paper|playbook|101|explained|lessons|sell your)\b/i;
+    const pulse = take(articles.filter((a) => a.category === "market_insight" && !FLUFF.test(a.title) && /\d/.test(a.summary ?? "") && !/vendor-authored|promotes its own|educational guide/i.test(a.summary ?? "")), 2);
 
     // Headlines also count as deals for extraction (they're the big ones); dedupe by id
-    const dealSource = [...headlines, ...dealArticles].filter((a, i, arr) => arr.findIndex((x) => x.id === a.id) === i);
+    const dealSource = [...dealArticles, ...headlines].filter((a, i, arr) => arr.findIndex((x) => x.id === a.id) === i);
+
+    // Where each item came from: the sponsor's own release, a wire, a banker's tombstone,
+    // trade or local press, or a filing. This is what decides "below the radar".
+    const viaById = new Map<string, FoundVia>();
+    {
+      const ids = dealSource.map((a) => a.id);
+      const { data: origin } = ids.length
+        ? await supabase.from("scraped_content").select("article_id, source_name, pe_firm_sources(source_kind)").in("article_id", ids)
+        : { data: [] };
+      type Origin = { article_id: string; source_name: string | null; pe_firm_sources: { source_kind: string } | { source_kind: string }[] | null };
+      for (const row of (origin ?? []) as unknown as Origin[]) {
+        const src = row.pe_firm_sources;
+        const k = Array.isArray(src) ? src[0]?.source_kind : src?.source_kind;
+        const via: FoundVia = k === "sponsor" ? "press_release" : k === "advisor" || k === "lender" ? "tombstone"
+          : k === "trade" ? ((row.source_name ?? "").startsWith("Google News") ? "local_press" : "trade_press") : "news";
+        const prev = viaById.get(row.article_id);
+        // A sponsor release beats anything else for the same article.
+        if (!prev || via === "press_release") viaById.set(row.article_id, via);
+      }
+      for (const a of dealSource) {
+        if (viaById.has(a.id)) continue;
+        viaById.set(a.id, /sec form d/i.test(a.source) ? "sec_filing" : /newswire|business wire|globenewswire|accesswire|pr newswire/i.test(a.source) ? "wire" : "news");
+      }
+    }
 
     if (!headlines.length && !dealSource.length && !fundArticles.length && !people.length && !pulse.length) {
       return new Response(JSON.stringify({ message: "No new articles to include", skipped: true }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
@@ -347,7 +417,10 @@ serve(async (req: Request): Promise<Response> => {
           enterprise_value_millions: d.enterprise_value_millions ?? null, ebitda_millions: d.ebitda_millions ?? null,
           ev_ebitda_multiple: d.ev_ebitda_multiple ?? null, figures_disclosed: Boolean(d.figures_disclosed),
           summary: d.one_line, source: src.source, source_url: src.source_url, editor_take: null, featured: false,
-        };
+          platform: d.platform ?? null, seller_type: d.seller_type ?? null, hq_state: d.hq_state ?? null,
+          advisors: d.advisors ?? null, lender: d.lender ?? null, found_via: viaById.get(src.id) ?? "news",
+          article_id: src.id,
+        } as DealRow & { article_id: string };
       });
 
     // Same deal from several wires: collapse on sponsor + overlapping target words.
@@ -368,6 +441,74 @@ serve(async (req: Request): Promise<Response> => {
         }
       }
     }
+
+    const edition0 = (): "daily" | "weekly" => new Date().getDay() === 5 ? "weekly" : "daily";
+    // The file on every deal, and whether anyone else reported it.
+    const contexts = await Promise.all(deals.map((d) => dealContext(supabase, d)));
+    deals.forEach((d, i) => {
+      const ctx: DealContext | null = contexts[i];
+      d.file = fileLines(d, ctx);
+      d.below_radar = isBelowRadar((d.found_via ?? "news") as FoundVia, ctx);
+    });
+    const verbOf = (d: DealRow) => d.deal_type === "exit" ? "sold" : d.deal_type === "add-on" ? `added ${d.target} to ${d.platform ?? "a platform"}` : d.deal_type === "recap" ? "recapitalized" : d.deal_type === "growth" ? "invested in" : "acquired";
+    const radar: RadarItem[] = deals.filter((d) => d.below_radar).map((d) => ({
+      headline: d.deal_type === "add-on" ? `${d.sponsor} ${verbOf(d)}` : `${d.sponsor} ${verbOf(d)} ${d.target}`,
+      body: d.summary, found_via: FOUND_VIA_LABEL[(d.found_via ?? "news") as FoundVia] ?? "Found", source: d.source, source_url: d.source_url,
+      confirmed: true, file: d.file,
+    }));
+
+    // Unconfirmed signals: names that appeared on a sponsor's portfolio page with no announcement.
+    const fourDaysAgo = new Date(); fourDaysAgo.setDate(fourDaysAgo.getDate() - 4);
+    const { data: spotted } = await supabase.from("editor_items").select("id, headline, body, url")
+      .eq("kind", "overheard").eq("status", "submitted").like("headline", "First spotted:%").gte("created_at", fourDaysAgo.toISOString()).limit(20);
+    const signalIds: string[] = [];
+    for (const it of (spotted ?? []) as { id: string; headline: string; body: string | null; url: string | null }[]) {
+      const m = it.headline.match(/^First spotted: (.+) now on (.+?)'s? portfolio page$/);
+      if (!m) continue;
+      const [, company, sponsor] = m;
+      if (/^[0-9a-f]{12,}$/i.test(company.replace(/[\s_-]/g, "")) || company.length < 3) continue;
+      signalIds.push(it.id);
+      radar.push({
+        headline: `${company} is now on ${sponsor}'s portfolio page`,
+        body: `${sponsor} added ${company} to the portfolio list on its website. We found no press release, wire story or banker tombstone for it. Treat it as a signal until the firm confirms.`,
+        found_via: FOUND_VIA_LABEL.portfolio_page, source: sponsor, source_url: it.url, confirmed: false,
+      });
+    }
+    // New borrowers in BDC filings: financings that were never announced, with the lender and the price.
+    const tenDaysAgo = new Date(); tenDaysAgo.setDate(tenDaysAgo.getDate() - 10);
+    const { data: bdcNew, error: bdcErr } = await supabase.from("bdc_holdings")
+      .select("id, bdc_ticker, bdc_name, period_end, filed_on, issuer, issuer_key, fair_value, spread_pct, maturity, first_lien, source_url")
+      .eq("is_new", true).eq("venture", false).gte("filed_on", tenDaysAgo.toISOString().slice(0, 10)).order("fair_value", { ascending: false }).limit(300);
+    if (bdcErr) console.warn("bdc_holdings unavailable:", bdcErr.message);
+    type BdcRow = { id: string; bdc_ticker: string; bdc_name: string | null; period_end: string | null; filed_on: string; issuer: string; issuer_key: string; fair_value: number | null; spread_pct: number | null; maturity: string | null; first_lien: boolean | null; source_url: string | null; used?: boolean };
+    const bdcRows = (bdcNew ?? []) as BdcRow[];
+    const bdcSpreads = bdcRows.filter((r) => r.first_lien && r.spread_pct).map((r) => Number(r.spread_pct)).sort((x, y) => x - y);
+    const bdcStat = bdcRows.length
+      ? `BDC filings (last 10 days): ${new Set(bdcRows.map((r) => r.issuer_key)).size} new borrowers across ${new Set(bdcRows.map((r) => r.bdc_ticker)).size} BDCs${bdcSpreads.length ? `; median spread on ${bdcSpreads.length} new first-lien loans ${bdcSpreads[Math.floor(bdcSpreads.length / 2)].toFixed(2)}% over the base rate` : ""}.`
+      : "";
+    const { data: usedBdc } = bdcRows.length
+      ? await supabase.from("bdc_holdings").select("issuer_key").not("used_in_newsletter_id", "is", null).in("issuer_key", bdcRows.map((r) => r.issuer_key))
+      : { data: [] };
+    const bdcDone = new Set(((usedBdc ?? []) as { issuer_key: string }[]).map((r) => r.issuer_key));
+    const byBorrower = new Map<string, BdcRow[]>();
+    for (const r of bdcRows) if (!bdcDone.has(r.issuer_key)) byBorrower.set(r.issuer_key, [...(byBorrower.get(r.issuer_key) ?? []), r]);
+    const bdcIds: string[] = [];
+    const usd = (n: number | null) => (n ? fmtMillions(n / 1e6) : null);
+    for (const rows of [...byBorrower.values()].slice(0, edition0() === "weekly" ? 10 : 5)) {
+      const top = rows[0];
+      rows.forEach((r) => bdcIds.push(r.id));
+      const lenders = [...new Set(rows.map((r) => r.bdc_name ?? r.bdc_ticker))];
+      const terms = [top.first_lien ? "first-lien" : null, usd(top.fair_value) ? `${usd(top.fair_value)} at fair value` : null, top.spread_pct ? `priced at ${Number(top.spread_pct).toFixed(2)}% over the base rate` : null, top.maturity ? `due ${top.maturity.slice(0, 4)}` : null].filter(Boolean).join(", ");
+      radar.push({
+        headline: `${top.issuer}: new borrower at ${lenders.join(" and ")}`,
+        body: `${lenders.length > 1 ? `${lenders.length} BDCs list` : `${lenders[0]} lists`} ${top.issuer} for the first time in the ${top.period_end ?? "latest"} schedule of investments${terms ? `: ${terms}` : ""}. It was not in the prior quarter's filing. The filing does not name a sponsor.`,
+        found_via: FOUND_VIA_LABEL.sec_filing, source: `${lenders.join(", ")} 10-Q`, source_url: top.source_url, confirmed: true,
+      });
+    }
+
+    radar.sort((x, y) => Number(y.confirmed) - Number(x.confirmed)); // confirmed finds before signals
+    // Below-the-radar deals lead the issue in their own section; the tracker keeps the announced ones.
+    let announced = deals.filter((d) => !d.below_radar);
 
     const funds: FundRow[] = rawFunds
       .filter((f) => f.firm && f.fund_name && fundArticles[f.index - 1])
@@ -412,6 +553,15 @@ serve(async (req: Request): Promise<Response> => {
       }
       // Disclosed multiples first, then everything else.
       deals.sort((a, b) => Number(Boolean(b.ev_ebitda_multiple)) - Number(Boolean(a.ev_ebitda_multiple)));
+      // The week's below-the-radar finds join today's; the tracker carries the rest.
+      const inRadar = new Set(radar.map((r) => r.headline.toLowerCase()));
+      for (const d of deals) {
+        if (!d.below_radar || d.file) continue; // today's are already in
+        const h = d.deal_type === "add-on" ? `${d.sponsor} ${verbOf(d)}` : `${d.sponsor} ${verbOf(d)} ${d.target}`;
+        if (inRadar.has(h.toLowerCase())) continue;
+        radar.push({ headline: h, body: d.summary, found_via: FOUND_VIA_LABEL[(d.found_via ?? "news") as FoundVia] ?? "Found", source: d.source, source_url: d.source_url, confirmed: true });
+      }
+      announced = deals.filter((d) => !d.below_radar);
 
       const mults = deals.map((d) => d.ev_ebitda_multiple).filter((x): x is number => typeof x === "number").sort((a, b) => a - b);
       const median = mults.length ? mults[Math.floor(mults.length / 2)] : null;
@@ -419,34 +569,43 @@ serve(async (req: Request): Promise<Response> => {
       const raised = closes.reduce((a, f) => a + (f.raised_millions ?? 0), 0);
       const bySector = deals.reduce((m, d) => { const k = d.sector ?? "Other"; m[k] = (m[k] ?? 0) + 1; return m; }, {} as Record<string, number>);
       weekStats = [
-        `Deals tracked this week: ${deals.length} (${mults.length} with disclosed multiples${median ? `, median ${median.toFixed(1)}x` : ""})`,
+        `Deals tracked this week: ${deals.length}, ${deals.filter((d) => d.below_radar).length} with no press release (${mults.length} with disclosed multiples${median ? `, median ${median.toFixed(1)}x` : ""})`,
         `By sector: ${Object.entries(bySector).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${v}`).join(", ") || "n/a"}`,
         `Fund closes: ${closes.length}${raised ? ` totaling $${Math.round(raised)}M` : ""}; funds newly in market: ${funds.filter((f) => f.status === "launched").length}`,
       ].join("\n");
     }
 
+    // Headlines that became tracker rows would print twice.
+    const dealArticleIds = new Set(deals.map((d) => (d as DealRow & { article_id?: string }).article_id));
+    const headlinesOnly = headlines.filter((a) => !dealArticleIds.has(a.id));
+    const readCandidates = [...headlinesOnly, ...pulse];
+
+    const intel = await marketIntel(supabase, 30);
     const dateLabel = now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
     const editorial = aiKey
-      ? await editorialPass({ dateLabel, edition, quotes, headlines, deals, funds, people, pulse, editorItems, weekNarrative, weekStats }, aiKey)
+      ? await editorialPass({ dateLabel, edition, quotes, headlines: headlinesOnly, deals: announced, radar, funds, people, pulse, readCandidates, editorItems, intel: [intelText(intel), bdcStat].filter(Boolean).join("\n"), weekNarrative, weekStats }, aiKey)
       : null;
 
     // Apply editorial layer
     const toArticle = (a: DbArticle): Article => ({ id: a.id, title: a.title, summary: a.summary, category: a.category, source: a.source, source_url: a.source_url, fund_size_relevant: a.fund_size_relevant });
-    const headlineArticles = headlines.map(toArticle);
+    const headlineArticles = headlinesOnly.map(toArticle);
     const pulseArticles = pulse.map(toArticle);
     if (editorial) {
       for (const t of editorial.headline_takes ?? []) if (headlineArticles[t.index - 1]) headlineArticles[t.index - 1].why_it_matters = t.why_it_matters;
       for (const t of editorial.market_pulse_takes ?? []) if (pulseArticles[t.index - 1]) pulseArticles[t.index - 1].why_it_matters = t.why_it_matters;
-      for (const t of editorial.deal_takes ?? []) if (deals[t.index - 1]) deals[t.index - 1].editor_take = t.take;
-      if (editorial.featured_deal_index && deals[editorial.featured_deal_index - 1]) {
-        deals[editorial.featured_deal_index - 1].featured = true;
-        deals.sort((a, b) => Number(b.featured) - Number(a.featured));
-      }
+      for (const t of editorial.deal_takes ?? []) if (announced[t.index - 1]) announced[t.index - 1].editor_take = t.take;
+      for (const t of editorial.radar_takes ?? []) if (radar[t.index - 1]) (radar[t.index - 1] as RadarItem & { take?: string }).take = t.take;
+      if (editorial.featured_deal_index && announced[editorial.featured_deal_index - 1]) announced[editorial.featured_deal_index - 1].featured = true;
+    }
+    // Tracker order: featured, then platforms, add-ons, recaps/growth, exits.
+    const typeRank: Record<string, number> = { platform: 0, "carve-out": 1, "add-on": 2, recap: 3, growth: 3, secondary: 4, exit: 5, other: 6 };
+    announced.sort((a, b) => Number(b.featured) - Number(a.featured) || (typeRank[a.deal_type] ?? 6) - (typeRank[b.deal_type] ?? 6));
+    if (editorial) {
     }
 
-    const readSource = [...headlines, ...pulse];
-    const theRead = editorial?.the_read && readSource[editorial.the_read.index - 1]
-      ? { title: readSource[editorial.the_read.index - 1].title, source: readSource[editorial.the_read.index - 1].source, url: readSource[editorial.the_read.index - 1].source_url, take: editorial.the_read.take }
+    const readItem = editorial?.the_read ? readCandidates[editorial.the_read.index - 1] : undefined;
+    const theRead = editorial?.the_read && readItem
+      ? { title: readItem.title, source: readItem.source, url: readItem.source_url, take: editorial.the_read.take }
       : null;
 
     const editorName = CONFIG.editorName;
@@ -456,8 +615,17 @@ serve(async (req: Request): Promise<Response> => {
       editors_note: editorial ? { headline: editorial.editors_note.headline, paragraphs: editorial.editors_note.paragraphs, byline: editorName } : null,
       market_data: quotes,
       by_the_numbers: (editorial?.by_the_numbers ?? []).slice(0, 3),
+      below_radar: radar,
+      scoreboard: intel ? {
+        window_days: 30,
+        banks: (intel.banks ?? []).slice(0, edition === "weekly" ? 8 : 5),
+        platforms: (intel.platforms ?? []).slice(0, edition === "weekly" ? 8 : 4),
+        sponsors: (intel.sponsors ?? []).slice(0, edition === "weekly" ? 8 : 5),
+        sectors: edition === "weekly" ? intel.sectors ?? [] : [],
+        radar: intel.radar ?? null,
+      } : null,
       top_headlines: headlineArticles,
-      deal_tracker: deals,
+      deal_tracker: announced,
       fund_tracker: funds,
       people_moves: people.map(toArticle),
       on_the_market: editorItems.filter((e) => e.kind === "on_the_market"),
@@ -471,7 +639,7 @@ serve(async (req: Request): Promise<Response> => {
     // Issue number + record
     const { data: last } = await supabase.from("newsletters").select("issue_number").order("issue_number", { ascending: false }).limit(1).maybeSingle();
     const issueNumber = (last?.issue_number ?? 0) + 1;
-    const fallbackSubject = `${headlines[0]?.title ?? "Today in the lower middle market"}`.slice(0, 80);
+    const fallbackSubject = (radar[0]?.headline ?? (announced[0] ? `${announced[0].sponsor} → ${announced[0].target}` : headlines[0]?.title ?? "Today in the lower middle market")).slice(0, 80);
     const subject = editorial?.subject?.trim() || fallbackSubject;
     const slug = `${now.toISOString().slice(0, 10)}-${issueNumber}`;
 
@@ -482,10 +650,21 @@ serve(async (req: Request): Promise<Response> => {
 
     // Persist structured rows, link editor items, mark articles used
     const usedIds = [...headlines, ...dealSource, ...fundArticles, ...people, ...pulse].map((a) => a.id);
+    // `file` is computed per issue, not stored. If the v2.1 columns aren't there yet, store the v2 row.
+    const dealRows = deals.map(({ file: _file, ...d }) => ({ ...d, announced_on: now.toISOString().slice(0, 10) }));
+    const saveDeals = async () => {
+      if (!dealRows.length) return;
+      const { error } = await supabase.from("deals").upsert(dealRows, { onConflict: "sponsor,target", ignoreDuplicates: true });
+      if (error) {
+        console.warn("deals upsert (v2.1) failed, retrying with v2 columns:", error.message);
+        const v2 = dealRows.map(({ platform: _p, seller_type: _s, hq_state: _h, found_via: _f, below_radar: _b, ...r }) => r);
+        await supabase.from("deals").upsert(v2, { onConflict: "sponsor,target", ignoreDuplicates: true });
+      }
+    };
     await Promise.all([
-      deals.length
-        ? supabase.from("deals").upsert(deals.map((d) => ({ ...d, announced_on: now.toISOString().slice(0, 10) })), { onConflict: "sponsor,target", ignoreDuplicates: true })
-        : Promise.resolve(),
+      saveDeals(),
+      bdcIds.length ? supabase.from("bdc_holdings").update({ used_in_newsletter_id: newsletter.id }).in("id", bdcIds) : Promise.resolve(),
+      signalIds.length ? supabase.from("editor_items").update({ status: "published", newsletter_id: newsletter.id }).in("id", signalIds) : Promise.resolve(),
       funds.length
         ? supabase.from("funds").upsert(funds.map((f) => ({ ...f, announced_on: now.toISOString().slice(0, 10) })), { onConflict: "firm,fund_name", ignoreDuplicates: true })
         : Promise.resolve(),
@@ -496,7 +675,7 @@ serve(async (req: Request): Promise<Response> => {
     ]);
 
     return new Response(JSON.stringify({
-      message: `Issue #${issueNumber} drafted: ${headlines.length} headlines, ${deals.length} deals, ${funds.length} funds, ${people.length} moves, ${editorItems.length} editor items${editorial ? "" : " (editorial pass unavailable)"}`,
+      message: `Issue #${issueNumber} drafted: ${radar.length} below the radar, ${headlinesOnly.length} headlines, ${announced.length} announced deals, ${funds.length} funds, ${people.length} moves, ${editorItems.length} editor items${editorial ? "" : " (editorial pass unavailable)"}`,
       newsletter_id: newsletter.id, issue_number: issueNumber, subject,
       sections: { headlines: headlines.length, deals: deals.length, funds: funds.length, people: people.length, pulse: pulse.length, editor_items: editorItems.length },
       editorial: Boolean(editorial),

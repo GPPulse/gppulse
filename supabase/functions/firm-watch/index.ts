@@ -16,6 +16,7 @@ import { getStaff, isInternalCall, unauthorized } from "../_shared/auth.ts";
 //                  seen_only rows are archive entries recorded so they are never reported as new;
 //                  they skip the classifier.
 //   portfolio   -> { firms: [{ id, portfolio_url, names }], signals: [{ headline, body, url }] }
+//   bdc         -> { holdings: [...] } BDC schedule-of-investments rows (firm-watch/src/bdc.mjs)
 //   crawled     -> { firm_ids: [...] } stamps last_scraped_at
 
 const corsHeaders = {
@@ -39,8 +40,8 @@ serve(async (req: Request): Promise<Response> => {
         const rows: unknown[] = [];
         for (let from = 0; ; from += 1000) {
           const { data, error } = await supabase.from("pe_firm_sources")
-            .select("id, name, website_url, domain, watchlist, source_kind, watch_tier, news_url, feed_url, deals_url, portfolio_url, portfolio_names, portfolio_checked_at, discovered_at, last_scraped_at, linkedin_url, signup_page, signup_provider, subscribed_at, discovery_note")
-            .or("watchlist.eq.true,source_kind.in.(advisor,lender)").eq("is_active", true).order("watch_tier").order("name").range(from, from + 999);
+            .select("id, name, website_url, domain, firm_type, watchlist, source_kind, watch_tier, news_url, feed_url, deals_url, portfolio_url, portfolio_names, portfolio_checked_at, discovered_at, last_scraped_at, linkedin_url, signup_page, signup_provider, subscribed_at, discovery_note")
+            .or("watchlist.eq.true,source_kind.in.(advisor,lender,trade)").eq("is_active", true).order("watch_tier").order("name").range(from, from + 999);
           if (error) throw new Error(error.message);
           rows.push(...(data ?? []));
           if ((data ?? []).length < 1000) break;
@@ -64,9 +65,9 @@ serve(async (req: Request): Promise<Response> => {
         const fresh: Record<string, unknown>[] = [];
         for (const f of list) {
           const hit = existing.get(f.domain);
-          const kind = f.kind === "advisor" || f.kind === "lender" ? f.kind : "sponsor";
+          const kind = f.kind === "advisor" || f.kind === "lender" || f.kind === "trade" ? f.kind : "sponsor";
           if (!hit) { fresh.push({ name: f.name, website_url: f.website, domain: f.domain, headquarters: f.hq ?? null, firm_type: f.type ?? null, watchlist: kind === "sponsor", watch_tier: kind === "sponsor" ? f.tier ?? 4 : null, source_kind: kind }); continue; }
-          if (kind !== "sponsor") continue; // an advisor or lender already tracked is left as it is
+          if (kind !== "sponsor") continue; // an advisor, lender or trade source already tracked is left as it is
           if (hit.watchlist && hit.watch_tier === (f.tier ?? 4)) continue;
           const patch: Record<string, unknown> = { watchlist: true, watch_tier: f.tier ?? 4, firm_type: f.type ?? null };
           if (!hit.watchlist) patch.discovered_at = null;
@@ -162,6 +163,18 @@ serve(async (req: Request): Promise<Response> => {
           if (error) console.error("firm-watch portfolio signal", error.message); else filed++;
         }
         return json({ updated: firms.length, filed });
+      }
+
+      case "bdc": {
+        // BDC schedule-of-investments rows from firm-watch/src/bdc.mjs.
+        const rows = ((body.holdings ?? []) as Record<string, unknown>[]).filter((r) => r.bdc_ticker && r.accession && r.issuer_key);
+        let saved = 0;
+        for (const part of chunk(rows, 400)) {
+          const { data, error } = await supabase.from("bdc_holdings").upsert(part, { onConflict: "bdc_ticker,accession,issuer_key", ignoreDuplicates: true }).select("id");
+          if (error) throw new Error(error.message);
+          saved += (data ?? []).length;
+        }
+        return json({ saved });
       }
 
       case "crawled": {

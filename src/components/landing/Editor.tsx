@@ -37,7 +37,7 @@ export const Editor = () => {
               <p className="font-mono text-[11px] uppercase tracking-wider font-bold mb-2">How an issue gets made</p>
               <ol className="text-sm space-y-2 text-foreground/85">
                 <li><span className="font-mono text-muted-foreground mr-2">17:00 CT</span>Software reads hundreds of PE firm newsrooms, the wires and the trades. Mega-caps and non-North American items are discarded.</li>
-                <li><span className="font-mono text-muted-foreground mr-2">evening</span>A draft lands on the editor's desk: deals extracted with disclosed figures only, funds, moves, macro.</li>
+                <li><span className="font-mono text-muted-foreground mr-2">evening</span>A draft lands on the editor's desk: below-the-radar finds, announced deals with our file on each party, funds, moves. Figures only when disclosed.</li>
                 <li><span className="font-mono text-muted-foreground mr-2">evening</span>The editor writes the Lede, cuts what doesn't belong, adds what readers sent in, and approves.</li>
                 <li><span className="font-mono text-muted-foreground mr-2">06:00 ET</span>It sends. Reply goes to a person.</li>
               </ol>

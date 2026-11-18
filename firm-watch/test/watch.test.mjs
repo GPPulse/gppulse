@@ -158,3 +158,8 @@ test('tombstones: several one-line deals in one block are split', () => {
   const html = '<main><div class="list"><p>ETI Precision was acquired by Accredited Labs. Macadam Company, Inc. has been acquired by Heartland Paving Partners.</p></div></main>';
   assert.deepEqual(extractTombstones(html, 'https://bank.example/deals/').map((i) => i.title), ['ETI Precision was acquired by Accredited Labs.', 'Macadam Company, Inc. has been acquired by Heartland Paving Partners.']);
 });
+
+test('portfolio names skip hashed image names and CMS ids', () => {
+  const html = `<main><img alt="e28b8c848da2809091cc818d8f"><img alt="a7cec9c1c8e7c5d5d489c4c8ca"><img alt="img_20240312_0041"><h3>AFI Industries</h3><h3>3D Corporate Solutions</h3></main>`;
+  assert.deepEqual(extractPortfolio(html, 'https://brs.example/portfolio/'), ['AFI Industries', '3D Corporate Solutions']);
+});
