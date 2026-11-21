@@ -25,4 +25,4 @@ jobs:
       - run: npm ci
       - run: npm test
       - name: Team watch (dry)
-        run: node src/team.mjs --dry --limit 160 --discover-limit 160 --show 45
+        run: node src/team.mjs --dry --limit 320 --discover-limit 320 --show 320

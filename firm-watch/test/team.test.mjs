@@ -21,6 +21,8 @@ test('titles rank on one ladder, most specific wording first', () => {
   assert.equal(titleRank('Operating Partner'), null, 'off the ladder');
   assert.equal(titleRank('Senior Advisor'), null);
   assert.equal(titleRank('Office Manager'), null);
+  assert.equal(titleRank('Former CFO, The Boeing Company'), null, 'a biography line, not a job here');
+  assert.equal(titleRank('MD'), null, 'a physician on a healthcare board as often as a managing director');
   assert.equal(normTitle('SVP & Head of Capital Markets'), 'senior vice president and head of capital markets');
 });
 
@@ -34,6 +36,9 @@ test('person names are told apart from everything else on a team page', () => {
   assert.ok(looksLikeTitle('Chief Financial Officer & Chief Compliance Officer'));
   assert.ok(!looksLikeTitle('Jane joined the firm in 2014 as an associate.'));
   assert.ok(!looksLikeTitle('Meet our partners'));
+  assert.ok(!looksLikeTitle('Your Partner for Unlocking'));
+  assert.ok(!looksLikeTitle('Jeff Rice, MD'));
+  for (const n of ['Former EVP', 'Northwestern University', 'National Defense Industrial Association', 'Independent Sponsors']) assert.equal(personName(n), null, n);
 });
 
 test('card layout: one person per card, title on the next line', () => {
@@ -101,4 +106,9 @@ test('a year-end batch of promotions is reported, a reshuffled page is not', () 
   assert.deepEqual(diffTeam(BASE, shifted).moves, []);
   assert.equal(diffTeam(BASE, BASE.slice(0, 3)).reason, 'page looked incomplete; kept previous list');
   assert.deepEqual(diffTeam(BASE, BASE.slice(0, 3)).store, BASE);
+});
+
+test('advisory-board rows and shouting titles', () => {
+  const html = '<main><div><h4>Jane Doe</h4><p>MANAGING PARTNER</p></div><div><h4>John Roe</h4><p>associate</p></div><div><h4>Mike Monahan</h4><p>Former EVP, COO, CFO Pitney Bowes</p></div><div><img alt=""><h4>Healthcare Bluebook</h4><p>Jeff Rice, MD</p></div><div><h4>Tom Pitera</h4><p>Operating Partner*</p></div></main>';
+  assert.deepEqual(extractTeam(html), team(['Jane Doe', 'Managing Partner'], ['John Roe', 'Associate'], ['Mike Monahan', 'Former EVP, COO, CFO Pitney Bowes'], ['Tom Pitera', 'Operating Partner']));
 });
