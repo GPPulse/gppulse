@@ -94,6 +94,12 @@ export const SWEEP_QUERIES = [
   '"majority investment" "private equity" company',
   '"growth investment from" private equity',
   '"has been acquired by" "backed by"',
+  // Promotions and senior hires. Year-end promotion releases rarely reach the PE trade press.
+  '"promoted to partner" "private equity"',
+  '"promoted to managing director" "private equity"',
+  '"promoted to principal" "private equity"',
+  '"announces promotions" "private equity"',
+  '"joins as" partner "private equity firm"',
 ];
 const PE_WORDS = /(private equity|portfolio company|capital partners|equity partners|independent sponsor|recapitali[sz]|backed by|investment firm|growth investment|majority investment|add-on)/i;
 
