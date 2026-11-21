@@ -121,7 +121,8 @@ export function personName(line) {
   if (t.length < 5 || t.length > 45 || /[\d@:;!?/|()&]/.test(t.replace(/\([^)]{1,15}\)/g, '')) || t.includes(',') && !SUFFIX.test(t)) return null;
   t = t.replace(/\s*\([^)]{1,15}\)/g, '');
   const words = t.replace(SUFFIX, '').split(' ');
-  if (words.length < 2 || words.length > 5 || PLACE.test(t)) return null;
+  // "General Counsel" and "Fund Accountant" are capitalised like names but are titles.
+  if (words.length < 2 || words.length > 5 || PLACE.test(t) || TITLE_WORD.test(t)) return null;
   let caps = 0;
   for (const w of words) {
     const bare = w.replace(/^"|"$/g, '');
@@ -252,6 +253,8 @@ const GUESS = ['/team', '/our-team', '/people', '/about/team', '/about-us/team',
 const TEXT = /^(our |the |meet (the|our) )?(team|people|professionals|leadership|who we are|our firm|about( us)?)$/i;
 const PATH = /\/(team|our-team|people|professionals|leadership|who-we-are|about)/i;
 
+const INVESTOR = /\b(partner|principal|managing director|vice president|vp|associate|analyst)\b/i;
+
 async function read(url, render) {
   let res = await get(url);
   if (render && res.ok && lib.looksJsRendered?.(res.body)) {
@@ -269,7 +272,8 @@ export async function findTeamPage(firm, { render = false } = {}) {
   let best = null;
   const consider = (url, body) => {
     const members = extractTeam(body);
-    if (members.length >= 2 && members.filter((m) => titleRank(m.title) != null).length >= 2 && (!best || members.length > best.members.length)) best = { url, members };
+    // Two or more investment titles, so a home page of portfolio-CEO testimonials does not pass.
+    if (members.length >= 2 && members.filter((m) => INVESTOR.test(m.title)).length >= 2 && (!best || members.length > best.members.length)) best = { url, members };
   };
   consider(home.url, home.body); // two-person firms often list themselves on the home page
   const tried = new Set([home.url.replace(/\/$/, '')]);
