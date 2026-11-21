@@ -16,6 +16,8 @@ import { getStaff, isInternalCall, unauthorized } from "../_shared/auth.ts";
 //                  seen_only rows are archive entries recorded so they are never reported as new;
 //                  they skip the classifier.
 //   portfolio   -> { firms: [{ id, portfolio_url, names }], signals: [{ headline, body, url }] }
+//   team        -> { firms: [{ id, team_url, members }], moves: [{ firm_id, firm_name, person, person_key, move_type,
+//                  old_title, new_title, old_rank, new_rank, url, publish, review, line }] } (firm-watch/src/team.mjs)
 //   bdc         -> { holdings: [...] } BDC schedule-of-investments rows (firm-watch/src/bdc.mjs)
 //   crawled     -> { firm_ids: [...] } stamps last_scraped_at
 
@@ -40,7 +42,7 @@ serve(async (req: Request): Promise<Response> => {
         const rows: unknown[] = [];
         for (let from = 0; ; from += 1000) {
           const { data, error } = await supabase.from("pe_firm_sources")
-            .select("id, name, website_url, domain, firm_type, watchlist, source_kind, watch_tier, news_url, feed_url, deals_url, portfolio_url, portfolio_names, portfolio_checked_at, discovered_at, last_scraped_at, linkedin_url, signup_page, signup_provider, subscribed_at, discovery_note")
+            .select("id, name, website_url, domain, firm_type, watchlist, source_kind, watch_tier, news_url, feed_url, deals_url, portfolio_url, portfolio_names, portfolio_checked_at, team_url, team_members, team_checked_at, discovered_at, last_scraped_at, linkedin_url, signup_page, signup_provider, subscribed_at, discovery_note")
             .or("watchlist.eq.true,source_kind.in.(advisor,lender,trade)").eq("is_active", true).order("watch_tier").order("name").range(from, from + 999);
           if (error) throw new Error(error.message);
           rows.push(...(data ?? []));
@@ -163,6 +165,63 @@ serve(async (req: Request): Promise<Response> => {
           if (error) console.error("firm-watch portfolio signal", error.message); else filed++;
         }
         return json({ updated: firms.length, filed });
+      }
+
+      case "team": {
+        // Team-page comparison. `firms` carries the people to store for each sponsor; `moves` are the
+        // changes since the last run. Every move is kept in people_moves. A promotion to vice
+        // president or above also becomes a People item, worded as what the firm's own page shows.
+        // Senior arrivals and departures are inferences about a person's job, so they wait on the
+        // Editor's Desk and are never published from here.
+        const firms = (body.firms ?? []) as Array<{ id: string; team_url?: string | null; members?: Array<{ name: string; title: string }> | null }>;
+        const now = new Date().toISOString();
+        for (const f of firms) {
+          if (!f.id) continue;
+          const patch: Record<string, unknown> = { team_checked_at: now };
+          if (f.team_url !== undefined) patch.team_url = f.team_url;
+          if (Array.isArray(f.members)) patch.team_members = f.members.slice(0, 400).map((m) => ({ name: String(m.name).slice(0, 80), title: String(m.title).slice(0, 90) }));
+          await supabase.from("pe_firm_sources").update(patch).eq("id", f.id);
+        }
+        type Move = { firm_id: string; firm_name: string; person: string; person_key: string; move_type: string; old_title: string | null; new_title: string | null; old_rank: number | null; new_rank: number | null; url: string | null; publish?: boolean; review?: boolean; line?: string };
+        const moves = ((body.moves ?? []) as Move[]).filter((m) => m?.firm_id && m?.person && m?.person_key && m?.move_type).slice(0, 300);
+        let saved = 0, published = 0, filed = 0;
+        const since = new Date(Date.now() - 60 * 864e5).toISOString();
+        for (const m of moves) {
+          const move_key = `${m.firm_id}|${m.person_key}|${m.move_type}|${(m.new_title ?? "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim()}`;
+          const { data: row, error } = await supabase.from("people_moves").upsert({
+            firm_id: m.firm_id, firm_name: m.firm_name, person_name: m.person.slice(0, 80), person_key: m.person_key, move_type: m.move_type,
+            old_title: m.old_title, new_title: m.new_title, old_rank: m.old_rank, new_rank: m.new_rank,
+            source: "team_page", source_url: m.url, move_key, status: m.review ? "review" : "logged",
+          }, { onConflict: "move_key", ignoreDuplicates: true }).select("id").maybeSingle();
+          if (error) { console.error("firm-watch team move", error.message); continue; }
+          if (!row) continue; // already recorded on an earlier run
+          saved++;
+
+          if (m.publish && m.move_type === "promotion") {
+            // Skip when the firm already announced it and the release is in the tracker.
+            const [{ data: announced }, { data: covered }] = await Promise.all([
+              supabase.from("people_moves").select("id").eq("person_key", m.person_key).eq("source", "announcement").gte("detected_at", since).limit(1),
+              supabase.from("articles").select("id").eq("category", "people_moves").ilike("title", `%${m.person.replace(/[%_]/g, " ")}%`).gte("created_at", since).limit(1),
+            ]);
+            if (announced?.length || covered?.length) continue;
+            const { data: article, error: aErr } = await supabase.from("articles").insert({
+              title: m.person, category: "people_moves", source: m.firm_name, source_url: m.url, watchlist_firm: m.firm_name,
+              summary: `Promotion — ${m.new_title} at ${m.firm_name}, previously ${m.old_title}. The title changed on the firm's team page; we found no announcement.`,
+              fund_size_relevant: true, relevance_score: 70, scraped_at: now, published_at: now,
+            }).select("id").single();
+            if (aErr) { console.error("firm-watch team article", aErr.message); continue; }
+            await supabase.from("people_moves").update({ status: "published", article_id: article.id }).eq("id", row.id);
+            published++;
+          } else if (m.review) {
+            const headline = `Team page: ${m.line ?? `${m.person} at ${m.firm_name}`}`.slice(0, 200);
+            const note = m.move_type === "departure"
+              ? "The name is no longer on the firm's team page. That can mean a departure, a retirement or a page edit. Confirm before running anything."
+              : "The name is new on the firm's team page. Check whether this is a hire or someone the page left out before.";
+            const { error: eErr } = await supabase.from("editor_items").insert({ kind: "overheard", headline, body: note, url: m.url ?? null, attribution: "GP Pulse firm watch", status: "submitted" });
+            if (eErr) console.error("firm-watch team signal", eErr.message); else filed++;
+          }
+        }
+        return json({ updated: firms.length, saved, published, filed });
       }
 
       case "bdc": {

@@ -1,0 +1,46 @@
+# Team watch: compares each watchlist sponsor's team page with the copy stored the day before.
+# A title that moved up is a promotion; most are never announced. Kept apart from firm-watch.yml
+# so a slow crawl there never delays it. Same secrets as pipeline.yml.
+name: Team watch
+on:
+  schedule:
+    - cron: "23 19 * * *"   # daily, about 2.5 hours before the nightly draft build (21:50 UTC)
+  workflow_dispatch:
+    inputs:
+      dry:
+        description: "Dry run: read and report, save nothing"
+        type: boolean
+        default: false
+      retry:
+        description: "Look again at firms where no team page was found"
+        type: boolean
+        default: false
+      discover_limit:
+        description: "How many firms to look for a team page at in this run"
+        default: "400"
+concurrency:
+  group: team-watch
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: firm-watch
+    env:
+      SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      PIPELINE_SECRET: ${{ secrets.PIPELINE_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: firm-watch/package-lock.json
+      - run: npm ci
+      # Finding a team page takes several requests per firm, so the first pass is spread over a
+      # few days (400 firms a run). After that each firm costs one request a day.
+      - name: Team watch
+        run: node src/team.mjs --discover-limit ${{ github.event.inputs.discover_limit || '400' }} ${{ github.event.inputs.dry == 'true' && '--dry --show 25' || '' }} ${{ github.event.inputs.retry == 'true' && '--retry' || '' }}

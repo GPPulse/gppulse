@@ -35,6 +35,29 @@ Two more sources feed the same queue:
   items with status `submitted`. These are inferences. They are never published automatically.
   A swing of more than three additions is treated as a redesign and only re-baselined.
 
+## Promotions nobody announces
+
+**Team watch** (`src/team.mjs`, `.github/workflows/team-watch.yml`, daily 19:23 UTC). Finds each
+sponsor's team page, stores every name and title on it (`pe_firm_sources.team_members`) and
+compares the page with the stored copy on later runs. Every change is kept in `people_moves`.
+
+| Change on the page | What happens |
+|---|---|
+| Title moves up the ladder, to vice president or above | People section, worded as what the firm's page shows. Skipped if the firm's own announcement is already in the tracker. |
+| New name at director / principal or above | Editor's Desk (`overheard`, `submitted`). Not published. |
+| Name gone, director / principal or above | Editor's Desk. Never published from here. |
+| Junior moves, sideways changes (Principal to Director), advisors | `people_moves` only. |
+
+Titles are ranked on one ladder (`titleRank`): analyst, associate, senior associate, vice
+president, principal or director, managing director, partner, managing partner. Operating
+partners and advisors are off the ladder. People are matched by name without middle initials,
+suffixes or credentials. A run in which more than a quarter of the names come or go, or more
+than half the titles change, is treated as a redesign and only re-baselined. One team page per
+firm is read; a team split across several pages is only partly covered.
+
+The classifier (`process-content`) also lists each person named in a people item, so a release
+announcing six promotions becomes six `people_moves` rows with `source = 'announcement'`.
+
 The first time a firm is crawled its archive is recorded as already seen and only items
 from the last 10 days are queued. The crawler identifies itself as `GPPulseBot`, obeys
 robots.txt and makes two or three requests per firm per day.
