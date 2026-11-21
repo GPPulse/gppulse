@@ -55,12 +55,14 @@ const LADDER = [
 export const normTitle = (t) => clean(t).toLowerCase()
   .replace(/&/g, ' and ').replace(/\bsr\.?(?=\s)/g, 'senior').replace(/\bv\.?p\.?\b/g, 'vice president')
   .replace(/\bs\.?v\.?p\.?\b/g, 'senior vice president').replace(/\be\.?v\.?p\.?\b/g, 'executive vice president')
-  .replace(/\bm\.?d\.?\b/g, 'managing director').replace(/[^a-z0-9]+/g, ' ').trim();
+  .replace(/[^a-z0-9]+/g, ' ').trim();
 
 // Highest rung named in a title, or null when the title is off the ladder (advisors, operating
 // partners) or not recognised.
 export function titleRank(title) {
   let rest = ` ${normTitle(title)} `;
+  // "Former CFO, The Boeing Company" on an advisory board is a biography, not a job at this firm.
+  if (/\b(former|formerly|retired|emeritus)\b/.test(rest)) return null;
   let best = null;
   for (const [re, rank] of LADDER) {
     const g = new RegExp(re.source, 'g');
@@ -71,12 +73,14 @@ export function titleRank(title) {
   return best;
 }
 
-const TITLE_WORD = /\b(partner|principal|director|president|associate|analyst|officer|chairman|chairwoman|chair|founder|controller|counsel|head of|manager|advis[eo]r|executive|administrator|assistant|accountant|treasurer|secretary|fellow|intern|specialist|coordinator|c[efoitm]o|cco|chro|vp|svp|evp|md)\b/i;
-const NOT_TITLE = /\b(our|we|us|their|is|are|was|were|has|have|joined|joins|responsible|years?|experience|prior to|previously|read|view|learn|click|meet|contact|bio|linkedin|email|phone)\b/i;
+const TITLE_WORD = /\b(partner|principal|director|president|associate|analyst|officer|chairman|chairwoman|chair|founder|controller|counsel|head of|manager|advis[eo]r|executive|administrator|assistant|accountant|treasurer|secretary|fellow|intern|specialist|coordinator|c[efoitm]o|cco|chro|vp|svp|evp)\b/i;
+const NOT_TITLE = /\b(our|we|us|their|is|are|was|were|has|have|joined|joins|responsible|years?|experience|prior to|previously|read|view|learn|click|meet|contact|bio|linkedin|email|phone|your|seeking|businesses|that|who)\b/i;
 
 export function looksLikeTitle(line) {
   const t = clean(line);
   if (t.length < 2 || t.length > 90 || /[.!?]$/.test(t) || t.split(' ').length > 12) return false;
+  // "Jeff Rice, MD" under a company logo is a person, not a title.
+  if (personName(t.replace(/,\s*(md|m\.d\.|pe)$/i, ''))) return false;
   return TITLE_WORD.test(t) && !NOT_TITLE.test(t);
 }
 
@@ -106,7 +110,7 @@ const SUFFIX = /,?\s+(jr|sr|ii|iii|iv)\b\.?/i;
 const PARTICLE = /^(de|del|della|der|den|di|da|dos|du|la|le|van|von|bin|al|el|st\.?|mc|mac|o')$/i;
 // Words that never appear in a person's name on a firm site. Place names are handled as whole
 // phrases below, because Park, West, Lake, Virginia and the like are also people's names.
-const NOT_NAME = new Set(('capital partners partner equity team our the investment investments management portfolio contact news about learn read view more group fund funds holdings llc inc lp advisors advisor advisory operating senior managing director directors principal principals associate associates analyst analysts vice president chief officer founder chairman privacy policy terms street avenue suite united states office offices headquarters board committee leadership professionals people staff executive executives administration finance accounting operations business development investor relations human resources marketing compliance legal firm company companies industries industry services solutions strategy approach criteria overview history values culture careers login search menu filter show load next previous back close skip follow share connect get started email phone download bio biography profile linkedin twitter buyout ventures meet who we what how why case studies study')
+const NOT_NAME = new Set(('capital partners partner equity team our the investment investments management portfolio contact news about learn read view more group fund funds holdings llc inc lp advisors advisor advisory operating senior managing director directors principal principals associate associates analyst analysts vice president chief officer founder chairman privacy policy terms street avenue suite united states office offices headquarters board committee leadership professionals people staff executive executives administration finance accounting operations business development investor relations human resources marketing compliance legal firm company companies industries industry services solutions strategy approach criteria overview history values culture careers login search menu filter show load next previous back close skip follow share connect get started email phone download bio biography profile linkedin twitter buyout ventures meet who we what how why case studies study former association university college institute foundation society alliance council national independent sponsors evp svp vp ceo cfo coo cio cto cco md')
   .split(' '));
 const PLACE = /^(new york|new york city|san francisco|los angeles|san diego|san antonio|san jose|san mateo|palm beach|west palm beach|north palm beach|fort worth|fort lauderdale|salt lake city|st\.? louis|st\.? paul|st\.? petersburg|kansas city|oklahoma city|park city|grand rapids|boca raton|las vegas|new orleans|new haven|new canaan|new jersey|des moines|baton rouge|santa monica|santa barbara|palo alto|menlo park|coral gables|winter park|long island|north carolina|south carolina|old greenwich|west hartford|ann arbor|el segundo|newport beach|laguna beach|beverly hills|overland park|highland park|oak brook|lake forest|chevy chase|bala cynwyd|west conshohocken|king of prussia|costa mesa|little rock|cedar rapids|sioux falls|colorado springs|bay area|twin cities|north america|united kingdom|hong kong|mexico city)$/i;
 
@@ -178,7 +182,10 @@ export function extractTeam(html) {
     const prev = people.get(key);
     // The same person often appears twice (grid and bio). Keep the entry with a ranked title.
     if (prev && (titleRank(prev.title) != null || titleRank(title) == null)) return;
-    people.set(key, { name, title: clean(title).replace(/^[-–—|,:\s]+|[-–—|,:\s]+$/g, '').slice(0, 90), how });
+    let shown = clean(title).replace(/^[-–—|,:\s]+|[-–—|,:\s*]+$/g, '').slice(0, 90);
+    // "VICE PRESIDENT" and "associate" are styling; store titles in ordinary case.
+    if (shown === shown.toUpperCase() && shown.length > 4 || shown === shown.toLowerCase()) shown = shown.toLowerCase().replace(/(^|[\s\-/&(])([a-z])/g, (_, a, b) => a + b.toUpperCase()).replace(/\b(And|Of|The|For|In)\b/g, (m) => m.toLowerCase()).replace(/\b(Ceo|Cfo|Coo|Cio|Cto|Cco|Vp|Svp|Evp|Hr|Ir|Ai|It)\b/g, (m) => m.toUpperCase());
+    people.set(key, { name, title: shown, how });
   };
 
   // Does this page put titles above names? Mid-page both readings fit ("Partner / Jane / Principal
@@ -295,7 +302,9 @@ export function describe(move, firm) {
 
 async function main() {
   const render = flag('render') && typeof lib.render === 'function';
-  let { firms } = await api('firms');
+  let { firms, team_ready } = await api('firms');
+  // Without its columns there is nowhere to keep a baseline, and every run would start over.
+  if (team_ready === false && !flag('dry')) { console.log('Team watch: database migration 20261121150000_team_watch is not applied yet. Nothing to do.'); return; }
   firms = firms.filter((f) => f.watchlist && (f.watch_tier ?? 4) <= Number(opt('tier', 4))).slice(0, Number(opt('limit', 1e9)));
   // Finding a team page takes several requests per firm; spread the first pass over a few days.
   let budget = Number(opt('discover-limit', 400));

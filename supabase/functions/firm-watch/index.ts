@@ -39,16 +39,24 @@ serve(async (req: Request): Promise<Response> => {
     const body = await req.json().catch(() => ({}));
     switch (String(body.action ?? "")) {
       case "firms": {
+        const base = "id, name, website_url, domain, firm_type, watchlist, source_kind, watch_tier, news_url, feed_url, deals_url, portfolio_url, portfolio_names, portfolio_checked_at, discovered_at, last_scraped_at, linkedin_url, signup_page, signup_provider, subscribed_at, discovery_note";
+        // The team columns arrive with migration 20261121150000_team_watch. Until it is applied
+        // the crawl carries on without them rather than failing.
+        let columns = `${base}, team_url, team_members, team_checked_at`;
         const rows: unknown[] = [];
         for (let from = 0; ; from += 1000) {
-          const { data, error } = await supabase.from("pe_firm_sources")
-            .select("id, name, website_url, domain, firm_type, watchlist, source_kind, watch_tier, news_url, feed_url, deals_url, portfolio_url, portfolio_names, portfolio_checked_at, team_url, team_members, team_checked_at, discovered_at, last_scraped_at, linkedin_url, signup_page, signup_provider, subscribed_at, discovery_note")
+          let { data, error } = await supabase.from("pe_firm_sources").select(columns)
             .or("watchlist.eq.true,source_kind.in.(advisor,lender,trade)").eq("is_active", true).order("watch_tier").order("name").range(from, from + 999);
+          if (error && columns !== base && /team_/.test(error.message)) {
+            columns = base;
+            ({ data, error } = await supabase.from("pe_firm_sources").select(columns)
+              .or("watchlist.eq.true,source_kind.in.(advisor,lender,trade)").eq("is_active", true).order("watch_tier").order("name").range(from, from + 999));
+          }
           if (error) throw new Error(error.message);
           rows.push(...(data ?? []));
           if ((data ?? []).length < 1000) break;
         }
-        return json({ firms: rows });
+        return json({ firms: rows, team_ready: columns !== base });
       }
 
       case "seed": {
