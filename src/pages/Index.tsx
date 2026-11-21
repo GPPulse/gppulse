@@ -4,6 +4,7 @@ import { Hero } from "@/components/landing/Hero";
 import { Features } from "@/components/landing/Features";
 import { SampleNewsletter } from "@/components/landing/SampleNewsletter";
 import { Editor } from "@/components/landing/Editor";
+import { ClosingCta } from "@/components/landing/ClosingCta";
 import { Footer } from "@/components/landing/Footer";
 import { SITE } from "@/lib/site";
 
@@ -21,6 +22,7 @@ const Index = () => {
         <Features />
         <SampleNewsletter />
         <Editor />
+        <ClosingCta />
         <Footer />
       </main>
     </div>
