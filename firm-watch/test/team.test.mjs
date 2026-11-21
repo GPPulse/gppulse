@@ -37,6 +37,7 @@ test('person names are told apart from everything else on a team page', () => {
   assert.ok(!looksLikeTitle('Jane joined the firm in 2014 as an associate.'));
   assert.ok(!looksLikeTitle('Meet our partners'));
   assert.ok(!looksLikeTitle('Your Partner for Unlocking'));
+  for (const t of ['General Counsel', 'Fund Accountant', 'Office Manager', 'Talent Partner']) { assert.ok(looksLikeTitle(t), t); assert.equal(personName(t), null, t); }
   assert.ok(!looksLikeTitle('Jeff Rice, MD'));
   for (const n of ['Former EVP', 'Northwestern University', 'National Defense Industrial Association', 'Independent Sponsors']) assert.equal(personName(n), null, n);
 });
@@ -109,6 +110,6 @@ test('a year-end batch of promotions is reported, a reshuffled page is not', () 
 });
 
 test('advisory-board rows and shouting titles', () => {
-  const html = '<main><div><h4>Jane Doe</h4><p>MANAGING PARTNER</p></div><div><h4>John Roe</h4><p>associate</p></div><div><h4>Mike Monahan</h4><p>Former EVP, COO, CFO Pitney Bowes</p></div><div><img alt=""><h4>Healthcare Bluebook</h4><p>Jeff Rice, MD</p></div><div><h4>Tom Pitera</h4><p>Operating Partner*</p></div></main>';
-  assert.deepEqual(extractTeam(html), team(['Jane Doe', 'Managing Partner'], ['John Roe', 'Associate'], ['Mike Monahan', 'Former EVP, COO, CFO Pitney Bowes'], ['Tom Pitera', 'Operating Partner']));
+  const html = '<main><div><h4>Jane Doe</h4><p>MANAGING PARTNER</p></div><div><h4>John Roe</h4><p>associate</p></div><div><h4>Mike Monahan</h4><p>Former EVP, COO, CFO Pitney Bowes</p></div><div><img alt=""><h4>Healthcare Bluebook</h4><p>Jeff Rice, MD</p></div><div><h4>Tom Pitera</h4><p>Operating Partner*</p></div><div><h4>Will Rabke</h4><p>General Counsel</p></div></main>';
+  assert.deepEqual(extractTeam(html), team(['Jane Doe', 'Managing Partner'], ['John Roe', 'Associate'], ['Mike Monahan', 'Former EVP, COO, CFO Pitney Bowes'], ['Tom Pitera', 'Operating Partner'], ['Will Rabke', 'General Counsel']));
 });
