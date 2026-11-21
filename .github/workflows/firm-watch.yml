@@ -1,15 +1,27 @@
-# Temporary: dry run of the team watch from a test branch. Reads only; nothing is saved.
+# Firm watch: reads the news pages of the ~860 middle-market firms on the watchlist and queues
+# anything new for the nightly classifier. Runs here rather than in an edge function because
+# walking that many sites takes minutes, not seconds. Free-tier Actions minutes cover it.
+# Uses the same secrets as pipeline.yml: SUPABASE_PROJECT_REF, SUPABASE_ANON_KEY, PIPELINE_SECRET.
 name: Firm watch
 on:
+  schedule:
+    - cron: "17 20 * * *"   # daily crawl, ~90 min before the nightly draft build (21:50 UTC)
+    - cron: "43 6 * * 0"    # Sunday: look for sources at firms that had none, and new firms
   workflow_dispatch:
     inputs:
       job:
-        description: "unused"
+        description: "crawl | discover (firms not yet checked) | discover-all (re-check every firm)"
         default: "crawl"
+  push:
+    branches: [main]
+    paths: ["firm-watch/**", ".github/workflows/firm-watch.yml"]
+concurrency:
+  group: firm-watch
+  cancel-in-progress: false
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 90
     defaults:
       run:
         working-directory: firm-watch
@@ -22,7 +34,44 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
+          cache-dependency-path: firm-watch/package-lock.json
       - run: npm ci
       - run: npm test
-      - name: Team watch (dry)
-        run: node src/team.mjs --dry --limit 320 --discover-limit 320 --show 320
+
+      # On a push the backend deploy runs in parallel; give it time to publish the function.
+      - name: Wait for backend deploy
+        if: github.event_name == 'push'
+        run: sleep 240
+
+      - name: Sync watchlist
+        run: node src/seed.mjs
+
+      # discover.mjs only visits firms that have not been checked, so on most days this is a no-op.
+      - name: Discover sources
+        if: github.event.inputs.job != 'crawl' || github.event_name != 'workflow_dispatch'
+        run: node src/discover.mjs ${{ github.event.inputs.job == 'discover-all' && '--all' || '' }} ${{ github.event.schedule == '43 6 * * 0' && '--retry' || '' }}
+
+      - name: Crawl
+        if: github.event.schedule != '43 6 * * 0' && !startsWith(github.event.inputs.job, 'discover')
+        run: node src/crawl.mjs
+
+      # Compares each sponsor's portfolio page with yesterday's; new names go to the Editor's Desk.
+      - name: Portfolio watch
+        if: github.event.schedule != '43 6 * * 0' && !startsWith(github.event.inputs.job, 'discover')
+        run: node src/portfolio.mjs ${{ github.event.schedule == '43 6 * * 0' && '--retry' || '' }}
+
+      # New borrowers in lower-middle-market BDCs' latest 10-Q/10-K: unannounced financings.
+      - name: BDC filings watch
+        if: github.event.schedule != '43 6 * * 0' && !startsWith(github.event.inputs.job, 'discover')
+        continue-on-error: true
+        run: node src/bdc.mjs
+
+      - name: Keep the hand-off lists (LinkedIn pages, mailing-list forms, firms to review)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: firm-watch-lists
+          path: firm-watch/out/
+          if-no-files-found: ignore
+          retention-days: 30
