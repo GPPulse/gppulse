@@ -9,6 +9,17 @@
       "destination": "https://bhkiiaturzpxvoxmjlcx.supabase.co/functions/v1/sitemap"
     },
     {
+      "source": "/archive/:slug",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(Twitterbot|facebookexternalhit|Facebot|LinkedInBot|Slackbot|Slack-ImgProxy|Discordbot|WhatsApp|TelegramBot|Applebot|SkypeUriPreview|redditbot|Pinterest|Googlebot|bingbot|DuckDuckBot).*"
+        }
+      ],
+      "destination": "/api/issue?slug=:slug"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
