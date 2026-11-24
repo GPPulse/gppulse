@@ -7,7 +7,7 @@ import { CONFIG } from "../_shared/config.ts";
 
 const PAGES: [path: string, changefreq: string, priority: string][] = [
   ["/", "daily", "1.0"], ["/archive", "daily", "0.9"], ["/deals", "daily", "0.9"], ["/comps", "daily", "0.8"],
-  ["/pricing", "weekly", "0.8"], ["/funds", "daily", "0.8"], ["/people-moves", "daily", "0.7"], ["/deal-stats", "weekly", "0.7"],
+  ["/pricing", "weekly", "0.8"], ["/sponsors", "daily", "0.8"], ["/funds", "daily", "0.8"], ["/people-moves", "daily", "0.7"], ["/deal-stats", "weekly", "0.7"],
   ["/about", "monthly", "0.5"], ["/tip", "monthly", "0.4"], ["/referrals", "monthly", "0.4"], ["/privacy", "yearly", "0.2"],
 ];
 const xml = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
