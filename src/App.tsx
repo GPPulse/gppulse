@@ -2,26 +2,28 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
-import Admin from "./pages/Admin";
-import Archive from "./pages/Archive";
-import NewsletterIssue from "./pages/NewsletterIssue";
-import Referrals from "./pages/Referrals";
-import DealStats from "./pages/DealStats";
-import PeopleMoves from "./pages/PeopleMoves";
-import Unsubscribe from "./pages/Unsubscribe";
-import Preferences from "./pages/Preferences";
-import About from "./pages/About";
-import Deals from "./pages/Deals";
-import Funds from "./pages/Funds";
-import Tip from "./pages/Tip";
-import Comps from "./pages/Comps";
-import Pricing from "./pages/Pricing";
-import Sponsors from "./pages/Sponsors";
-import Vote from "./pages/Vote";
-import Privacy from "./pages/Privacy";
-import NotFound from "./pages/NotFound";
+const Admin = lazy(() => import("./pages/Admin"));
+const Archive = lazy(() => import("./pages/Archive"));
+const NewsletterIssue = lazy(() => import("./pages/NewsletterIssue"));
+const Referrals = lazy(() => import("./pages/Referrals"));
+const DealStats = lazy(() => import("./pages/DealStats"));
+const PeopleMoves = lazy(() => import("./pages/PeopleMoves"));
+const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
+const Preferences = lazy(() => import("./pages/Preferences"));
+const About = lazy(() => import("./pages/About"));
+const Deals = lazy(() => import("./pages/Deals"));
+const Funds = lazy(() => import("./pages/Funds"));
+const Tip = lazy(() => import("./pages/Tip"));
+const Comps = lazy(() => import("./pages/Comps"));
+const Pricing = lazy(() => import("./pages/Pricing"));
+const Sponsors = lazy(() => import("./pages/Sponsors"));
+const Vote = lazy(() => import("./pages/Vote"));
+const Privacy = lazy(() => import("./pages/Privacy"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+import { SeoSync } from "./components/SeoSync";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +33,8 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        {/* Only the landing page is in the first download; every other page loads its own code when opened. */}
+        <Suspense fallback={<div className="min-h-screen bg-background" />}>
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/admin" element={<Admin />} />
@@ -53,6 +57,8 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        </Suspense>
+        <SeoSync />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

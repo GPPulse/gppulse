@@ -1,27 +1,49 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "vite",
-  "buildCommand": "npm run build",
+  "buildCommand": "npm run build && node scripts/postbuild.mjs",
   "outputDirectory": "dist",
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "gppulse.vercel.app"
+        }
+      ],
+      "destination": "https://thegppulse.com/$1",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/sitemap.xml",
-      "destination": "https://bhkiiaturzpxvoxmjlcx.supabase.co/functions/v1/sitemap"
+      "destination": "/api/sitemap"
     },
     {
-      "source": "/archive/:slug",
-      "has": [
-        {
-          "type": "header",
-          "key": "user-agent",
-          "value": ".*(Twitterbot|facebookexternalhit|Facebot|LinkedInBot|Slackbot|Slack-ImgProxy|Discordbot|WhatsApp|TelegramBot|Applebot|SkypeUriPreview|redditbot|Pinterest|Googlebot|bingbot|DuckDuckBot).*"
-        }
-      ],
-      "destination": "/api/issue?slug=:slug"
+      "source": "/feed.xml",
+      "destination": "/api/feed"
+    },
+    {
+      "source": "/rss.xml",
+      "destination": "/api/feed"
+    },
+    {
+      "source": "/llms.txt",
+      "destination": "/api/llms"
+    },
+    {
+      "source": "/llms-full.txt",
+      "destination": "/api/llms?full=1"
+    },
+    {
+      "source": "/(admin|preferences|unsubscribe|vote)(/.*)?",
+      "destination": "/shell.html"
     },
     {
       "source": "/(.*)",
-      "destination": "/index.html"
+      "destination": "/api/page?p=$1"
     }
   ],
   "headers": [
@@ -50,6 +72,16 @@
           "value": "strict-origin-when-cross-origin"
         }
       ]
+    },
+    {
+      "source": "/(admin|preferences|unsubscribe|vote|shell.html)(.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
     }
-  ]
+  ],
+  "trailingSlash": false
 }

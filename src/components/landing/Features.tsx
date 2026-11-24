@@ -1,27 +1,6 @@
 import { SITE } from "@/lib/site";
 
-const principles = [
-  {
-    n: "01",
-    title: "Lower middle market only. By rule, not by vibe.",
-    body: "Apollo, Blackstone, KKR and the rest of the mega-cap list are filtered out before a human ever sees the draft. If a fund is over $1B or a deal is a $4B take-private, it isn't in here. Your competitors are, and so are the firms you'll be bidding against next quarter.",
-  },
-  {
-    n: "02",
-    title: "If we print a multiple, someone disclosed it.",
-    body: "No estimated EBITDA, no inferred EV, no \"sources say roughly 9x.\" The Deal tracker shows the figures that were actually released and says \"undisclosed\" when they weren't. You've seen enough made-up comps.",
-  },
-  {
-    n: "03",
-    title: "Written by someone who's sat on your side of the table.",
-    body: `${SITE.editor.name} is a partner at a lower middle market firm. The Lede is a point of view, tagged with how much conviction is behind it. When the material is thin, it says so instead of manufacturing significance.`,
-  },
-  {
-    n: "04",
-    title: "Reply, and a person reads it.",
-    body: "Processes you're seeing, a lender quote worth repeating, a hire we missed. The best replies become the \"On the market\" and \"Overheard\" sections, attributed by role, never by name.",
-  },
-];
+import { PRINCIPLES as principles } from "../../../api/_lib/copy.js";
 
 export const Features = () => {
   return (

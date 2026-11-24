@@ -8,7 +8,7 @@ const env = (k: string): string | undefined => {
 };
 
 export const CONFIG = {
-  siteUrl: (env("SITE_URL") ?? "https://gppulse.vercel.app").replace(/\/$/, ""),
+  siteUrl: (env("SITE_URL") ?? "https://thegppulse.com").replace(/\/$/, ""),
   from: env("NEWSLETTER_FROM") ?? "The GP Pulse <pulse@mail.thegppulse.com>",
   replyTo: env("NEWSLETTER_REPLY_TO") ?? "cschlotman@littlejohncapital.com",
   // CAN-SPAM requires a valid physical postal address. Replace with a street address or PO box.
