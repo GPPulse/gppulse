@@ -15,6 +15,7 @@ import { getStaff, isInternalCall, unauthorized } from "../_shared/auth.ts";
 //   items       -> { items: [{ firm_id, url, title, content, published_at, source_name, category_hint, seen_only }] }
 //                  seen_only rows are archive entries recorded so they are never reported as new;
 //                  they skip the classifier.
+//   subscribed  -> { firms: [{ id, status, note }] }   one mailing-list sign-up attempt per firm
 //   portfolio   -> { firms: [{ id, portfolio_url, names }], signals: [{ headline, body, url }] }
 //   bdc         -> { holdings: [...] } BDC schedule-of-investments rows (firm-watch/src/bdc.mjs)
 //   crawled     -> { firm_ids: [...] } stamps last_scraped_at
@@ -38,15 +39,22 @@ serve(async (req: Request): Promise<Response> => {
     switch (String(body.action ?? "")) {
       case "firms": {
         const rows: unknown[] = [];
+        const base = "id, name, website_url, domain, firm_type, watchlist, source_kind, watch_tier, news_url, feed_url, deals_url, portfolio_url, portfolio_names, portfolio_checked_at, discovered_at, last_scraped_at, linkedin_url, signup_page, signup_provider, subscribed_at, discovery_note";
+        // signup_status arrives with migration 20261124060000; until it is applied, read without it.
+        let cols = `${base}, signup_status`;
         for (let from = 0; ; from += 1000) {
-          const { data, error } = await supabase.from("pe_firm_sources")
-            .select("id, name, website_url, domain, firm_type, watchlist, source_kind, watch_tier, news_url, feed_url, deals_url, portfolio_url, portfolio_names, portfolio_checked_at, discovered_at, last_scraped_at, linkedin_url, signup_page, signup_provider, subscribed_at, discovery_note")
+          let { data, error } = await supabase.from("pe_firm_sources").select(cols)
             .or("watchlist.eq.true,source_kind.in.(advisor,lender,trade)").eq("is_active", true).order("watch_tier").order("name").range(from, from + 999);
+          if (error && cols !== base && /signup_status/.test(error.message)) {
+            cols = base;
+            ({ data, error } = await supabase.from("pe_firm_sources").select(cols)
+              .or("watchlist.eq.true,source_kind.in.(advisor,lender,trade)").eq("is_active", true).order("watch_tier").order("name").range(from, from + 999));
+          }
           if (error) throw new Error(error.message);
           rows.push(...(data ?? []));
           if ((data ?? []).length < 1000) break;
         }
-        return json({ firms: rows });
+        return json({ firms: rows, signup_tracking: cols !== base });
       }
 
       case "seed": {
@@ -138,6 +146,22 @@ serve(async (req: Request): Promise<Response> => {
           queued += (data ?? []).filter((r: { processed: boolean }) => !r.processed).length;
         }
         return json({ created, queued });
+      }
+
+      case "subscribed": {
+        // Outcome of one mailing-list sign-up attempt per firm (firm-watch/src/subscribe.mjs).
+        const firms = (body.firms ?? []) as Array<{ id: string; status: string; note?: string }>;
+        const now = new Date().toISOString();
+        let updated = 0;
+        for (const f of firms) {
+          if (!f.id || !f.status) continue;
+          const patch: Record<string, unknown> = { signup_status: f.status.slice(0, 30), signup_note: (f.note ?? "").slice(0, 300), signup_attempted_at: now };
+          if (f.status === "subscribed") patch.subscribed_at = now;
+          const { error } = await supabase.from("pe_firm_sources").update(patch).eq("id", f.id);
+          if (error) return json({ error: `could not record sign-ups (is migration 20261124060000 applied?): ${error.message}` }, 500);
+          updated++;
+        }
+        return json({ updated });
       }
 
       case "portfolio": {

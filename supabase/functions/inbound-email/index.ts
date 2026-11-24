@@ -3,7 +3,8 @@
 // function. We fetch the message, match the sender to a watchlist firm, log it in
 // watch_inbox, and copy announcements into scraped_content so the nightly classifier
 // treats them like any other source. Subscription-confirmation emails are logged with
-// their confirmation link and are not sent to the classifier.
+// their confirmation link and are not sent to the classifier; the link is opened automatically
+// when it belongs to a mailing-list service or to the firm itself (confirm.ts).
 //
 // Forwards: a firm email forwarded from one of the editors' own inboxes (WATCH_FORWARDERS,
 // comma-separated addresses or @domains; default cschlotman@littlejohncapital.com) is credited
@@ -14,6 +15,7 @@
 // email.received webhook). verify_jwt is off; the Svix signature authenticates the call.
 // Webhook and receiving domain (in.thegppulse.com) were created in Resend on 2026-11-16.
 
+import { mayAutoConfirm, openConfirmLink } from "./confirm.ts";
 import { cleanSubject, findForwarded } from "./forwarded.ts";
 
 const env = (k: string) => Deno.env.get(k) ?? "";
@@ -93,22 +95,22 @@ Deno.serve(async (req: Request): Promise<Response> => {
   const tracked = "or=(watchlist.eq.true,source_kind.in.(advisor,lender))&is_active=is.true";
   const parts = senderDomain.split(".");
   const candidates = [senderDomain, parts.slice(-2).join(".")].filter((d, i, a) => d && a.indexOf(d) === i);
-  let firm: { id: string; name: string; source_kind: string } | null = null;
+  let firm: { id: string; name: string; source_kind: string; domain?: string | null } | null = null;
   if (candidates.length) {
-    const r = await db(`pe_firm_sources?select=id,name,source_kind&${tracked}&domain=in.(${candidates.map((d) => `"${d}"`).join(",")})&limit=1`);
+    const r = await db(`pe_firm_sources?select=id,name,source_kind,domain&${tracked}&domain=in.(${candidates.map((d) => `"${d}"`).join(",")})&limit=1`);
     firm = r.ok ? (await r.json())[0] ?? null : null;
   }
   // A parent company's mail system can send for a subsidiary (KippsDeSanto mails from
   // kippsdesanto@cm.capitalone.com). When the mailbox name is itself a tracked firm, that firm wins.
   const local = (address.split("@")[0] ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
   if (local.length >= 6 && !/^(info|news|newsletter|marketing|contact|update|updates|noreply|donotreply|nonreply|communications?|team|admin|hello|mail|mailer|email|events|ibmarketing)$/.test(local)) {
-    const r = await db(`pe_firm_sources?select=id,name,source_kind&${tracked}&name=ilike.${encodeURIComponent(local)}*&limit=2`);
-    const hits = r.ok ? ((await r.json()) as Array<{ id: string; name: string; source_kind: string }>) : [];
+    const r = await db(`pe_firm_sources?select=id,name,source_kind,domain&${tracked}&name=ilike.${encodeURIComponent(local)}*&limit=2`);
+    const hits = r.ok ? ((await r.json()) as Array<{ id: string; name: string; source_kind: string; domain?: string | null }>) : [];
     if (hits.length === 1 && hits[0].id !== firm?.id) firm = hits[0];
   }
   // Mailing-list tools often send from their own domains; fall back to the display name.
   if (!firm && display.length >= 6 && !isForwarder(address)) {
-    const r = await db(`pe_firm_sources?select=id,name,source_kind&${tracked}&name=ilike.${encodeURIComponent(display.replace(/[*%,()]/g, " "))}&limit=1`);
+    const r = await db(`pe_firm_sources?select=id,name,source_kind,domain&${tracked}&name=ilike.${encodeURIComponent(display.replace(/[*%,()]/g, " "))}&limit=1`);
     firm = r.ok ? (await r.json())[0] ?? null : null;
   }
 
@@ -142,6 +144,14 @@ Deno.serve(async (req: Request): Promise<Response> => {
     });
   }
 
+  // Double opt-in: open the confirmation link when it plainly belongs to a list service or to the
+  // firm itself. A forwarded confirmation is never opened; it was not addressed to this inbox.
+  let confirmed = false;
+  if (isNew && isConfirm && confirmLink && !forwardedBy && mayAutoConfirm(confirmLink, firm?.domain ?? null)) {
+    confirmed = await openConfirmLink(confirmLink);
+    if (confirmed) await db(`watch_inbox?message_id=eq.${encodeURIComponent(messageId)}`, { method: "PATCH", body: JSON.stringify({ confirmed_at: new Date().toISOString() }) });
+  }
+
   // Only mail from a known firm goes to the classifier; anything else stays in the log for the editor.
   if (isNew && firm && !isConfirm) {
     await db("scraped_content?on_conflict=url", {
@@ -160,5 +170,5 @@ Deno.serve(async (req: Request): Promise<Response> => {
     // First real email from a firm proves the watch inbox's own subscription is live (a forward doesn't).
     if (!forwardedBy) await db(`pe_firm_sources?id=eq.${firm.id}&subscribed_at=is.null`, { method: "PATCH", body: JSON.stringify({ subscribed_at: new Date().toISOString() }) });
   }
-  return new Response(JSON.stringify({ ok: true, firm: firm?.name ?? null, forwarded_by: forwardedBy, kind: isConfirm ? "confirm" : "news" }), { headers: { "content-type": "application/json" } });
+  return new Response(JSON.stringify({ ok: true, firm: firm?.name ?? null, forwarded_by: forwardedBy, kind: isConfirm ? "confirm" : "news", confirmed }), { headers: { "content-type": "application/json" } });
 });
