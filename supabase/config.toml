@@ -52,4 +52,5 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.social-x]
+[functions.sitemap]
 verify_jwt = false
