@@ -24,3 +24,17 @@ describe("sponsor activity table", () => {
     expect(lines[1].other).toBe(1);
   });
 });
+
+import { cleanFollowList, followedIn } from "../../supabase/functions/_shared/sponsor";
+
+describe("following a sponsor", () => {
+  it("cleans a reader's list: trims, drops repeats of one firm, caps the length", () => {
+    expect(cleanFollowList(["  Kian Capital ", "Kian Capital Partners, LLC", "", 7, "LFM Capital", "x"])).toEqual(["Kian Capital", "LFM Capital"]);
+    expect(cleanFollowList(Array.from({ length: 40 }, (_, i) => `Firm ${i} Industries`)).length).toBe(25);
+    expect(cleanFollowList("Kian")).toEqual([]);
+  });
+  it("matches a followed firm inside a co-sponsored deal, whatever the spelling", () => {
+    expect(followedIn("Seaport Capital; Kian Capital Partners", ["Kian Capital", "MPE Partners"])).toEqual(["Kian Capital"]);
+    expect(followedIn("Kinderhook Industries", ["Kian Capital"])).toEqual([]);
+  });
+});
