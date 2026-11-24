@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { aiConfigured, chat, HOUSE_STYLE, parseJSON } from "../_shared/ai.ts";
 import { getStaff, isInternalCall, unauthorized } from "../_shared/auth.ts";
 import { CONFIG } from "../_shared/config.ts";
+import { lintIssue } from "../_shared/lint.ts";
 import { dealContext, DealContext, fileLines, FOUND_VIA_LABEL, FoundVia, intelText, isBelowRadar, marketIntel } from "../_shared/intel.ts";
 import {
   Article,
@@ -190,6 +191,8 @@ async function editorialPass(
     intel: string;
     weekNarrative: string | null;
     weekStats: string | null;
+    /** Set on the second attempt: what the first draft got wrong. */
+    feedback?: string[];
   },
   apiKey: string,
 ): Promise<EditorialOutput | null> {
@@ -274,7 +277,7 @@ TICKER (printed at the top of the issue; context only — do not lead the Lede o
 
 EDITOR-SUBMITTED ITEMS (already written; context only):
 ${fmtItems || "(none)"}
-${input.weekStats ? `\nTHIS WEEK (computed from the tracker):\n${input.weekStats}` : ""}${input.weekNarrative ? `\nWEEKLY INDEX NARRATIVE:\n${input.weekNarrative}` : ""}`;
+${input.weekStats ? `\nTHIS WEEK (computed from the tracker):\n${input.weekStats}` : ""}${input.weekNarrative ? `\nWEEKLY INDEX NARRATIVE:\n${input.weekNarrative}` : ""}${input.feedback?.length ? `\n\nYOUR FIRST DRAFT WAS REJECTED. Write it again and fix every one of these:\n${input.feedback.map((f) => `- ${f}`).join("\n")}` : ""}`;
 
   try {
     const text = await chat(apiKey, system, user, { temperature: 0.5, maxTokens: 4500, tier: "editorial" });
@@ -599,9 +602,20 @@ serve(async (req: Request): Promise<Response> => {
 
     const intel = await marketIntel(supabase, 30);
     const dateLabel = now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
-    const editorial = aiKey
-      ? await editorialPass({ dateLabel, edition, quotes, headlines: headlinesOnly, deals: announced, radar, funds, people, pulse, readCandidates, editorItems, intel: [intelText(intel), bdcStat].filter(Boolean).join("\n"), weekNarrative, weekStats }, aiKey)
-      : null;
+    const editorialInput = { dateLabel, edition, quotes, headlines: headlinesOnly, deals: announced, radar, funds, people, pulse, readCandidates, editorItems, intel: [intelText(intel), bdcStat].filter(Boolean).join("\n"), weekNarrative, weekStats };
+    let editorial = aiKey ? await editorialPass(editorialInput, aiKey) : null;
+
+    // The issue checks its own front page. One rewrite; if it still fails, it is held for the editor.
+    const lenderNames = [...new Set(bdcRows.map((r) => r.bdc_name ?? r.bdc_ticker))];
+    const check = (e: EditorialOutput | null): string[] => e
+      ? lintIssue({ subject: e.subject, preheader: e.preheader, headline: e.editors_note?.headline, paragraphs: e.editors_note?.paragraphs, numbers: e.by_the_numbers, closing: e.closing_line, lenders: lenderNames })
+      : ["The writing pass did not run, so the issue has no Lede or subject line of its own."];
+    let qualityFlags = check(editorial);
+    if (editorial && qualityFlags.length && aiKey) {
+      console.warn("issue failed its own check, rewriting once:", qualityFlags);
+      const second = await editorialPass({ ...editorialInput, feedback: qualityFlags }, aiKey);
+      if (second) { const again = check(second); if (again.length < qualityFlags.length) { editorial = second; qualityFlags = again; } }
+    }
 
     // Apply editorial layer
     const toArticle = (a: DbArticle): Article => ({ id: a.id, title: a.title, summary: a.summary, category: a.category, source: a.source, source_url: a.source_url, fund_size_relevant: a.fund_size_relevant });
@@ -651,6 +665,7 @@ serve(async (req: Request): Promise<Response> => {
       the_read: theRead,
       jobs: editorItems.filter((e) => e.kind === "job"),
       closing_line: editorial?.closing_line ?? null,
+      quality_flags: qualityFlags,
     };
 
     // Issue number + record
@@ -691,11 +706,27 @@ serve(async (req: Request): Promise<Response> => {
       usedIds.length ? supabase.from("articles").update({ used_in_newsletter_id: newsletter.id }).in("id", usedIds) : Promise.resolve(),
     ]);
 
+    // A held issue will not go out on its own. Tell the editor now, while there is an evening to fix it.
+    if (qualityFlags.length) {
+      const resendKey = Deno.env.get("RESEND_API_KEY");
+      if (resendKey) {
+        const esc = (t: string) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        await fetch("https://api.resend.com/emails", {
+          method: "POST", headers: { Authorization: `Bearer ${resendKey.trim()}`, "Content-Type": "application/json" },
+          body: JSON.stringify({
+            from: CONFIG.from, to: [CONFIG.replyTo], subject: `[HELD] Issue #${issueNumber} needs you before it sends`,
+            html: `<p>Issue #${issueNumber} ("${esc(subject)}") failed its own check and will not send automatically.</p><ul>${qualityFlags.map((f) => `<li>${esc(f)}</li>`).join("")}</ul><p>Fix it and approve it on the <a href="${CONFIG.siteUrl}/admin">Editor's Desk</a>. Approving sends it at the usual time.</p>`,
+            tags: [{ name: "kind", value: "held" }],
+          }),
+        }).catch((e) => console.error("held-issue alert failed", e));
+      }
+    }
+
     return new Response(JSON.stringify({
-      message: `Issue #${issueNumber} drafted: ${radar.length} below the radar, ${headlinesOnly.length} headlines, ${announced.length} announced deals, ${funds.length} funds, ${people.length} moves, ${editorItems.length} editor items${editorial ? "" : " (editorial pass unavailable)"}`,
+      message: `Issue #${issueNumber} drafted: ${radar.length} below the radar, ${headlinesOnly.length} headlines, ${announced.length} announced deals, ${funds.length} funds, ${people.length} moves, ${editorItems.length} editor items${editorial ? "" : " (editorial pass unavailable)"}${qualityFlags.length ? `. HELD for the editor: ${qualityFlags.join(" ")}` : ""}`,
       newsletter_id: newsletter.id, issue_number: issueNumber, subject,
       sections: { headlines: headlines.length, deals: deals.length, funds: funds.length, people: people.length, pulse: pulse.length, editor_items: editorItems.length },
-      editorial: Boolean(editorial),
+      editorial: Boolean(editorial), held: qualityFlags.length > 0, quality_flags: qualityFlags,
     }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (error) {
     console.error("generate-newsletter", error);
