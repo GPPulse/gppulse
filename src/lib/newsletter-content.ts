@@ -43,6 +43,8 @@ export interface DealRow {
   hq_state?: string | null;
   found_via?: string | null;
   below_radar?: boolean;
+  /** The day we first had this deal, when it was in our tracker before today's report (YYYY-MM-DD). */
+  first_seen?: string;
   file?: string[];
 }
 
@@ -127,6 +129,8 @@ export interface NewsletterContentV2 {
   the_read: TheRead | null;
   jobs: EditorItem[];
   closing_line: string | null;
+  /** What the generator's own check found wrong. Non-empty means the issue is held for the editor. */
+  quality_flags?: string[];
 }
 
 export function emptyContent(edition: NewsletterContentV2["edition"] = "daily"): NewsletterContentV2 {

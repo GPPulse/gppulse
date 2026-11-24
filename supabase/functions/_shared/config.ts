@@ -15,4 +15,6 @@ export const CONFIG = {
   postalAddress: env("NEWSLETTER_POSTAL_ADDRESS") ?? "The GP Pulse · Austin, TX 78746",
   editorName: env("NEWSLETTER_EDITOR_NAME") ?? "Carl Schlotman",
   editorTitle: env("NEWSLETTER_EDITOR_TITLE") ?? "Partner, Eaglehead Capital Management",
+  // Deals at or above this disclosed enterprise value are outside the letter's scope.
+  maxEvMillions: Number(env("LMM_MAX_EV_MILLIONS") ?? 500) || 500,
 };

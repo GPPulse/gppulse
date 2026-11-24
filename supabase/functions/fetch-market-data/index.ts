@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { dailyMove } from "../_shared/market.ts";
 
 // Ticker for the masthead. Chosen for what moves an LMM investor's math, not for
 // what's on CNBC: small-cap equities, the 10-year, SOFR (unitranche base rate),
@@ -22,13 +23,13 @@ const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36";
 
 async function yahoo(symbol: string, name: string, unit: MarketQuote["unit"] = "index"): Promise<MarketQuote | null> {
   try {
-    const r = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=5d`, { headers: { "User-Agent": UA } });
+    const r = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=10d`, { headers: { "User-Agent": UA } });
     if (!r.ok) return null;
     const d = await r.json();
-    const meta = d.chart?.result?.[0]?.meta;
-    const price = meta?.regularMarketPrice;
-    const prev = meta?.chartPreviousClose ?? meta?.previousClose;
-    if (!price || !prev) return null;
+    // Day over day, from the daily bars. Not chartPreviousClose: over a 5-day range that is last week's close.
+    const move = dailyMove(d.chart?.result?.[0]);
+    if (!move) return null;
+    const { price, prev } = move;
     const change = price - prev;
     return {
       symbol, name, unit,

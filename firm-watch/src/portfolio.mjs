@@ -3,9 +3,13 @@
 // portfolio page once, stores the names on it, and on later runs sends new names to the
 // Editor's Desk as unconfirmed signals. Nothing from here is published without an editor.
 //
+// Exit watch: a name that leaves the page is often the first sign of a sale, again with no
+// announcement. Those go to the Editor's Desk too, as "Possible exit", after a second read of
+// the page confirms the name is gone from the text and not just from one load.
+//
 //   node src/portfolio.mjs [--retry] [--tier 2] [--limit 50] [--dry]
 import { appendFile } from 'node:fs/promises';
-import { get, pool, allowed, sameSite, findLinks, extractPortfolio, diffPortfolio } from './lib.mjs';
+import { get, pool, allowed, sameSite, findLinks, extractPortfolio, diffPortfolio, stillOnPage } from './lib.mjs';
 import { api, chunk } from './api.mjs';
 
 const args = process.argv.slice(2);
@@ -38,7 +42,7 @@ async function main() {
   let { firms } = await api('firms');
   firms = firms.filter((f) => f.watchlist && (f.watch_tier ?? 4) <= Number(opt('tier', 4))).slice(0, Number(opt('limit', 1e9)));
   const updates = [], signals = [];
-  let found = 0, baselined = 0, changed = 0, skipped = 0;
+  let found = 0, baselined = 0, changed = 0, skipped = 0, exits = 0;
 
   await pool(firms, 8, async (firm) => {
     if (!firm.portfolio_url) {
@@ -64,9 +68,24 @@ async function main() {
         url: firm.portfolio_url,
       });
     }
+    // Exits: at most two names leaving at once, and only if a second read agrees.
+    const removed = d.removed ?? [];
+    if (removed.length && removed.length <= 2) {
+      const again = await get(firm.portfolio_url);
+      for (const company of removed) {
+        if (!again.ok || stillOnPage(company, res.body) || stillOnPage(company, again.body)) continue;
+        exits++;
+        signals.push({
+          headline: `Possible exit: ${company} no longer on ${firm.name}'s portfolio page`,
+          body: `${firm.name} removed "${company}" from its portfolio page. No announcement found. Unconfirmed: it may have moved to a realized-investments page or been renamed. Check before running.`,
+          url: firm.portfolio_url,
+          company, sponsor: firm.name,
+        });
+      }
+    }
   });
 
-  console.log(`Portfolio watch: ${firms.length} sponsors. ${found} new portfolio pages found, ${baselined} lists stored for the first time, ${signals.length} new-company signals, ${skipped} pages unreadable today.`);
+  console.log(`Portfolio watch: ${firms.length} sponsors. ${found} new portfolio pages found, ${baselined} lists stored for the first time, ${changed} new-company signals, ${exits} possible exits, ${skipped} pages unreadable today.`);
   for (const s of signals.slice(0, 40)) console.log(`  ${s.headline}`);
   if (flag('dry')) return;
 
@@ -77,7 +96,7 @@ async function main() {
     filed += r.filed ?? 0;
   }
   if (process.env.GITHUB_STEP_SUMMARY) {
-    const lines = ['## Portfolio watch', `${firms.filter((f) => f.portfolio_url).length + found} of ${firms.length} sponsors have a portfolio page on file. **${filed} new-company signals** sent to the Editor's Desk.`, '', ...signals.map((s) => `- [${s.headline}](${s.url})`)];
+    const lines = ['## Portfolio watch', `${firms.filter((f) => f.portfolio_url).length + found} of ${firms.length} sponsors have a portfolio page on file. **${filed} signals** sent to the Editor's Desk (${changed} new companies, ${exits} possible exits).`, '', ...signals.map((s) => `- [${s.headline}](${s.url})`)];
     await appendFile(process.env.GITHUB_STEP_SUMMARY, lines.join('\n') + '\n');
   }
 }
