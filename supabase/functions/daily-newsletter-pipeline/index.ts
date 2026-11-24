@@ -16,7 +16,8 @@ import { CONFIG } from "../_shared/config.ts";
 //     small queues; for a full nightly build prefer the step mode.
 //
 // Steps: discover-sources · scrape-rss · scrape-form-d · scrape-pe-sources · scrape-industry-news · scrape-people-moves ·
-//        process-content · generate-newsletter · generate-gp-index · send-newsletter · send-deal-alerts
+//        process-content · generate-newsletter · generate-gp-index · send-newsletter · send-deal-alerts ·
+//        social-generate · social-post
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -86,6 +87,8 @@ serve(async (req: Request): Promise<Response> => {
         const d = (res.data ?? {}) as { processed?: number; articles_created?: number };
         return finish(res, { remaining: count ?? 0, processed: d.processed ?? 0, created: d.articles_created ?? 0 });
       }
+      case "social-generate": return finish(await call(supabaseUrl, serviceKey, "social-x", { action: "generate" }));
+      case "social-post": return finish(await call(supabaseUrl, serviceKey, "social-x", { action: "post", dry: Boolean(body.dry) }));
       case "generate-newsletter": return finish(await call(supabaseUrl, serviceKey, "generate-newsletter", { force: Boolean(body.force) }));
       case "generate-gp-index": {
         const dow = new Date().getDay();
