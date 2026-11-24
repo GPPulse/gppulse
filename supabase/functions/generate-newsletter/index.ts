@@ -228,7 +228,7 @@ HARD RULES
 - UNCONFIRMED signals (new names on a portfolio page) are described as exactly that: "now listed on X's portfolio page; we found no announcement". Never state a deal closed on the strength of a signal.
 - Use only figures that appear in the material. Never estimate.
 - LENDER FILINGS. Items found via \"SEC filing\" are loans listed in a lender's quarterly schedule. Our readers are sponsors; they do not follow BDCs. Never build the subject, the Lede, a by_the_numbers entry or the closing line on a lender, a BDC or a list of its borrowers, and never name a BDC or lender in the subject. A filing item may get one radar take about the borrower and its pricing. If filings are the only below-the-radar material, lead with a pattern from the Scoreboard or the most instructive announced deal instead.
-- SIZE. This is a lower-middle-market letter. Do not lead with, feature, or build a number on a deal above $1B in enterprise value or one where the only sponsor is a large-cap firm.
+- SIZE. This letter covers deals under $500M in total price. Do not lead with, feature, or build a number on a larger deal or one where the only sponsor is a large-cap firm.
 ${input.edition === "weekly" ? `
 FRIDAY RULES. The keeper issue. The Lede is 3–4 paragraphs on the PATTERN across the week from OUR DATA (the Scoreboard numbers below): who was busiest, which platforms stacked add-ons, which banks closed the most, which sectors ran above their own pace, how many deals were below the radar. Open with the single number that best summarizes the week. Subject reads as a weekly verdict built on our data.` : ""}
 
@@ -290,6 +290,10 @@ ${input.weekStats ? `\nTHIS WEEK (computed from the tracker):\n${input.weekStats
     return null;
   }
 }
+
+// The letter covers deals under $500M in total price. A deal with a disclosed value at or above
+// this is out; most deals disclose nothing and stay in.
+const LMM_MAX_EV = Number(Deno.env.get("LMM_MAX_EV_MILLIONS") ?? 500);
 
 // Sponsors whose flagship funds are well above our readers' range. A deal stays if any named
 // sponsor is not on this list (a smaller co-investor or seller makes it relevant).
@@ -458,8 +462,8 @@ serve(async (req: Request): Promise<Response> => {
       }
     }
 
-    // Lower middle market only: drop billion-dollar deals and deals whose only sponsor is a large-cap firm.
-    const tooBig = (d: DealRow) => (d.enterprise_value_millions ?? 0) >= 1000 || (d.sponsor.split(/[;,/&]| and /i).map((x) => x.trim()).filter(Boolean).every((x) => LARGE_SPONSOR.test(x)));
+    // Lower middle market only: drop deals at or above the size cap and deals whose only sponsor is a large-cap firm.
+    const tooBig = (d: DealRow) => (d.enterprise_value_millions ?? 0) >= LMM_MAX_EV || (d.sponsor.split(/[;,/&]| and /i).map((x) => x.trim()).filter(Boolean).every((x) => LARGE_SPONSOR.test(x)));
     for (let i = deals.length - 1; i >= 0; i--) if (tooBig(deals[i])) deals.splice(i, 1);
 
     // The draft is built the evening before it goes out, so "is this the Friday issue" is asked of the send day.

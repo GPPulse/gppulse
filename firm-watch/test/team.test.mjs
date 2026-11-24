@@ -113,3 +113,17 @@ test('advisory-board rows and shouting titles', () => {
   const html = '<main><div><h4>Jane Doe</h4><p>MANAGING PARTNER</p></div><div><h4>John Roe</h4><p>associate</p></div><div><h4>Mike Monahan</h4><p>Former EVP, COO, CFO Pitney Bowes</p></div><div><img alt=""><h4>Healthcare Bluebook</h4><p>Jeff Rice, MD</p></div><div><h4>Tom Pitera</h4><p>Operating Partner*</p></div><div><h4>Will Rabke</h4><p>General Counsel</p></div></main>';
   assert.deepEqual(extractTeam(html), team(['Jane Doe', 'Managing Partner'], ['John Roe', 'Associate'], ['Mike Monahan', 'Former EVP, COO, CFO Pitney Bowes'], ['Tom Pitera', 'Operating Partner'], ['Will Rabke', 'General Counsel']));
 });
+
+import { teamSubpages } from '../src/team.mjs';
+
+test('team split over several pages: group and numbered pages are followed, biographies are not', () => {
+  const html = `<a href="/team/investment-team">Investment Team</a><a href="/team/operations/">Operations</a><a href="/team/jane-doe">Jane Doe</a>
+    <a href="/team/page/2/">2</a><a href="/team?group=associates">Associates</a><a href="/portfolio">Portfolio</a><a href="https://elsewhere.com/team/partners">Partners</a><a href="/team/">Our Team</a>`;
+  const subs = teamSubpages(html, 'https://www.acme-capital.com/team/');
+  assert.deepEqual(subs.sort(), [
+    'https://www.acme-capital.com/team/investment-team',
+    'https://www.acme-capital.com/team/operations/',
+    'https://www.acme-capital.com/team/page/2/',
+    'https://www.acme-capital.com/team?group=associates',
+  ].sort());
+});

@@ -143,6 +143,50 @@ export const SWEEP_QUERIES = [
   '"promoted to principal" "private equity"',
   '"announces promotions" "private equity"',
   '"joins as" partner "private equity firm"',
+  '"promoted to vice president" "private equity"',
+  '"promoted to senior associate" "private equity"',
+  '"promoted to director" "private equity firm"',
+  '"named partner" "private equity firm"',
+  '"promotions" "private equity firm" "vice president" "senior associate"',
+  '"joins" "private equity" as "managing director"',
+  '"joins" "private equity" as principal',
+  // More ways a lower-middle-market deal gets announced, usually by the company, not the sponsor.
+  '"has acquired" "a portfolio company of"',
+  '"announces acquisition of" "backed by"',
+  '"completes acquisition of" "private equity"',
+  '"announces the sale of" "private equity"',
+  '"has been sold to" "private equity"',
+  '"partners with" founders "private equity" investment',
+  '"new platform investment" "private equity"',
+  '"announces investment in" "private equity firm"',
+  '"completed the recapitalization of"',
+  '"served as exclusive financial advisor" acquisition',
+  '"acted as exclusive financial advisor" sale',
+  '"advised" "on its sale to" "private equity"',
+  '"provided senior debt" acquisition "private equity"',
+  '"unitranche" "to support" acquisition sponsor',
+  '"search fund" acquisition completed',
+  '"family office" acquires company majority',
+  '"employee-owned" acquired "private equity"',
+  // Roll-up sectors where most deals are small and announced only locally or by the platform.
+  'acquires HVAC plumbing "backed by" OR "portfolio company"',
+  'acquires roofing OR landscaping "backed by" OR "portfolio company"',
+  'acquires "pest control" OR "lawn care" "private equity" OR "portfolio company"',
+  'acquires dental OR veterinary OR dermatology practice "backed by" OR "portfolio company"',
+  'acquires "managed services provider" OR MSP "backed by" OR "portfolio company"',
+  'acquires "insurance agency" OR "wealth management" "backed by" OR "portfolio company"',
+  'acquires "accounting firm" OR "CPA firm" "private equity"',
+  'acquires "precision machining" OR "metal fabrication" "backed by" OR "portfolio company"',
+  'acquires packaging OR "specialty distribution" "backed by" OR "portfolio company"',
+  'acquires "auto repair" OR "collision" OR "car wash" "backed by" OR "portfolio company"',
+  'acquires "fire protection" OR "electrical contractor" OR "mechanical contractor" "backed by" OR "portfolio company"',
+  'acquires "environmental services" OR "waste" OR "testing and inspection" "backed by" OR "portfolio company"',
+  'acquires "home health" OR "behavioral health" OR "physical therapy" "backed by" OR "portfolio company"',
+  'acquires "aerospace" OR "defense" supplier "backed by" OR "portfolio company"',
+  'acquires "food manufacturer" OR "food distributor" "backed by" OR "portfolio company"',
+  'acquires "logistics" OR "freight" OR "trucking" "backed by" OR "portfolio company"',
+  'acquires "staffing" OR "engineering firm" OR "consulting firm" "backed by" OR "portfolio company"',
+  'acquires "software" company "backed by" "lower middle market"',
 ];
 const PE_WORDS = /(private equity|portfolio company|capital partners|equity partners|independent sponsor|recapitali[sz]|backed by|investment firm|growth investment|majority investment|add-on)/i;
 
@@ -150,12 +194,16 @@ async function sweep(firm, days = 2) {
   const out = [];
   const statuses = {};
   let raw = 0;
-  for (const q of SWEEP_QUERIES) {
+  // The original phrases are precise and get 25 results each. The later, broader ones (extra
+  // announcement wordings and roll-up sectors) get 12, so the classifier's nightly budget goes
+  // to the likeliest items first.
+  const BROAD_FROM = SWEEP_QUERIES.indexOf('"has acquired" "a portfolio company of"');
+  for (const [qi, q] of SWEEP_QUERIES.entries()) {
     const res = await get(`https://news.google.com/rss/search?q=${encodeURIComponent(`${q} when:${days}d`)}&hl=en-US&gl=US&ceid=US:en`, { accept: 'application/rss+xml,application/xml,text/xml,*/*', gap: 0 });
     await sleep(900);
     statuses[res.status] = (statuses[res.status] || 0) + 1;
     if (!looksLikeFeed(res)) continue;
-    for (const it of parseFeed(res.body).slice(0, 25)) {
+    for (const it of parseFeed(res.body).slice(0, BROAD_FROM >= 0 && qi >= BROAD_FROM ? 12 : 25)) {
       raw++;
       const title = it.title.replace(/\s+-\s+[^-]+$/, '');
       if ((daysAgo(it.date) ?? 99) > days + 1) continue;
@@ -166,7 +214,7 @@ async function sweep(firm, days = 2) {
   }
   console.log(`LMM phrase sweep: HTTP ${JSON.stringify(statuses)}, ${raw} feed items read`);
   const seen = new Set();
-  return out.filter((i) => { const k = i.title.toLowerCase().slice(0, 60); if (seen.has(k)) return false; seen.add(k); return true; });
+  return out.filter((i) => { const k = i.title.toLowerCase().slice(0, 60); if (seen.has(k)) return false; seen.add(k); return true; }).slice(0, 260);
 }
 
 async function main() {

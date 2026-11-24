@@ -54,7 +54,7 @@ async function processWithAI(content: string, title: string, apiKey: string, wat
 2. A category (MUST be one of these exact values: "headline", "fund_tracker", "people_moves", "deal_flow", "market_insight")
    - headline: Major PE buyouts, exits, add-on acquisitions, fund closings involving lower middle market firms
    - fund_tracker: New fund raises, fund closings, capital commitments — MUST be under $1B
-   - people_moves: Partner promotions, key hires, team changes ONLY at private equity firms, growth equity firms, investment banks, or PE-backed portfolio companies. NOT law firms, lawyers, accounting firms, consulting firms, recruiters, or other professional services.
+   - people_moves: Promotions to Senior Associate, Vice President, Principal, Director, Managing Director or Partner, hires and departures at those levels, and team changes ONLY at private equity firms, growth equity firms, investment banks, or PE-backed portfolio companies. NOT law firms, lawyers, accounting firms, consulting firms, recruiters, or other professional services.
    - deal_flow: PE-sponsored acquisitions, exits, add-on acquisitions, recapitalizations, platform investments. NOT generic partnerships, vendor agreements, technology integrations, cybersecurity deals, or marketing partnerships.
    - market_insight: Market trends, analysis, economic impact on PE
 3. Whether this is relevant to lower middle market PE (funds under $1B) - true/false. Set FALSE for mega-cap PE firms.

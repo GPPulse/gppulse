@@ -71,3 +71,15 @@ test('field values: we give a name, the publication and the address, nothing els
   assert.equal(valueFor('phone'), null);
   assert.equal(valueFor('zip postal'), null);
 });
+
+import { formCandidates } from '../src/subscribe.mjs';
+
+test('form search: looks at subscribe, newsletter and contact pages on the same site, best first', () => {
+  const html = `<a href="/subscribe">Subscribe</a><a href="/news/">News</a><a href="https://other.com/newsletter">Partner newsletter</a>
+    <a href="/contact-us">Contact</a><a href="/careers">Careers</a><a href="/files/deck.pdf">Newsletter PDF</a><a href="/login">Sign in</a>`;
+  const c = formCandidates(html, 'https://www.acme-capital.com/');
+  assert.equal(c[0], 'https://www.acme-capital.com/subscribe');
+  assert.ok(c.includes('https://www.acme-capital.com/contact-us'));
+  assert.ok(!c.some((u) => u.includes('other.com') || u.endsWith('.pdf') || u.includes('login') || u.includes('careers')));
+  assert.ok(c.length <= 5);
+});
