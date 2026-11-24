@@ -45,6 +45,8 @@ export interface DealRow {
   found_via?: string | null;
   below_radar?: boolean;
   file?: string[];
+  /** Set when the deal was in our tracker before today's report: the day we first had it (YYYY-MM-DD). */
+  first_seen?: string;
 }
 
 /** A deal or signal nobody announced: banker tombstone, trade/local press, portfolio page, filing. */

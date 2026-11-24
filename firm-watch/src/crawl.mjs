@@ -23,13 +23,23 @@ const HINT = { platform: 'deal_flow', add_on: 'deal_flow', exit: 'deal_flow', fu
 // The first time a firm is crawled its whole archive is unseen; only items dated in the
 // last `freshDays` are news. After that, anything unseen is news unless it is plainly old
 // (a site redesign re-listing old posts) or not about a deal, fund or person.
-export function triage(items, { firstCrawl, freshDays = 10, now = Date.now() }) {
+//
+// Undated links are the hard case. One or two new ones on a site we already read are news.
+// More than `maxUndated` at once is the back catalogue arriving (a second page of the news
+// list, a redesign): Seaport's 2023 deals went out as "this week" that way. Those are recorded
+// as seen. A past year in the address (/news/2023/...) settles it for a single link.
+export const urlYear = (url) => { const m = String(url || '').match(/\/(20\d{2})(?:\/|-)/); return m ? Number(m[1]) : null; };
+export function triage(items, { firstCrawl, freshDays = 10, now = Date.now(), maxUndated = 2 }) {
   const queue = [], seenOnly = [];
-  for (const it of items) {
+  const thisYear = new Date(now).getUTCFullYear();
+  const typed = items.map((it) => ({ ...it, kind: it.kind || classify(it.title, it.summary) }));
+  const undatedNews = typed.filter((it) => !it.date && RELEVANT.has(it.kind) && (urlYear(it.url) ?? thisYear) >= thisYear).length;
+  for (const it of typed) {
     const age = daysAgo(it.date, now);
-    const kind = it.kind || classify(it.title, it.summary);
-    const fresh = firstCrawl ? age !== null && age <= freshDays : age === null || age <= freshDays;
-    (fresh && RELEVANT.has(kind) ? queue : seenOnly).push({ ...it, kind });
+    const y = urlYear(it.url);
+    const stale = age === null && ((y !== null && y < thisYear) || undatedNews > maxUndated);
+    const fresh = firstCrawl ? age !== null && age <= freshDays : (age === null ? !stale : age <= freshDays);
+    (fresh && RELEVANT.has(it.kind) ? queue : seenOnly).push(it);
   }
   return { queue, seenOnly };
 }

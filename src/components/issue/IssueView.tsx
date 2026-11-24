@@ -195,7 +195,7 @@ function Deals({ deals, weekly }: { deals: DealRow[]; weekly?: boolean }) {
           const parties = [d.advisors ? `Advisors: ${d.advisors}` : "", d.lender ? `Debt: ${d.lender}` : ""].filter(Boolean).join("  ·  ");
           return (
             <div key={d.id ?? i} className="py-3.5 first:pt-0">
-              <div className="mb-1.5"><Chip dark={d.featured}>{DEAL_TYPE_LABEL[d.deal_type] ?? "Deal"}</Chip>{d.featured && <Chip dark>Deal of the day</Chip>}</div>
+              <div className="mb-1.5"><Chip dark={d.featured}>{DEAL_TYPE_LABEL[d.deal_type] ?? "Deal"}</Chip>{d.featured && <Chip dark>Deal of the day</Chip>}{d.first_seen && <Chip dark>First here {new Date(`${d.first_seen}T12:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" })}</Chip>}</div>
               <p className="text-[15px] leading-snug"><strong>{d.sponsor}</strong> {verb(d.deal_type)} <Ext href={d.source_url}>{d.target}</Ext>{d.platform && d.deal_type === "add-on" && <span className="text-muted-foreground"> via {d.platform}</span>}</p>
               <p className="font-mono text-[11px] text-muted-foreground mt-1">{facts.join("  ·  ")}</p>
               {d.summary && <p className="text-sm text-foreground/80 leading-relaxed mt-1">{d.summary}</p>}

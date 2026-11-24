@@ -265,7 +265,7 @@ function dealTracker(deals: DealRow[], weekly = false): string {
       const verb = d.deal_type === "exit" ? "exits" : d.deal_type === "add-on" ? "adds on" : d.deal_type === "recap" ? "recaps" : d.deal_type === "growth" ? "invests in" : "acquires";
       const parties = [d.advisors ? `Advisors: ${d.advisors}` : "", d.lender ? `Debt: ${d.lender}` : ""].filter(Boolean).join("  ·  ");
       return item(`
-        <div style="margin-bottom:6px;">${chip(DEAL_TYPE_LABEL[d.deal_type] ?? "Deal", !!d.featured)}${d.featured ? chip("Deal of the day", true) : ""}</div>
+        <div style="margin-bottom:6px;">${chip(DEAL_TYPE_LABEL[d.deal_type] ?? "Deal", !!d.featured)}${d.featured ? chip("Deal of the day", true) : ""}${d.first_seen ? chip(`First here ${new Date(d.first_seen + "T12:00:00Z").toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" })}`, true) : ""}</div>
         <div style="font-family:${SANS};font-size:14px;line-height:1.4;color:${INK};"><strong>${escapeHtml(d.sponsor)}</strong> ${verb} ${link(d.source_url, d.target)}${d.platform && d.deal_type === "add-on" ? ` <span style="color:${MUTED};">via ${escapeHtml(d.platform)}</span>` : ""}</div>
         ${facts.length ? meta(facts.join("  ·  ")) : ""}
         ${summary(d.summary)}

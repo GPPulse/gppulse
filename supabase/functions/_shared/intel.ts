@@ -48,6 +48,8 @@ export interface DealContext {
   tombstone_total: number;
   fund: { fund_name: string; raised_millions: number | null; target_millions: number | null; status: string; announced_on: string } | null;
   press_mentions: number;
+  /** The same deal, already in the tracker from an earlier day (migration 20261124070000). */
+  prior_report?: { announced_on: string; first_seen_on: string | null; found_via: string | null; source: string | null } | null;
 }
 
 export async function dealContext(
@@ -68,6 +70,11 @@ const shortDate = (iso: string) => new Date(iso + (iso.length === 10 ? "T12:00:0
 export function fileLines(d: { sponsor: string; deal_type: string; platform?: string | null }, ctx: DealContext | null): string[] {
   if (!ctx) return [];
   const out: string[] = [];
+  const pr = ctx.prior_report;
+  if (pr) {
+    const how = pr.found_via && QUIET.has(pr.found_via) ? `, from ${HOW[pr.found_via]}${pr.source && pr.found_via === "tombstone" ? ` (${pr.source})` : ""}` : "";
+    out.push(`In our tracker since ${shortDate(pr.first_seen_on ?? pr.announced_on)}${how}`);
+  }
   const prior = ctx.tracker ?? [];
   if (prior.length) {
     const since = shortDate(prior[prior.length - 1].announced_on);
@@ -88,6 +95,14 @@ export function fileLines(d: { sponsor: string; deal_type: string; platform?: st
     out.push(`Latest fund on file: ${f.fund_name}${size ? `, ${size}` : ""} (${f.status.replace("_", " ")}, ${shortDate(f.announced_on)})`);
   }
   return out.slice(0, 3);
+}
+
+const QUIET = new Set(["tombstone", "trade_press", "local_press", "portfolio_page", "sec_filing"]);
+const HOW: Record<string, string> = { tombstone: "a banker tombstone", trade_press: "the trade press", local_press: "local press", portfolio_page: "a portfolio page", sec_filing: "an SEC filing" };
+
+/** We had it quietly and today a release, a wire or the PE press reported it. */
+export function isCaughtUp(via: FoundVia, prior: NonNullable<DealContext["prior_report"]>): boolean {
+  return Boolean(prior.found_via && QUIET.has(prior.found_via)) && ["press_release", "wire", "news"].includes(via);
 }
 
 /** Below the radar: we found it somewhere other than a release, and no release or wire story turned up. */

@@ -99,6 +99,24 @@ test('first crawl records the archive as seen; later crawls queue new deal news 
   assert.equal(later.queue[0].kind, 'platform');
 });
 
+test('a back catalogue arriving on a later crawl is not queued as news', () => {
+  const now = Date.parse('2026-11-16T12:00:00Z');
+  // Seaport Capital, Nov 16 2026: four undated links on a site already crawled, two of them from 2023.
+  const seaport = [
+    { url: 'https://www.seaportcapital.com/news/2023/seaport-capital-completes-acquisition-of-cyberlinkasp', title: 'Seaport Capital Completes Acquisition of CyberlinkASP', date: null },
+    { url: 'https://www.seaportcapital.com/news/2023/all-traffic-data-acquires-traffic-survey-specialists', title: 'All Traffic Data Acquires Traffic Survey Specialists', date: null },
+    { url: 'https://www.seaportcapital.com/news/2026/cyberlinkasp-completes-acquisition-of-fresh-managed-it', title: 'CyberlinkASP Completes Acquisition of Fresh Managed IT', date: null },
+  ];
+  const t = triage(seaport, { firstCrawl: false, now });
+  assert.deepEqual(t.queue.map((i) => i.url), [seaport[2].url], 'a past year in the address is old; this year\'s link is news');
+
+  const dump = ['mplt-healthcare', 'duggal-visual-solutions', 'rotating-machinery-services', 'chauvet'].map((x) => ({ url: `https://cortecgroup.com/cortec-group-announces-acquisition-of-${x}/`, title: `Cortec Group Announces Acquisition of ${x}`, date: null }));
+  assert.equal(triage(dump, { firstCrawl: false, now }).queue.length, 0, 'four undated deal links at once is an archive');
+  assert.equal(triage(dump.slice(0, 2), { firstCrawl: false, now }).queue.length, 2, 'one or two undated links are news');
+  const mixed = [...dump, { url: 'https://cortecgroup.com/new', title: 'Cortec Group Acquires Dated Company', date: '2026-11-15' }];
+  assert.deepEqual(triage(mixed, { firstCrawl: false, now }).queue.map((i) => i.url), ['https://cortecgroup.com/new'], 'dated news still goes through beside an archive');
+});
+
 test('article text extraction', () => {
   const p = 'Huron Capital announced today that it has completed the sale of its portfolio company to a strategic buyer. ';
   const html = `<html><body><nav><p>${p}${p}</p></nav><article><h1>T</h1><p>${p}${p}</p><p>short</p><p>${p}</p></article><footer><p>${p}</p></footer></body></html>`;

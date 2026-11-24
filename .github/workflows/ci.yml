@@ -24,3 +24,4 @@ jobs:
       - uses: denoland/setup-deno@v2
         with: { deno-version: v2.x }
       - run: bash scripts/check-functions.sh
+      - run: deno test --no-lock supabase/functions/_shared/tests/market_test.ts supabase/functions/_shared/tests/tracker_test.ts supabase/functions/_shared/tests/intel_test.ts

@@ -43,6 +43,8 @@ export interface DealRow {
   hq_state?: string | null;
   found_via?: string | null;
   below_radar?: boolean;
+  /** The day we first had this deal, when it was in our tracker before today's report (YYYY-MM-DD). */
+  first_seen?: string;
   file?: string[];
 }
 

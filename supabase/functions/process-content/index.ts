@@ -2,6 +2,17 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getStaff, isInternalCall, unauthorized } from "../_shared/auth.ts";
 import { aiConfigured, chat } from "../_shared/ai.ts";
+import { urlDate } from "../_shared/tracker.ts";
+
+/** A publish date for an item the crawler could not date. Null when nothing says. Never today by default. */
+function publishedFrom(estimated: string | null, url: string): string | null {
+  for (const d of [estimated, urlDate(url)]) {
+    if (!d) continue;
+    const t = new Date(/^\d{4}-\d{2}-\d{2}$/.test(d) ? `${d}T12:00:00Z` : d);
+    if (!isNaN(t.getTime()) && t.getTime() < Date.now() + 864e5 && t.getUTCFullYear() >= 2000) return t.toISOString();
+  }
+  return null;
+}
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -276,7 +287,8 @@ serve(async (req: Request): Promise<Response> => {
               source_url: item.url,
               original_content: item.raw_content,
               scraped_at: item.scraped_at,
-              published_at: item.published_at ?? (result.estimated_publish_date ? new Date(result.estimated_publish_date).toISOString() : null),
+              // The crawler's date, else the classifier's reading of the text, else the date in the address.
+              published_at: item.published_at ?? publishedFrom(result.estimated_publish_date, item.url),
             })
             .select()
             .single();
