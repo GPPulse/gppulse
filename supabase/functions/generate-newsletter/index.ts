@@ -376,7 +376,13 @@ serve(async (req: Request): Promise<Response> => {
       const t = text(a); return !isMegaFirm(t) && !hasNonPEPattern(t);
     }), 4);
     const fundArticles = take(articles.filter((a) => a.category === "fund_tracker" && a.fund_size_relevant !== false && !isMegaFirm(text(a))), 6);
-    const people = take(articles.filter((a) => { if (a.category !== "people_moves") return false; const t = text(a); return !hasNonPEOrg(t) && !isMegaFirm(t) && !hasNonPEPattern(t); }), 6);
+    // Promotions cluster (most firms announce in December and January), so a busy day can bring
+    // dozens. Six run in full, more on Friday; the rest are named in one roundup line instead of
+    // being left to resurface over the following days.
+    const PEOPLE_FULL = isFridayIssue() ? 12 : 6;
+    const peopleAll = take(articles.filter((a) => { if (a.category !== "people_moves") return false; const t = text(a); return !hasNonPEOrg(t) && !isMegaFirm(t) && !hasNonPEPattern(t); }), PEOPLE_FULL + 40);
+    const people = peopleAll.slice(0, PEOPLE_FULL);
+    const peopleMore = peopleAll.slice(PEOPLE_FULL);
     // Macro & credit only when it carries data. Sell-side guides, vendor op-eds and webinars are not news.
     const FLUFF = /\b(guide|how to|step[- ]by[- ]step|what is|tips|checklist|webinar|podcast|e-?book|white ?paper|playbook|101|explained|lessons|sell your)\b/i;
     const pulse = take(articles.filter((a) => a.category === "market_insight" && !FLUFF.test(a.title) && /\d/.test(a.summary ?? "") && !/vendor-authored|promotes its own|educational guide/i.test(a.summary ?? "")), 2);
@@ -660,7 +666,15 @@ serve(async (req: Request): Promise<Response> => {
       top_headlines: headlineArticles,
       deal_tracker: announced,
       fund_tracker: funds,
-      people_moves: people.map(toArticle),
+      people_moves: [
+        ...people.map(toArticle),
+        ...(peopleMore.length ? [{
+          id: `more-${peopleMore[0].id}`,
+          title: `${peopleMore.length} more move${peopleMore.length === 1 ? "" : "s"} today`,
+          summary: peopleMore.map((a) => (a.title.toLowerCase().includes(a.source.toLowerCase()) ? a.title : `${a.title} (${a.source})`)).join("; ").slice(0, 1400),
+          category: "people_moves", source: "The GP Pulse tracker", source_url: `${CONFIG.siteUrl}/people-moves`,
+        } as Article] : []),
+      ],
       on_the_market: editorItems.filter((e) => e.kind === "on_the_market"),
       overheard: editorItems.filter((e) => e.kind === "overheard" || e.kind === "reader_question"),
       market_pulse: pulseArticles,
@@ -683,7 +697,7 @@ serve(async (req: Request): Promise<Response> => {
     if (nlErr) throw new Error(nlErr.message);
 
     // Persist structured rows, link editor items, mark articles used
-    const usedIds = [...headlines, ...dealSource, ...fundArticles, ...people, ...pulse].map((a) => a.id);
+    const usedIds = [...headlines, ...dealSource, ...fundArticles, ...people, ...peopleMore, ...pulse].map((a) => a.id);
     // `file` is computed per issue, not stored. If the v2.1 columns aren't there yet, store the v2 row.
     const dealRows = deals.map(({ file: _file, ...d }) => ({ ...d, announced_on: now.toISOString().slice(0, 10) }));
     const saveDeals = async () => {

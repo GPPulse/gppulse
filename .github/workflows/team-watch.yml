@@ -40,7 +40,18 @@ jobs:
           cache: npm
           cache-dependency-path: firm-watch/package-lock.json
       - run: npm ci
+
+      # Headless Chromium, for team pages that are blank until JavaScript runs. If the install
+      # fails the watch still runs; those firms are read as plain pages, as before.
+      - name: Cache headless browser
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('firm-watch/package-lock.json') }}
+      - name: Install headless browser
+        continue-on-error: true
+        run: npx playwright install --with-deps chromium
       # Finding a team page takes several requests per firm, so the first pass is spread over a
       # few days (400 firms a run). After that each firm costs one request a day.
       - name: Team watch
-        run: node src/team.mjs --discover-limit ${{ github.event.inputs.discover_limit || '400' }} ${{ github.event.inputs.dry == 'true' && '--dry --show 25' || '' }} ${{ github.event.inputs.retry == 'true' && '--retry' || '' }}
+        run: node src/team.mjs --render --discover-limit ${{ github.event.inputs.discover_limit || '400' }} ${{ github.event.inputs.dry == 'true' && '--dry --show 25' || '' }} ${{ github.event.inputs.retry == 'true' && '--retry' || '' }}
