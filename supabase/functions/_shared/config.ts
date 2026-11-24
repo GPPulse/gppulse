@@ -8,11 +8,13 @@ const env = (k: string): string | undefined => {
 };
 
 export const CONFIG = {
-  siteUrl: (env("SITE_URL") ?? "https://gppulse.vercel.app").replace(/\/$/, ""),
+  siteUrl: (env("SITE_URL") ?? "https://thegppulse.com").replace(/\/$/, ""),
   from: env("NEWSLETTER_FROM") ?? "The GP Pulse <pulse@mail.thegppulse.com>",
   replyTo: env("NEWSLETTER_REPLY_TO") ?? "cschlotman@littlejohncapital.com",
   // CAN-SPAM requires a valid physical postal address. Replace with a street address or PO box.
   postalAddress: env("NEWSLETTER_POSTAL_ADDRESS") ?? "The GP Pulse · Austin, TX 78746",
   editorName: env("NEWSLETTER_EDITOR_NAME") ?? "Carl Schlotman",
   editorTitle: env("NEWSLETTER_EDITOR_TITLE") ?? "Partner, Eaglehead Capital Management",
+  // Deals at or above this disclosed enterprise value are outside the letter's scope.
+  maxEvMillions: Number(env("LMM_MAX_EV_MILLIONS") ?? 500) || 500,
 };

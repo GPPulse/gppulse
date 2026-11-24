@@ -50,3 +50,7 @@ verify_jwt = false
 
 [functions.inbound-email]
 verify_jwt = false
+
+[functions.social-x]
+verify_jwt = false
+

@@ -4,6 +4,7 @@ import { getStaff, isInternalCall, unauthorized } from "../_shared/auth.ts";
 import { normalizeContent } from "../_shared/content.ts";
 import { renderIssueEmail } from "../_shared/email.ts";
 import { CONFIG } from "../_shared/config.ts";
+import { pingIndexNow } from "../_shared/indexnow.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -109,6 +110,13 @@ serve(async (req: Request): Promise<Response> => {
       return new Response(JSON.stringify({ message: `Issue #${nl.issue_number} is already ${nl.status}`, skipped: true }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
     const approved = nl.status === "approved" || nl.status === "scheduled";
+    // An issue that failed its own check never goes out unattended, even with AUTO_SEND on.
+    const flags = ((nl.content as { quality_flags?: string[] } | null)?.quality_flags ?? []).filter(Boolean);
+    if (!approved && !force && flags.length) {
+      return new Response(JSON.stringify({ message: `Issue #${nl.issue_number} is held for the editor: ${flags.join(" ")} Approve it in the Editor's Desk to send.`, skipped: true, held: true }), {
+        status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
     if (!approved && !force && !(internal && cfg.autoSend)) {
       return new Response(JSON.stringify({ message: `Issue #${nl.issue_number} is a draft. Approve it in the Editor's Desk first (or set AUTO_SEND=true for unattended sends).`, skipped: true }), {
         status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -171,6 +179,10 @@ serve(async (req: Request): Promise<Response> => {
       status: "sent", sent_at: new Date().toISOString(), recipient_count: sent,
       send_log: { sent, failed, errors: errors.slice(0, 10), by: staff?.email ?? "pipeline", at: new Date().toISOString() },
     }).eq("id", nl.id);
+
+    // The issue is now public at /archive/<slug>. Tell the search engines; best effort, never blocks the send.
+    const indexnow = await pingIndexNow([`/archive/${nl.slug ?? nl.id}`, "/", "/archive", "/deals", "/sponsors", "/comps", "/funds", "/people-moves"]);
+    console.log("indexnow", indexnow);
 
     return new Response(JSON.stringify({ message: `Issue #${nl.issue_number} sent to ${sent} subscribers${failed ? ` (${failed} failed)` : ""}`, sent, failed, errors: errors.slice(0, 5) }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

@@ -11,7 +11,7 @@ import { ROLE_OPTIONS, SECTOR_OPTIONS } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 
-interface Prefs { email: string; first_name: string | null; company: string | null; role: string | null; status: string; referral_code: string | null; sectors: string[] }
+interface Prefs { email: string; first_name: string | null; company: string | null; role: string | null; status: string; referral_code: string | null; sectors: string[]; followed_firms: string[] }
 
 export default function Preferences() {
   const [params] = useSearchParams();
@@ -20,12 +20,31 @@ export default function Preferences() {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
+  const [firm, setFirm] = useState("");
+  const [known, setKnown] = useState<string[]>([]);
+
+  // Sponsors already in the tracker, offered as suggestions. Any firm name can be typed.
+  useEffect(() => {
+    supabase.from("deals").select("sponsor").eq("hidden", false).order("announced_on", { ascending: false }).limit(1000).then(({ data }) => {
+      const names = new Set<string>();
+      for (const r of (data ?? []) as { sponsor: string | null }[]) for (const n of (r.sponsor ?? "").split(/\s*;\s*/)) if (n.trim().length > 2) names.add(n.trim());
+      setKnown([...names].sort((a, b) => a.localeCompare(b)));
+    });
+  }, []);
+
+  const addFirm = () => {
+    const name = firm.replace(/\s+/g, " ").trim();
+    if (!prefs || name.length < 2) return;
+    if (prefs.followed_firms.length >= 25) { toast({ title: "25 firms is the limit" }); return; }
+    if (!prefs.followed_firms.some((f) => f.toLowerCase() === name.toLowerCase())) setPrefs({ ...prefs, followed_firms: [...prefs.followed_firms, name] });
+    setFirm("");
+  };
 
   useEffect(() => {
     if (!token) { setError("This link is missing its token. Use the preferences link at the bottom of any issue."); return; }
     supabase.functions.invoke("manage-subscribers", { body: { action: "get-preferences", token } }).then(({ data, error }) => {
       if (error || data?.error) setError(data?.error ?? "We couldn't find that subscription.");
-      else setPrefs({ ...data.subscriber, sectors: data.subscriber.sectors ?? [] });
+      else setPrefs({ ...data.subscriber, sectors: data.subscriber.sectors ?? [], followed_firms: data.subscriber.followed_firms ?? [] });
     });
   }, [token]);
 
@@ -34,7 +53,7 @@ export default function Preferences() {
     if (!prefs || !token) return;
     setSaving(true);
     const { data, error } = await supabase.functions.invoke("manage-subscribers", {
-      body: { action: "update-preferences", token, first_name: prefs.first_name ?? "", company: prefs.company ?? "", role: prefs.role, sectors: prefs.sectors ?? [], status: prefs.status === "active" ? "active" : undefined },
+      body: { action: "update-preferences", token, first_name: prefs.first_name ?? "", company: prefs.company ?? "", role: prefs.role, sectors: prefs.sectors ?? [], followed_firms: prefs.followed_firms ?? [], status: prefs.status === "active" ? "active" : undefined },
     });
     setSaving(false);
     if (error || data?.error) toast({ title: "Couldn't save", variant: "destructive" });
@@ -49,7 +68,7 @@ export default function Preferences() {
           <div className="container max-w-xl mx-auto px-4">
             <p className="font-mono text-[11px] uppercase tracking-[0.14em] font-bold mb-2">Preferences</p>
             <h1 className="text-3xl font-bold mb-2">Make it fit your seat.</h1>
-            <p className="font-serif text-muted-foreground mb-8">Your first name goes on the morning greeting. Your role shapes what we lead with. Sectors turn on deal alerts.</p>
+            <p className="font-serif text-muted-foreground mb-8">Your first name goes on the morning greeting. Your role shapes what we lead with. Sectors and followed sponsors turn on alerts.</p>
 
             {error && (
               <div className="border-2 border-foreground p-6">
@@ -104,6 +123,26 @@ export default function Preferences() {
                       );
                     })}
                   </div>
+                </div>
+                <div>
+                  <Label htmlFor="follow" className="font-mono text-[11px] uppercase tracking-wider">Sponsors you follow</Label>
+                  <p className="text-xs text-muted-foreground mt-1">Name up to 25 firms. When one of them turns up in our tracker, announced or not, you get a short note that day. Leave empty for none.</p>
+                  <div className="flex gap-2 mt-2">
+                    <Input id="follow" list="known-sponsors" value={firm} onChange={(e) => setFirm(e.target.value)} placeholder="Firm name"
+                      onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addFirm(); } }} className="border-2 border-foreground" />
+                    <datalist id="known-sponsors">{known.map((n) => <option key={n} value={n} />)}</datalist>
+                    <Button type="button" variant="outline" onClick={addFirm}>Add</Button>
+                  </div>
+                  {prefs.followed_firms.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {prefs.followed_firms.map((f) => (
+                        <button key={f} type="button" onClick={() => setPrefs({ ...prefs, followed_firms: prefs.followed_firms.filter((x) => x !== f) })}
+                          className="text-xs px-3 py-1.5 border-2 border-foreground bg-foreground text-background" aria-label={`Stop following ${f}`}>
+                          {f} <span aria-hidden="true">×</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 <div className="flex items-center justify-between gap-4 pt-2">
                   <Button type="submit" disabled={saving}>{saving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save"}</Button>

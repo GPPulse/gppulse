@@ -3,7 +3,10 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { aiConfigured, chat, HOUSE_STYLE, parseJSON } from "../_shared/ai.ts";
 import { getStaff, isInternalCall, unauthorized } from "../_shared/auth.ts";
 import { CONFIG } from "../_shared/config.ts";
-import { dealContext, DealContext, fileLines, FOUND_VIA_LABEL, FoundVia, intelText, isBelowRadar, marketIntel } from "../_shared/intel.ts";
+import { lintIssue } from "../_shared/lint.ts";
+import { isFridayIssue, issueDateLabel, issueDay } from "../_shared/issue-day.ts";
+import { dealContext, DealContext, fileLines, FOUND_VIA_LABEL, FoundVia, intelText, isBelowRadar, isCaughtUp, marketIntel } from "../_shared/intel.ts";
+import { announcedOn, archiveIds, lenderAsSponsor, sameDeal } from "../_shared/tracker.ts";
 import {
   Article,
   DealRow,
@@ -57,6 +60,8 @@ const NON_PE_ORG_PATTERNS = [
   "bain & company", "bcg", "recruiter", "recruiting", "staffing",
 ];
 const isMegaFirm = (t: string) => MEGA_FIRMS.some((f) => t.includes(f));
+// Upper-middle-market and large-cap names that turn up in people news and fund headlines.
+const LARGE_ANYWHERE = /\b(charlesbank|clayton,? dubilier|cd&r|platinum equity|clearlake|new mountain capital|american securities|madison dearborn|gtcr|veritas capital|genstar|leonard green|providence equity|stone point|onex|berkshire partners|ta associates|insight partners|francisco partners|golden gate capital|welsh,? carson|roark capital|l catterton|partners group|mubadala|temasek|cppib|cpp investments|omers|ontario teachers)\b/i;
 const hasNonPEPattern = (t: string) => NON_PE_PATTERNS.some((p) => t.includes(p));
 const hasNonPEOrg = (t: string) => NON_PE_ORG_PATTERNS.some((p) => t.includes(p));
 const isPartnershipNotDeal = (t: string) => {
@@ -116,6 +121,8 @@ RULES
 - Convert stated figures to millions USD (e.g. "$1.2 billion" → 1200).
 - sector: one of Industrials, Business Services, Healthcare, Technology, Consumer, Financial Services, Energy, Aerospace & Defense, Infrastructure, Other.
 - Some items come from an M&A advisor's or lender's list of closed deals, or from trade/local press. The advisor, lender or publication is NOT the buyer. On add-ons, the sponsor is the PE firm that owns the acquiring company ("Ecowaste Solutions, a portfolio company of Kinderhook" → sponsor Kinderhook Industries, platform Ecowaste Solutions). If no sponsor can be identified from the text, skip the item.
+- A lender is never the sponsor. A mezzanine fund, BDC, bank or credit fund that provided debt (even with an equity co-investment) goes in "lender". If the text names no private equity owner or buyer besides the lender, skip the item: a refinancing with no sponsor is not a deal for this table.
+- An investment in a private equity firm itself (a GP stake, a seeding deal) is not a portfolio transaction. Skip it.
 - platform: on add-ons, the acquiring portfolio company. Otherwise null.
 - seller_type: founder (founder/family/owner-operated), sponsor (another PE firm sold), corporate (carve-out from a company), management, or null if not stated.
 - hq_state: two-letter US state of the target if stated, else null.
@@ -190,13 +197,15 @@ async function editorialPass(
     intel: string;
     weekNarrative: string | null;
     weekStats: string | null;
+    /** Set on the second attempt: what the first draft got wrong. */
+    feedback?: string[];
   },
   apiKey: string,
 ): Promise<EditorialOutput | null> {
   const fmtArt = (list: DbArticle[]) => list.map((a, i) => `[${i + 1}] ${a.title}\n    ${a.summary ?? ""}\n    (${a.source})`).join("\n");
   const fmtFile = (f?: string[]) => (f?.length ? `\n    THE FILE: ${f.join(" | ")}` : "");
   const fmtDeals = input.deals
-    .map((d, i) => `[${i + 1}] ${d.sponsor} → ${d.target}${d.platform ? ` (add-on to ${d.platform})` : ""} | ${d.deal_type} | ${d.sector ?? "sector n/d"}${d.hq_state ? ` | ${d.hq_state}` : ""}${d.seller_type ? ` | seller: ${d.seller_type}` : ""} | EV ${d.enterprise_value_millions ?? "n/d"}M | EBITDA ${d.ebitda_millions ?? "n/d"}M | ${d.ev_ebitda_multiple ?? "n/d"}x${d.advisors ? ` | advisors: ${d.advisors}` : ""}${d.lender ? ` | lender: ${d.lender}` : ""} | found via: ${d.found_via ?? "n/d"}\n    ${d.summary ?? ""}${fmtFile(d.file)}`)
+    .map((d, i) => `[${i + 1}] ${d.first_seen ? `(FIRST HERE: in our tracker since ${d.first_seen}) ` : ""}${d.sponsor} → ${d.target}${d.platform ? ` (add-on to ${d.platform})` : ""} | ${d.deal_type} | ${d.sector ?? "sector n/d"}${d.hq_state ? ` | ${d.hq_state}` : ""}${d.seller_type ? ` | seller: ${d.seller_type}` : ""} | EV ${d.enterprise_value_millions ?? "n/d"}M | EBITDA ${d.ebitda_millions ?? "n/d"}M | ${d.ev_ebitda_multiple ?? "n/d"}x${d.advisors ? ` | advisors: ${d.advisors}` : ""}${d.lender ? ` | lender: ${d.lender}` : ""} | found via: ${d.found_via ?? "n/d"}\n    ${d.summary ?? ""}${fmtFile(d.file)}`)
     .join("\n");
   const fmtRadar = input.radar
     .map((r, i) => `[${i + 1}] (${r.found_via}${r.confirmed ? "" : ", UNCONFIRMED signal"}) ${r.headline}\n    ${r.body ?? ""}${fmtFile(r.file)}`)
@@ -223,6 +232,11 @@ HARD RULES
 - Deal takes and radar takes must use a fact from THE FILE, the advisor/lender, the seller type, the geography, or the platform history. A take that would fit any deal ("deploying on pace", "classic add-on", "route density") is banned. If you have nothing specific, skip the deal — fewer takes is better.
 - UNCONFIRMED signals (new names on a portfolio page) are described as exactly that: "now listed on X's portfolio page; we found no announcement". Never state a deal closed on the strength of a signal.
 - Use only figures that appear in the material. Never estimate.
+- LENDER FILINGS. Items found via \"SEC filing\" are loans listed in a lender's quarterly schedule. Our readers are sponsors; they do not follow BDCs. Never build the subject, the Lede, a by_the_numbers entry or the closing line on a lender, a BDC or a list of its borrowers, and never name a BDC or lender in the subject. A filing item may get one radar take about the borrower and its pricing. If filings are the only below-the-radar material, lead with a pattern from the Scoreboard or the most instructive announced deal instead.
+- SIZE. This is a lower-middle-market letter. Do not lead with, feature, or build a number on a deal above $500M in enterprise value or one where the only sponsor is a large-cap firm.
+- PACE CLAIMS. Say a sponsor is on its "second", "third" or "Nth" deal, or "on a run", only when THE FILE for that deal says so in those words, and name the other deals it lists. Never count deals yourself from the lists below, and never treat two spellings of one company as two deals.
+- FIRST HERE. A deal marked FIRST HERE was in our tracker before anyone reported it. Say so plainly, once, with the date and how we found it. It is the proof of what this letter is for; do not gloat.
+- THE READ is a piece worth fifteen minutes: reporting, data or an argument. A press release, a promotional webcast or anything you would describe as having "no new data" is not. If no candidate qualifies, return null. An empty slot beats a weak pick.
 ${input.edition === "weekly" ? `
 FRIDAY RULES. The keeper issue. The Lede is 3–4 paragraphs on the PATTERN across the week from OUR DATA (the Scoreboard numbers below): who was busiest, which platforms stacked add-ons, which banks closed the most, which sectors ran above their own pace, how many deals were below the radar. Open with the single number that best summarizes the week. Subject reads as a weekly verdict built on our data.` : ""}
 
@@ -272,7 +286,7 @@ TICKER (printed at the top of the issue; context only — do not lead the Lede o
 
 EDITOR-SUBMITTED ITEMS (already written; context only):
 ${fmtItems || "(none)"}
-${input.weekStats ? `\nTHIS WEEK (computed from the tracker):\n${input.weekStats}` : ""}${input.weekNarrative ? `\nWEEKLY INDEX NARRATIVE:\n${input.weekNarrative}` : ""}`;
+${input.weekStats ? `\nTHIS WEEK (computed from the tracker):\n${input.weekStats}` : ""}${input.weekNarrative ? `\nWEEKLY INDEX NARRATIVE:\n${input.weekNarrative}` : ""}${input.feedback?.length ? `\n\nYOUR FIRST DRAFT WAS REJECTED. Write it again and fix every one of these:\n${input.feedback.map((f) => `- ${f}`).join("\n")}` : ""}`;
 
   try {
     const text = await chat(apiKey, system, user, { temperature: 0.5, maxTokens: 4500, tier: "editorial" });
@@ -284,6 +298,10 @@ ${input.weekStats ? `\nTHIS WEEK (computed from the tracker):\n${input.weekStats
     return null;
   }
 }
+
+// Sponsors whose flagship funds are well above our readers' range. A deal stays if any named
+// sponsor is not on this list (a smaller co-investor or seller makes it relevant).
+const LARGE_SPONSOR = /^(the )?(charlesbank|cpp investments|canada pension plan|lee equity|webster equity|birch hill|blackstone|kkr|kohlberg kravis roberts|carlyle|apollo|tpg|bain capital|advent international|warburg pincus|cvc|eqt|thoma bravo|vista equity|silver lake|hellman & friedman|hellman and friedman|clayton,? dubilier & rice|cd&r|platinum equity|clearlake|new mountain|american securities|madison dearborn|mdp|gtcr|veritas capital|genstar|audax|h\.?i\.?g\.?|leonard green|providence equity|permira|cinven|apax|brookfield|ares|stone point|onex|berkshire partners|ta associates|general atlantic|insight partners|francisco partners|golden gate capital|oak hill|kelso|welsh,? carson|wcas|roark|l catterton|partners group|mubadala|temasek|gic|adia|cppib|omers|ontario teachers)\b/i;
 
 // ---------------------------------------------------------------------------
 // Handler
@@ -328,6 +346,10 @@ serve(async (req: Request): Promise<Response> => {
     let articles = (articlesResult.data ?? []) as DbArticle[];
     const threeDaysAgo = new Date(); threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
     articles = articles.filter((a) => !a.published_at || new Date(a.published_at) >= threeDaysAgo);
+    // A firm's back catalogue read for the first time is not today's news (see _shared/tracker.ts).
+    const archive = archiveIds(articles);
+    if (archive.size) console.log(`archive guard: ${archive.size} undated or past-year items left out`);
+    articles = articles.filter((a) => !archive.has(a.id));
 
     const yStart = new Date(todayStart); yStart.setDate(yStart.getDate() - 1);
     const tier = (a: DbArticle) => { const d = new Date(a.published_at ?? a.scraped_at); return d >= todayStart ? 2 : d >= yStart ? 1 : 0; };
@@ -366,10 +388,18 @@ serve(async (req: Request): Promise<Response> => {
       const t = text(a); return !isMegaFirm(t) && !hasNonPEPattern(t);
     }), 4);
     const fundArticles = take(articles.filter((a) => a.category === "fund_tracker" && a.fund_size_relevant !== false && !isMegaFirm(text(a))), 6);
-    const people = take(articles.filter((a) => { if (a.category !== "people_moves") return false; const t = text(a); return !hasNonPEOrg(t) && !isMegaFirm(t) && !hasNonPEPattern(t); }), 6);
+    // Promotions cluster (most firms announce in December and January), so a busy day can bring
+    // dozens. Six run in full, more on Friday; the rest are named in one roundup line instead of
+    // being left to resurface over the following days.
+    const PEOPLE_FULL = isFridayIssue() ? 12 : 6;
+    const peopleAll = take(articles.filter((a) => { if (a.category !== "people_moves") return false; const t = text(a); return !hasNonPEOrg(t) && !isMegaFirm(t) && !hasNonPEPattern(t) && !LARGE_ANYWHERE.test(t); }), PEOPLE_FULL + 40);
+    const people = peopleAll.slice(0, PEOPLE_FULL);
+    const peopleMore = peopleAll.slice(PEOPLE_FULL);
     // Macro & credit only when it carries data. Sell-side guides, vendor op-eds and webinars are not news.
-    const FLUFF = /\b(guide|how to|step[- ]by[- ]step|what is|tips|checklist|webinar|podcast|e-?book|white ?paper|playbook|101|explained|lessons|sell your)\b/i;
-    const pulse = take(articles.filter((a) => a.category === "market_insight" && !FLUFF.test(a.title) && /\d/.test(a.summary ?? "") && !/vendor-authored|promotes its own|educational guide/i.test(a.summary ?? "")), 2);
+    const FLUFF = /\b(guide|how to|step[- ]by[- ]step|what is|tips|checklist|webinar|webcast|podcast|e-?book|white ?paper|playbook|101|explained|lessons|sell your|makes the case)\b/i;
+    // The classifier says so itself when an item is marketing or carries nothing new.
+    const NOTHING_NEW = /vendor-authored|promotes its own|educational guide|promotional|no new (deal|data|transaction)|does not disclose any|with no new/i;
+    const pulse = take(articles.filter((a) => a.category === "market_insight" && !FLUFF.test(a.title) && /\d/.test(a.summary ?? "") && !NOTHING_NEW.test(a.summary ?? "")), 2);
 
     // Headlines also count as deals for extraction (they're the big ones); dedupe by id
     const dealSource = [...dealArticles, ...headlines].filter((a, i, arr) => arr.findIndex((x) => x.id === a.id) === i);
@@ -410,6 +440,7 @@ serve(async (req: Request): Promise<Response> => {
 
     const deals: DealRow[] = rawDeals
       .filter((d) => d.sponsor && d.target && dealSource[d.index - 1])
+      .filter((d) => !lenderAsSponsor(d))
       .map((d) => {
         const src = dealSource[d.index - 1];
         return {
@@ -429,10 +460,10 @@ serve(async (req: Request): Promise<Response> => {
       const a = deals[i];
       for (let j = 0; j < i; j++) {
         const b = deals[j];
-        if (a.sponsor.toLowerCase().split(/[;,(]/)[0].trim() !== b.sponsor.toLowerCase().split(/[;,(]/)[0].trim()) continue;
         const wa = new Set(norm(a.target)), wb = norm(b.target);
         const overlap = wb.filter((w) => wa.has(w)).length / Math.max(1, Math.min(wa.size, wb.length));
-        if (overlap >= 0.5) {
+        const sameSponsor = a.sponsor.toLowerCase().split(/[;,(]/)[0].trim() === b.sponsor.toLowerCase().split(/[;,(]/)[0].trim();
+        if (sameDeal(a, b) || (sameSponsor && overlap >= 0.5)) {
           // keep the one with more disclosed figures / longer summary
           const score = (d: DealRow) => Number(Boolean(d.ev_ebitda_multiple)) * 3 + Number(Boolean(d.enterprise_value_millions)) * 2 + (d.summary?.length ?? 0) / 1000;
           if (score(a) > score(b)) deals[j] = a;
@@ -442,14 +473,31 @@ serve(async (req: Request): Promise<Response> => {
       }
     }
 
-    const edition0 = (): "daily" | "weekly" => new Date().getDay() === 5 ? "weekly" : "daily";
+    // Lower middle market only: drop deals at or above the size cap (LMM_MAX_EV_MILLIONS, $500M) and deals whose only sponsor is a large-cap firm.
+    const tooBig = (d: DealRow) => (d.enterprise_value_millions ?? 0) >= CONFIG.maxEvMillions || (d.sponsor.split(/[;,/&]| and /i).map((x) => x.trim()).filter(Boolean).every((x) => LARGE_SPONSOR.test(x)));
+    for (let i = deals.length - 1; i >= 0; i--) if (tooBig(deals[i])) deals.splice(i, 1);
+
+    // The draft is built the evening before it goes out, so "is this the Friday issue" is asked of the send day.
+    const edition0 = (): "daily" | "weekly" => isFridayIssue() ? "weekly" : "daily";
     // The file on every deal, and whether anyone else reported it.
     const contexts = await Promise.all(deals.map((d) => dealContext(supabase, d)));
+    // A deal already in the tracker is not news twice. One exception, and it is the best line in
+    // the issue: we found it quietly (tombstone, portfolio page, local press) and today the press
+    // caught up. That one runs, marked with the day we first had it.
+    const repeats = new Set<DealRow>();
     deals.forEach((d, i) => {
       const ctx: DealContext | null = contexts[i];
       d.file = fileLines(d, ctx);
       d.below_radar = isBelowRadar((d.found_via ?? "news") as FoundVia, ctx);
+      if (ctx?.prior_report) {
+        if (isCaughtUp((d.found_via ?? "news") as FoundVia, ctx.prior_report)) { d.first_seen = ctx.prior_report.first_seen_on ?? ctx.prior_report.announced_on; d.below_radar = false; }
+        repeats.add(d);
+      }
     });
+    // Repeats never go back into the tracker; only the caught-up ones are printed.
+    const reprinted = deals.filter((d) => repeats.has(d) && d.first_seen);
+    for (let i = deals.length - 1; i >= 0; i--) if (repeats.has(deals[i])) deals.splice(i, 1);
+    if (repeats.size) console.log(`${repeats.size} deals already in the tracker; ${reprinted.length} printed as first-here`);
     const verbOf = (d: DealRow) => d.deal_type === "exit" ? "sold" : d.deal_type === "add-on" ? `added ${d.target} to ${d.platform ?? "a platform"}` : d.deal_type === "recap" ? "recapitalized" : d.deal_type === "growth" ? "invested in" : "acquired";
     const radar: RadarItem[] = deals.filter((d) => d.below_radar).map((d) => ({
       headline: d.deal_type === "add-on" ? `${d.sponsor} ${verbOf(d)}` : `${d.sponsor} ${verbOf(d)} ${d.target}`,
@@ -467,6 +515,8 @@ serve(async (req: Request): Promise<Response> => {
       if (!m) continue;
       const [, company, sponsor] = m;
       if (/^[0-9a-f]{12,}$/i.test(company.replace(/[\s_-]/g, "")) || company.length < 3) continue;
+      // A news headline scraped off the page is not a company name.
+      if (company.split(/\s+/).length > 6 || /\b(leads?|acquires?|announces?|completes?|invests?|recapitali[sz]ation|acquisition|partners with)\b/i.test(company)) continue;
       signalIds.push(it.id);
       radar.push({
         headline: `${company} is now on ${sponsor}'s portfolio page`,
@@ -484,7 +534,7 @@ serve(async (req: Request): Promise<Response> => {
     const bdcRows = (bdcNew ?? []) as BdcRow[];
     const bdcSpreads = bdcRows.filter((r) => r.first_lien && r.spread_pct).map((r) => Number(r.spread_pct)).sort((x, y) => x - y);
     const bdcStat = bdcRows.length
-      ? `BDC filings (last 10 days): ${new Set(bdcRows.map((r) => r.issuer_key)).size} new borrowers across ${new Set(bdcRows.map((r) => r.bdc_ticker)).size} BDCs${bdcSpreads.length ? `; median spread on ${bdcSpreads.length} new first-lien loans ${bdcSpreads[Math.floor(bdcSpreads.length / 2)].toFixed(2)}% over the base rate` : ""}.`
+      ? `Lender filings, last 10 days (context only; see the LENDER FILINGS rule): ${bdcSpreads.length ? `median spread on ${bdcSpreads.length} new first-lien loans ${bdcSpreads[Math.floor(bdcSpreads.length / 2)].toFixed(2)}% over the base rate` : `${new Set(bdcRows.map((r) => r.issuer_key)).size} new borrowers, no spreads stated`}.`
       : "";
     const { data: usedBdc } = bdcRows.length
       ? await supabase.from("bdc_holdings").select("issuer_key").not("used_in_newsletter_id", "is", null).in("issuer_key", bdcRows.map((r) => r.issuer_key))
@@ -493,22 +543,27 @@ serve(async (req: Request): Promise<Response> => {
     const byBorrower = new Map<string, BdcRow[]>();
     for (const r of bdcRows) if (!bdcDone.has(r.issuer_key)) byBorrower.set(r.issuer_key, [...(byBorrower.get(r.issuer_key) ?? []), r]);
     const bdcIds: string[] = [];
-    const usd = (n: number | null) => (n ? fmtMillions(n / 1e6) : null);
-    for (const rows of [...byBorrower.values()].slice(0, edition0() === "weekly" ? 10 : 5)) {
+    // Lender filings are supporting material, never the story (the readers are sponsors, not
+    // credit investors). At most two a day, borrower first, and only loans with a stated spread.
+    const usd = (n: number | null) => (n && n >= 1e6 ? fmtMillions(n / 1e6) : null);
+    const filingRadar: RadarItem[] = [];
+    const priced = [...byBorrower.values()].filter((rows) => rows[0].first_lien && rows[0].spread_pct);
+    for (const rows of priced.slice(0, edition0() === "weekly" ? 4 : 2)) {
       const top = rows[0];
       rows.forEach((r) => bdcIds.push(r.id));
-      const lenders = [...new Set(rows.map((r) => r.bdc_name ?? r.bdc_ticker))];
-      const terms = [top.first_lien ? "first-lien" : null, usd(top.fair_value) ? `${usd(top.fair_value)} at fair value` : null, top.spread_pct ? `priced at ${Number(top.spread_pct).toFixed(2)}% over the base rate` : null, top.maturity ? `due ${top.maturity.slice(0, 4)}` : null].filter(Boolean).join(", ");
-      radar.push({
-        headline: `${top.issuer}: new borrower at ${lenders.join(" and ")}`,
-        body: `${lenders.length > 1 ? `${lenders.length} BDCs list` : `${lenders[0]} lists`} ${top.issuer} for the first time in the ${top.period_end ?? "latest"} schedule of investments${terms ? `: ${terms}` : ""}. It was not in the prior quarter's filing. The filing does not name a sponsor.`,
+      const lenders = [...new Set(rows.map((r) => (r.bdc_name ?? r.bdc_ticker).replace(/,? (Inc|Corp|Corporation|LLC)\.?$/i, "").replace(/\b([A-Z])([A-Z]{3,})\b/g, (_m, h: string, t: string) => h + t.toLowerCase())))];
+      const terms = [usd(top.fair_value) ? `${usd(top.fair_value)} at fair value` : null, `${Number(top.spread_pct).toFixed(2)}% over the base rate`, top.maturity ? `due ${top.maturity.slice(0, 4)}` : null].filter(Boolean).join(", ");
+      filingRadar.push({
+        headline: `${top.issuer} took a new first-lien loan`,
+        body: `${top.issuer} appears for the first time in a lender's quarterly schedule of investments (${lenders.join(", ")}, period ending ${top.period_end ?? "latest quarter"}): ${terms}. It was not in the prior quarter's filing, and the filing does not name a sponsor.`,
         found_via: FOUND_VIA_LABEL.sec_filing, source: `${lenders.join(", ")} 10-Q`, source_url: top.source_url, confirmed: true,
       });
     }
 
     radar.sort((x, y) => Number(y.confirmed) - Number(x.confirmed)); // confirmed finds before signals
+    radar.push(...filingRadar); // filings last: deals and signals lead the section
     // Below-the-radar deals lead the issue in their own section; the tracker keeps the announced ones.
-    let announced = deals.filter((d) => !d.below_radar);
+    let announced = [...reprinted, ...deals.filter((d) => !d.below_radar)];
 
     const funds: FundRow[] = rawFunds
       .filter((f) => f.firm && f.fund_name && fundArticles[f.index - 1])
@@ -528,7 +583,7 @@ serve(async (req: Request): Promise<Response> => {
 
     // Friday = week in review; pull the latest index narrative for context
     const now = new Date();
-    const edition: "daily" | "weekly" = now.getDay() === 5 ? "weekly" : "daily";
+    const edition: "daily" | "weekly" = isFridayIssue(now) ? "weekly" : "daily";
     let weekNarrative: string | null = null;
     let weekStats: string | null = null;
     if (edition === "weekly") {
@@ -544,7 +599,8 @@ serve(async (req: Request): Promise<Response> => {
       const seenDeal = new Set(deals.map((d) => `${d.sponsor}|${d.target}`.toLowerCase()));
       for (const d of (weekDeals ?? []) as (DealRow & { id: string })[]) {
         const k = `${d.sponsor}|${d.target}`.toLowerCase();
-        if (!seenDeal.has(k)) { seenDeal.add(k); deals.push({ ...d, featured: false }); }
+        if (seenDeal.has(k) || [...deals, ...reprinted].some((x) => sameDeal(x, d))) continue;
+        seenDeal.add(k); deals.push({ ...d, featured: false });
       }
       const seenFund = new Set(funds.map((f) => `${f.firm}|${f.fund_name}`.toLowerCase()));
       for (const f of (weekFunds ?? []) as (FundRow & { id: string })[]) {
@@ -561,7 +617,7 @@ serve(async (req: Request): Promise<Response> => {
         if (inRadar.has(h.toLowerCase())) continue;
         radar.push({ headline: h, body: d.summary, found_via: FOUND_VIA_LABEL[(d.found_via ?? "news") as FoundVia] ?? "Found", source: d.source, source_url: d.source_url, confirmed: true });
       }
-      announced = deals.filter((d) => !d.below_radar);
+      announced = [...reprinted, ...deals.filter((d) => !d.below_radar)];
 
       const mults = deals.map((d) => d.ev_ebitda_multiple).filter((x): x is number => typeof x === "number").sort((a, b) => a - b);
       const median = mults.length ? mults[Math.floor(mults.length / 2)] : null;
@@ -581,13 +637,26 @@ serve(async (req: Request): Promise<Response> => {
     const readCandidates = [...headlinesOnly, ...pulse];
 
     const intel = await marketIntel(supabase, 30);
-    const dateLabel = now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
-    const editorial = aiKey
-      ? await editorialPass({ dateLabel, edition, quotes, headlines: headlinesOnly, deals: announced, radar, funds, people, pulse, readCandidates, editorItems, intel: [intelText(intel), bdcStat].filter(Boolean).join("\n"), weekNarrative, weekStats }, aiKey)
-      : null;
+    const dateLabel = issueDateLabel(now);
+    const editorialInput = { dateLabel, edition, quotes, headlines: headlinesOnly, deals: announced, radar, funds, people, pulse, readCandidates, editorItems, intel: [intelText(intel), bdcStat].filter(Boolean).join("\n"), weekNarrative, weekStats };
+    let editorial = aiKey ? await editorialPass(editorialInput, aiKey) : null;
+
+    // The issue checks its own front page. One rewrite; if it still fails, it is held for the editor.
+    const lenderNames = [...new Set(bdcRows.map((r) => r.bdc_name ?? r.bdc_ticker))];
+    const check = (e: EditorialOutput | null): string[] => e
+      ? lintIssue({ subject: e.subject, preheader: e.preheader, headline: e.editors_note?.headline, paragraphs: e.editors_note?.paragraphs, numbers: e.by_the_numbers, closing: e.closing_line, lenders: lenderNames })
+      : ["The writing pass did not run, so the issue has no Lede or subject line of its own."];
+    let qualityFlags = check(editorial);
+    if (editorial && qualityFlags.length && aiKey) {
+      console.warn("issue failed its own check, rewriting once:", qualityFlags);
+      const second = await editorialPass({ ...editorialInput, feedback: qualityFlags }, aiKey);
+      if (second) { const again = check(second); if (again.length < qualityFlags.length) { editorial = second; qualityFlags = again; } }
+    }
 
     // Apply editorial layer
-    const toArticle = (a: DbArticle): Article => ({ id: a.id, title: a.title, summary: a.summary, category: a.category, source: a.source, source_url: a.source_url, fund_size_relevant: a.fund_size_relevant });
+    // The classifier sometimes leaves itself a note in brackets. Readers never see those.
+    const clean = (t: string | null) => (t ? t.replace(/\s*\[(note|editor'?s? note|n\.?b\.?)[:\s][^\]]*\]/gi, "").replace(/\.\.\.\s*(?=[A-Z])/g, ". ").replace(/\s{2,}/g, " ").trim() : t);
+    const toArticle = (a: DbArticle): Article => ({ id: a.id, title: a.title, summary: clean(a.summary), category: a.category, source: a.source, source_url: a.source_url, fund_size_relevant: a.fund_size_relevant });
     const headlineArticles = headlinesOnly.map(toArticle);
     const pulseArticles = pulse.map(toArticle);
     if (editorial) {
@@ -600,9 +669,6 @@ serve(async (req: Request): Promise<Response> => {
     // Tracker order: featured, then platforms, add-ons, recaps/growth, exits.
     const typeRank: Record<string, number> = { platform: 0, "carve-out": 1, "add-on": 2, recap: 3, growth: 3, secondary: 4, exit: 5, other: 6 };
     announced.sort((a, b) => Number(b.featured) - Number(a.featured) || (typeRank[a.deal_type] ?? 6) - (typeRank[b.deal_type] ?? 6));
-    if (editorial) {
-    }
-
     const readItem = editorial?.the_read ? readCandidates[editorial.the_read.index - 1] : undefined;
     const theRead = editorial?.the_read && readItem
       ? { title: readItem.title, source: readItem.source, url: readItem.source_url, take: editorial.the_read.take }
@@ -627,14 +693,42 @@ serve(async (req: Request): Promise<Response> => {
       top_headlines: headlineArticles,
       deal_tracker: announced,
       fund_tracker: funds,
-      people_moves: people.map(toArticle),
+      people_moves: [
+        ...people.map(toArticle),
+        ...(peopleMore.length ? [{
+          id: `more-${peopleMore[0].id}`,
+          title: `${peopleMore.length} more move${peopleMore.length === 1 ? "" : "s"} today`,
+          summary: peopleMore.map((a) => (a.title.toLowerCase().includes(a.source.toLowerCase()) ? a.title : `${a.title} (${a.source})`)).join("; ").slice(0, 1400),
+          category: "people_moves", source: "The GP Pulse tracker", source_url: `${CONFIG.siteUrl}/people-moves`,
+        } as Article] : []),
+      ],
       on_the_market: editorItems.filter((e) => e.kind === "on_the_market"),
       overheard: editorItems.filter((e) => e.kind === "overheard" || e.kind === "reader_question"),
       market_pulse: pulseArticles,
       the_read: theRead,
       jobs: editorItems.filter((e) => e.kind === "job"),
       closing_line: editorial?.closing_line ?? null,
+      quality_flags: qualityFlags,
     };
+
+    // Reader question: Tuesday's issue asks one from the bank and reports last week's answers
+    // once at least POLL_MIN readers have voted. Best effort; the issue never waits on it.
+    let pollToMark: string | null = null, resultToMark: string | null = null;
+    try {
+      const day = issueDay(now);
+      if (day.getUTCDay() === 2) {
+        const POLL_MIN = Number(Deno.env.get("POLL_MIN_VOTES") ?? 10);
+        const { data: last } = await supabase.from("polls").select("id, question, options").not("active_from", "is", null).is("result_newsletter_id", null).order("active_from", { ascending: false }).limit(1).maybeSingle();
+        if (last) {
+          const { data: votes } = await supabase.from("poll_votes").select("option_index").eq("poll_id", last.id).limit(20000);
+          const counts = (last.options as string[]).map((_o, i) => ((votes ?? []) as { option_index: number }[]).filter((v) => v.option_index === i).length);
+          const total = counts.reduce((x, y) => x + y, 0);
+          if (total >= POLL_MIN) { content.poll_result = { question: last.question, options: last.options, counts, total }; resultToMark = last.id; }
+        }
+        const { data: next } = await supabase.from("polls").select("id, question, options").is("active_from", null).order("sort", { ascending: true }).limit(1).maybeSingle();
+        if (next) { content.poll = { id: next.id, question: next.question, options: next.options }; pollToMark = next.id; }
+      }
+    } catch (e) { console.warn("poll step skipped:", e); }
 
     // Issue number + record
     const { data: last } = await supabase.from("newsletters").select("issue_number").order("issue_number", { ascending: false }).limit(1).maybeSingle();
@@ -648,10 +742,17 @@ serve(async (req: Request): Promise<Response> => {
     }).select().single();
     if (nlErr) throw new Error(nlErr.message);
 
+    if (pollToMark) await supabase.from("polls").update({ active_from: issueDay(now).toISOString().slice(0, 10), newsletter_id: newsletter.id }).eq("id", pollToMark);
+    if (resultToMark) await supabase.from("polls").update({ result_newsletter_id: newsletter.id }).eq("id", resultToMark);
+
     // Persist structured rows, link editor items, mark articles used
-    const usedIds = [...headlines, ...dealSource, ...fundArticles, ...people, ...pulse].map((a) => a.id);
+    const usedIds = [...headlines, ...dealSource, ...fundArticles, ...people, ...peopleMore, ...pulse].map((a) => a.id);
     // `file` is computed per issue, not stored. If the v2.1 columns aren't there yet, store the v2 row.
-    const dealRows = deals.map(({ file: _file, ...d }) => ({ ...d, announced_on: now.toISOString().slice(0, 10) }));
+    // The date on a deal is the day it was announced, not the day we built the issue. When the
+    // article carries no date the row says so (date_known, set by the database) and it stays out
+    // of every pace count.
+    const publishedById = new Map(dealSource.map((a) => [a.id, a.published_at]));
+    const dealRows = deals.map(({ file: _file, first_seen: _fs, ...d }) => ({ ...d, announced_on: announcedOn(publishedById.get((d as DealRow & { article_id?: string }).article_id ?? ""), now).date }));
     const saveDeals = async () => {
       if (!dealRows.length) return;
       const { error } = await supabase.from("deals").upsert(dealRows, { onConflict: "sponsor,target", ignoreDuplicates: true });
@@ -666,7 +767,7 @@ serve(async (req: Request): Promise<Response> => {
       bdcIds.length ? supabase.from("bdc_holdings").update({ used_in_newsletter_id: newsletter.id }).in("id", bdcIds) : Promise.resolve(),
       signalIds.length ? supabase.from("editor_items").update({ status: "published", newsletter_id: newsletter.id }).in("id", signalIds) : Promise.resolve(),
       funds.length
-        ? supabase.from("funds").upsert(funds.map((f) => ({ ...f, announced_on: now.toISOString().slice(0, 10) })), { onConflict: "firm,fund_name", ignoreDuplicates: true })
+        ? supabase.from("funds").upsert(funds.map((f) => ({ ...f, announced_on: announcedOn(null, now).date })), { onConflict: "firm,fund_name", ignoreDuplicates: true })
         : Promise.resolve(),
       editorItems.length
         ? supabase.from("editor_items").update({ status: "published", newsletter_id: newsletter.id }).in("id", editorItems.map((e) => e.id))
@@ -674,11 +775,27 @@ serve(async (req: Request): Promise<Response> => {
       usedIds.length ? supabase.from("articles").update({ used_in_newsletter_id: newsletter.id }).in("id", usedIds) : Promise.resolve(),
     ]);
 
+    // A held issue will not go out on its own. Tell the editor now, while there is an evening to fix it.
+    if (qualityFlags.length) {
+      const resendKey = Deno.env.get("RESEND_API_KEY");
+      if (resendKey) {
+        const esc = (t: string) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        await fetch("https://api.resend.com/emails", {
+          method: "POST", headers: { Authorization: `Bearer ${resendKey.trim()}`, "Content-Type": "application/json" },
+          body: JSON.stringify({
+            from: CONFIG.from, to: [CONFIG.replyTo], subject: `[HELD] Issue #${issueNumber} needs you before it sends`,
+            html: `<p>Issue #${issueNumber} ("${esc(subject)}") failed its own check and will not send automatically.</p><ul>${qualityFlags.map((f) => `<li>${esc(f)}</li>`).join("")}</ul><p>Fix it and approve it on the <a href="${CONFIG.siteUrl}/admin">Editor's Desk</a>. Approving sends it at the usual time.</p>`,
+            tags: [{ name: "kind", value: "held" }],
+          }),
+        }).catch((e) => console.error("held-issue alert failed", e));
+      }
+    }
+
     return new Response(JSON.stringify({
-      message: `Issue #${issueNumber} drafted: ${radar.length} below the radar, ${headlinesOnly.length} headlines, ${announced.length} announced deals, ${funds.length} funds, ${people.length} moves, ${editorItems.length} editor items${editorial ? "" : " (editorial pass unavailable)"}`,
+      message: `Issue #${issueNumber} drafted: ${radar.length} below the radar, ${headlinesOnly.length} headlines, ${announced.length} announced deals, ${funds.length} funds, ${people.length} moves, ${editorItems.length} editor items${editorial ? "" : " (editorial pass unavailable)"}${qualityFlags.length ? `. HELD for the editor: ${qualityFlags.join(" ")}` : ""}`,
       newsletter_id: newsletter.id, issue_number: issueNumber, subject,
       sections: { headlines: headlines.length, deals: deals.length, funds: funds.length, people: people.length, pulse: pulse.length, editor_items: editorItems.length },
-      editorial: Boolean(editorial),
+      editorial: Boolean(editorial), held: qualityFlags.length > 0, quality_flags: qualityFlags,
     }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (error) {
     console.error("generate-newsletter", error);

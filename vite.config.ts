@@ -10,9 +10,10 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
+        // No chunk for the charting library: named here, it was downloaded on every page.
+        // Left alone, it loads only with the two pages that draw charts.
         manualChunks: {
           react: ["react", "react-dom", "react-router-dom"],
-          charts: ["recharts"],
           supabase: ["@supabase/supabase-js", "@tanstack/react-query"],
         },
       },
