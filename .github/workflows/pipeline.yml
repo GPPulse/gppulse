@@ -105,8 +105,9 @@ jobs:
         if: github.event.inputs.step == '' && contains(fromJSON('["full","generate"]'), steps.mode.outputs.mode)
         env: { RUN_ID: "${{ steps.mode.outputs.run_id }}", RUN_MODE: "${{ steps.mode.outputs.mode }}" }
         run: |
-          ./step.sh generate-newsletter "\"force\":${{ github.event.inputs.force || 'false' }}"
+          # The weekly index goes first: Friday's week-in-review issue reads this week's narrative from it.
           ./step.sh generate-gp-index || true
+          ./step.sh generate-newsletter "\"force\":${{ github.event.inputs.force || 'false' }}"
 
       - name: Send
         if: github.event.inputs.step == '' && steps.mode.outputs.mode == 'send'

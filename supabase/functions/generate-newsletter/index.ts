@@ -4,6 +4,7 @@ import { aiConfigured, chat, HOUSE_STYLE, parseJSON } from "../_shared/ai.ts";
 import { getStaff, isInternalCall, unauthorized } from "../_shared/auth.ts";
 import { CONFIG } from "../_shared/config.ts";
 import { lintIssue } from "../_shared/lint.ts";
+import { isFridayIssue, issueDateLabel } from "../_shared/issue-day.ts";
 import { dealContext, DealContext, fileLines, FOUND_VIA_LABEL, FoundVia, intelText, isBelowRadar, marketIntel } from "../_shared/intel.ts";
 import {
   Article,
@@ -455,7 +456,8 @@ serve(async (req: Request): Promise<Response> => {
     const tooBig = (d: DealRow) => (d.enterprise_value_millions ?? 0) >= 1000 || (d.sponsor.split(/[;,/&]| and /i).map((x) => x.trim()).filter(Boolean).every((x) => LARGE_SPONSOR.test(x)));
     for (let i = deals.length - 1; i >= 0; i--) if (tooBig(deals[i])) deals.splice(i, 1);
 
-    const edition0 = (): "daily" | "weekly" => new Date().getDay() === 5 ? "weekly" : "daily";
+    // The draft is built the evening before it goes out, so "is this the Friday issue" is asked of the send day.
+    const edition0 = (): "daily" | "weekly" => isFridayIssue() ? "weekly" : "daily";
     // The file on every deal, and whether anyone else reported it.
     const contexts = await Promise.all(deals.map((d) => dealContext(supabase, d)));
     deals.forEach((d, i) => {
@@ -548,7 +550,7 @@ serve(async (req: Request): Promise<Response> => {
 
     // Friday = week in review; pull the latest index narrative for context
     const now = new Date();
-    const edition: "daily" | "weekly" = now.getDay() === 5 ? "weekly" : "daily";
+    const edition: "daily" | "weekly" = isFridayIssue(now) ? "weekly" : "daily";
     let weekNarrative: string | null = null;
     let weekStats: string | null = null;
     if (edition === "weekly") {
@@ -601,7 +603,7 @@ serve(async (req: Request): Promise<Response> => {
     const readCandidates = [...headlinesOnly, ...pulse];
 
     const intel = await marketIntel(supabase, 30);
-    const dateLabel = now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+    const dateLabel = issueDateLabel(now);
     const editorialInput = { dateLabel, edition, quotes, headlines: headlinesOnly, deals: announced, radar, funds, people, pulse, readCandidates, editorItems, intel: [intelText(intel), bdcStat].filter(Boolean).join("\n"), weekNarrative, weekStats };
     let editorial = aiKey ? await editorialPass(editorialInput, aiKey) : null;
 
