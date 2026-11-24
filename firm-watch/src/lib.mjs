@@ -5,20 +5,60 @@ import { XMLParser } from 'fast-xml-parser';
 export const UA = 'GPPulseBot/1.0 (+https://thegppulse.com/bot; newsletter firm watch)';
 // ---------- fetching ----------
 
-export async function get(url, { timeout = 15000, accept = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' } = {}) {
+// Politeness: at most one request to a given host every HOST_GAP ms, however many workers are
+// running. Sites that say "slow down" (429) or are briefly down (502-504) get a couple of retries
+// with backoff, honouring Retry-After. A 403 is a site's answer, not a fault, so it is not retried.
+const HOST_GAP = Number(process.env.FW_HOST_GAP_MS ?? 1500);
+const RETRY_STATUS = new Set([429, 502, 503, 504]);
+const RETRY_ERROR = /ECONNRESET|EAI_AGAIN|UND_ERR_SOCKET|EPIPE/;
+const nextSlot = new Map();
+
+export async function waitTurn(host, gap = HOST_GAP) {
+  if (!gap) return;
+  const now = Date.now();
+  const at = Math.max(now, nextSlot.get(host) || 0);
+  nextSlot.set(host, at + gap);
+  if (at > now) await sleep(at - now);
+}
+
+export function retryDelay(attempt, retryAfter, now = Date.now()) {
+  if (retryAfter) {
+    const secs = Number(retryAfter);
+    const ms = Number.isFinite(secs) ? secs * 1000 : Date.parse(retryAfter) - now;
+    if (Number.isFinite(ms) && ms >= 0) return ms;
+  }
+  return 2000 * 2 ** attempt + Math.floor(Math.random() * 1000);
+}
+
+async function fetchOnce(url, timeout, accept) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), timeout);
   try {
     const res = await fetch(url, { headers: { 'user-agent': UA, accept }, redirect: 'follow', signal: ctrl.signal });
     const type = res.headers.get('content-type') || '';
-    if (!res.ok) return { ok: false, status: res.status, url: res.url, type, body: '' };
-    if (!/text|xml|json|html/i.test(type)) return { ok: false, status: res.status, url: res.url, type, body: '' };
+    const retryAfter = res.headers.get('retry-after');
+    if (!res.ok) { res.body?.cancel?.().catch(() => {}); return { ok: false, status: res.status, url: res.url, type, body: '', retryAfter }; }
+    if (!/text|xml|json|html/i.test(type)) { res.body?.cancel?.().catch(() => {}); return { ok: false, status: res.status, url: res.url, type, body: '' }; }
     const body = (await res.text()).slice(0, 2_000_000);
     return { ok: true, status: res.status, url: res.url, type, body };
   } catch (err) {
     return { ok: false, status: 0, url, type: '', body: '', error: String(err?.cause?.code || err?.name || err) };
   } finally {
     clearTimeout(timer);
+  }
+}
+
+export async function get(url, { timeout = 15000, accept = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', gap = HOST_GAP, retries = 2, maxWait = 30000 } = {}) {
+  let host;
+  try { host = new URL(url).host; } catch { return { ok: false, status: 0, url, type: '', body: '', error: 'bad url' }; }
+  for (let attempt = 0; ; attempt++) {
+    await waitTurn(host, gap);
+    const res = await fetchOnce(url, timeout, accept);
+    const again = RETRY_STATUS.has(res.status) || (res.status === 0 && RETRY_ERROR.test(res.error || ''));
+    if (!again || attempt >= retries) { delete res.retryAfter; return res; }
+    const wait = retryDelay(attempt, res.retryAfter);
+    if (wait > maxWait) { delete res.retryAfter; return res; } // "come back tomorrow": do that
+    await sleep(wait);
   }
 }
 
@@ -236,6 +276,112 @@ export function parseFeed(xml) {
 }
 
 export const looksLikeFeed = (res) => res.ok && /<(rss|feed)[\s>]/i.test(res.body.slice(0, 2000));
+
+// ---------- other machine-readable sources ----------
+// Many firm sites have no RSS link but still publish a list of their posts somewhere a program
+// can read: the WordPress REST API, or an XML sitemap. Both are published for exactly this use.
+
+export const WP_POSTS = '/wp-json/wp/v2/posts?per_page=20&_fields=link,title,date,excerpt';
+const stripTags = (s) => clean(String(s ?? '').replace(/<[^>]+>/g, ' ').replace(/&#8217;|&rsquo;/g, "'").replace(/&#8211;|&ndash;/g, '-').replace(/&#038;|&amp;/g, '&').replace(/&#8220;|&#8221;|&quot;/g, '"').replace(/&nbsp;|&#160;/g, ' '));
+
+export function parseWpPosts(body) {
+  let rows;
+  try { rows = JSON.parse(body); } catch { return []; }
+  if (!Array.isArray(rows)) return [];
+  return rows.map((r) => ({
+    url: r?.link, title: stripTags(r?.title?.rendered ?? r?.title),
+    date: r?.date && !isNaN(new Date(r.date)) ? new Date(r.date).toISOString().slice(0, 10) : null,
+    summary: stripTags(r?.excerpt?.rendered ?? '').slice(0, 500),
+  })).filter((i) => typeof i.url === 'string' && /^https?:/.test(i.url) && i.title);
+}
+
+// A headline from a URL slug: /news/acme-capital-acquires-widget-co/ -> "Acme Capital Acquires Widget Co".
+// Crude, but enough to classify; the crawl fetches the article itself for anything it queues.
+export function titleFromSlug(url) {
+  let seg;
+  try { seg = decodeURIComponent(new URL(url).pathname.replace(/\/$/, '').split('/').pop() || ''); } catch { return ''; }
+  seg = seg.replace(/\.(html?|php|aspx?)$/i, '').replace(/^\d{4}-\d{2}-\d{2}-/, '');
+  if (!/[a-z]/i.test(seg) || /^\d+$/.test(seg)) return '';
+  return seg.split(/[-_]+/).filter(Boolean).map((w) => (/^(llc|lp|inc|ii|iii|iv|vi?|ceo|cfo|coo)$/i.test(w) ? w.toUpperCase() : w[0].toUpperCase() + w.slice(1))).join(' ');
+}
+
+const ARTICLE_SITEMAP = /post|news|press|article|blog|insight|announcement/i;
+const xml = () => new XMLParser({ ignoreAttributes: true, processEntities: true });
+
+// Returns { items } for a sitemap of pages, or { children } for a sitemap index.
+// Only article-like URLs count, unless the sitemap itself is the posts sitemap.
+export function parseSitemap(body, sitemapUrl) {
+  let doc;
+  try { doc = xml().parse(body); } catch { return { items: [], children: [] }; }
+  const arr = (v) => (v == null ? [] : Array.isArray(v) ? v : [v]);
+  const children = arr(doc?.sitemapindex?.sitemap).map((s) => String(s?.loc ?? '').trim()).filter(Boolean);
+  const all = ARTICLE_SITEMAP.test(new URL(sitemapUrl).pathname);
+  const items = [];
+  for (const u of arr(doc?.urlset?.url)) {
+    const loc = String(u?.loc ?? '').trim();
+    if (!loc || SKIP_PATH.test(loc)) continue;
+    let path; try { path = new URL(loc).pathname; } catch { continue; }
+    const deep = path.replace(/\/$/, '').split('/').filter(Boolean).length >= 2;
+    if (!all && !(NEWS_PATH.test(path) && deep)) continue;
+    const title = titleFromSlug(loc);
+    if (title.split(' ').length < 3) continue;
+    const date = u?.lastmod ? parseDate(String(u.lastmod)) : null;
+    items.push({ url: loc, title, date });
+  }
+  items.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+  return { items: items.slice(0, 300), children };
+}
+
+export const sourceKind = (url) => (/\/wp-json\//.test(url) ? 'wp' : /sitemap[^/]*\.xml/i.test(url) ? 'sitemap' : 'feed');
+
+// Read whatever kind of source feed_url points at. Returns null if it could not be read.
+export async function readSource(url) {
+  const kind = sourceKind(url);
+  if (kind === 'wp') {
+    const res = await get(url, { accept: 'application/json' });
+    return res.ok ? parseWpPosts(res.body) : null;
+  }
+  const res = await get(url, { accept: 'application/rss+xml,application/atom+xml,application/xml,text/xml,*/*' });
+  if (kind === 'sitemap') return res.ok && /<(urlset|sitemapindex)[\s>]/i.test(res.body.slice(0, 3000)) ? parseSitemap(res.body, res.url).items : null;
+  return looksLikeFeed(res) ? parseFeed(res.body) : null;
+}
+
+// ---------- JavaScript-rendered sites ----------
+// A few firm sites send an empty shell and build the page in the browser. For those only, the
+// page is rendered in headless Chromium (if Playwright is installed). Same user agent, same
+// robots rules, same per-host spacing. Never used to get past a block: a 403 stays a 403.
+
+export function looksJsRendered(html) {
+  const $ = cheerio.load(html);
+  const links = $('a[href]').length;
+  const scripts = $('script').length;
+  $('script, style, noscript').remove();
+  const text = clean($('body').text()).length;
+  const shell = /<div id="(root|app|__next|__nuxt|___gatsby)"[^>]*>\s*<\/div>|ng-version=|data-server-rendered/i.test(html);
+  return shell || (links < 8 && scripts >= 3) || (text < 400 && scripts >= 5);
+}
+
+let browser = null;
+export async function render(url, { timeout = 25000 } = {}) {
+  let pw;
+  try { pw = await import('playwright'); } catch { return { ok: false, status: 0, url, type: '', body: '', error: 'playwright not installed' }; }
+  try { browser ||= pw.chromium.launch(process.env.FW_CHROME_PATH ? { executablePath: process.env.FW_CHROME_PATH } : {}); await browser; } catch (err) { browser = null; return { ok: false, status: 0, url, type: '', body: '', error: `no browser (${String(err).slice(0, 80)})` }; }
+  await waitTurn(new URL(url).host);
+  const ctx = await (await browser).newContext({ userAgent: UA });
+  try {
+    const page = await ctx.newPage();
+    await page.route('**/*', (r) => (/^(image|media|font)$/.test(r.request().resourceType()) ? r.abort() : r.continue()));
+    const resp = await page.goto(url, { waitUntil: 'networkidle', timeout });
+    const status = resp?.status() ?? 0;
+    const body = (await page.content()).slice(0, 2_000_000);
+    return { ok: !!resp && resp.ok(), status, url: page.url(), type: 'text/html', body, rendered: true };
+  } catch (err) {
+    return { ok: false, status: 0, url, type: '', body: '', error: String(err?.name || err).slice(0, 80) };
+  } finally {
+    await ctx.close().catch(() => {});
+  }
+}
+export async function closeRenderer() { if (browser) { const b = await browser.catch(() => null); browser = null; await b?.close().catch(() => {}); } }
 
 // ---------- classification ----------
 
