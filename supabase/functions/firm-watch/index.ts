@@ -15,7 +15,7 @@ import { getStaff, isInternalCall, unauthorized } from "../_shared/auth.ts";
 //   items       -> { items: [{ firm_id, url, title, content, published_at, source_name, category_hint, seen_only }] }
 //                  seen_only rows are archive entries recorded so they are never reported as new;
 //                  they skip the classifier.
-//   portfolio   -> { firms: [{ id, portfolio_url, names }], signals: [{ headline, body, url }] }
+//   portfolio   -> { firms: [{ id, portfolio_url, names }], signals: [{ headline, body, url, company?, sponsor? }] }
 //   team        -> { firms: [{ id, team_url, members }], moves: [{ firm_id, firm_name, person, person_key, move_type,
 //                  old_title, new_title, old_rank, new_rank, url, publish, review, line }] } (firm-watch/src/team.mjs)
 //   bdc         -> { holdings: [...] } BDC schedule-of-investments rows (firm-watch/src/bdc.mjs)
@@ -163,12 +163,27 @@ serve(async (req: Request): Promise<Response> => {
           if (Array.isArray(f.names)) patch.portfolio_names = f.names.slice(0, 600);
           await supabase.from("pe_firm_sources").update(patch).eq("id", f.id);
         }
-        const signals = (body.signals ?? []) as Array<{ headline: string; body: string; url: string }>;
+        const signals = (body.signals ?? []) as Array<{ headline: string; body: string; url: string; company?: string; sponsor?: string }>;
         let filed = 0;
         for (const sig of signals.slice(0, 50)) {
           if (!sig?.headline) continue;
           const { data: dup } = await supabase.from("editor_items").select("id").eq("headline", sig.headline.slice(0, 200)).limit(1);
           if (dup?.length) continue;
+          // Possible exits: add what our own tracker has on the company (entry date, add-ons since).
+          if (sig.company && sig.sponsor && sig.headline.startsWith("Possible exit:")) {
+            const like = (v: string) => `%${v.replace(/[%_,()]/g, " ").trim().slice(0, 60)}%`;
+            const { data: hist } = await supabase.from("deals").select("target, platform, deal_type, announced_on")
+              .ilike("sponsor", like(sig.sponsor)).or(`target.ilike.${like(sig.company)},platform.ilike.${like(sig.company)}`)
+              .order("announced_on", { ascending: true }).limit(20);
+            const rows = (hist ?? []) as { target: string; platform: string | null; deal_type: string; announced_on: string | null }[];
+            const entry = rows.find((r) => r.deal_type !== "add-on" && r.deal_type !== "exit");
+            const addOns = rows.filter((r) => r.deal_type === "add-on").length;
+            const notes = [
+              entry?.announced_on ? `Our tracker has the ${entry.deal_type} on ${entry.announced_on}.` : "",
+              addOns ? `${addOns} add-on${addOns === 1 ? "" : "s"} tracked under it.` : "",
+            ].filter(Boolean).join(" ");
+            if (notes) sig.body = `${sig.body ?? ""} ${notes}`.trim();
+          }
           const { error } = await supabase.from("editor_items").insert({ kind: "overheard", headline: sig.headline.slice(0, 200), body: (sig.body ?? "").slice(0, 1000), url: sig.url ?? null, attribution: "GP Pulse firm watch", status: "submitted" });
           if (error) console.error("firm-watch portfolio signal", error.message); else filed++;
         }

@@ -514,6 +514,17 @@ export function diffPortfolio(oldNames, newNames) {
   return { store: newNames, added, removed, reason: 'changed' };
 }
 
+// Is this company still named anywhere in the page's text or image labels? Used to confirm a
+// removal: the name list comes from headings and cards, and one failed card must not read as a sale.
+export function stillOnPage(name, html) {
+  const needle = normName(name);
+  if (needle.length < 3) return true; // too short to tell; assume it is still there
+  const $ = cheerio.load(html);
+  $('script, style, noscript').remove();
+  const labels = $('img[alt], [title], [aria-label]').map((_, el) => `${$(el).attr('alt') ?? ''} ${$(el).attr('title') ?? ''} ${$(el).attr('aria-label') ?? ''}`).get().join(' ');
+  return ` ${normName(`${$.root().text()} ${labels}`)} `.includes(` ${needle} `);
+}
+
 // Links on a home page that look like the page we want (by link text or path).
 export function findLinks(html, baseUrl, textRe, pathRe) {
   const $ = cheerio.load(html);
