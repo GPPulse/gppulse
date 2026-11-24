@@ -6,10 +6,13 @@
 // honeypot fields empty, never touches a form behind a CAPTCHA, and tries each firm once.
 // Forms that only work in a browser are recorded as such and left for a person.
 //
-//   node src/subscribe.mjs [--limit 40] [--kind sponsor] [--dry] [--retry]
+//   node src/subscribe.mjs [--limit 40] [--find 150] [--kind sponsor] [--dry] [--retry]
+//
+// --find N first looks for a sign-up form at N firms that have none on file. Discovery only reads
+// the home page; many firms keep the form on a contact, news or insights page instead.
 import { appendFile } from 'node:fs/promises';
 import * as cheerio from 'cheerio';
-import { get, pool, allowed, sleep } from './lib.mjs';
+import { get, pool, allowed, sleep, scanHome, sameSite } from './lib.mjs';
 import { api, chunk } from './api.mjs';
 
 const args = process.argv.slice(2);
@@ -145,6 +148,48 @@ export async function submit(plan, pageUrl, id = IDENTITY) {
   }
 }
 
+// Pages other than the home page where firms tend to put the newsletter form.
+const FORM_PATHS = ['/subscribe', '/newsletter', '/contact', '/contact-us', '/news', '/insights', '/connect', '/stay-connected'];
+const FORM_LINK = /subscribe|newsletter|sign[- ]?up|mailing list|email (alerts|updates)|stay (connected|informed|in touch)|insights|contact/i;
+
+/** Links on a page worth checking for a sign-up form, best first, same site only. */
+export function formCandidates(html, baseUrl) {
+  const $ = cheerio.load(html);
+  const scored = new Map();
+  $('a[href]').each((_, el) => {
+    let u; try { u = new URL($(el).attr('href'), baseUrl); } catch { return; }
+    if (!/^https?:$/.test(u.protocol) || !sameSite(u.href, baseUrl)) return;
+    const href = u.href.split('#')[0];
+    const text = $(el).text().replace(/\s+/g, ' ').trim();
+    if (text.length > 50 || /\.(pdf|jpg|png|zip)$/i.test(u.pathname) || /unsubscribe|login|sign-?in|careers|privacy|terms/i.test(href)) return;
+    let score = 0;
+    if (/subscribe|newsletter|mailing|sign[- ]?up/i.test(text)) score += 3;
+    if (/subscribe|newsletter|signup|sign-up|mailing/i.test(u.pathname)) score += 3;
+    if (!score && FORM_LINK.test(text)) score += 1;
+    if (score && (scored.get(href) ?? 0) < score) scored.set(href, score);
+  });
+  let origin; try { origin = new URL(baseUrl).origin; } catch { return []; }
+  for (const p of FORM_PATHS) if (!scored.has(origin + p) && !scored.has(`${origin}${p}/`)) scored.set(origin + p, 0.5);
+  return [...scored.entries()].sort((a, b) => b[1] - a[1] || a[0].length - b[0].length).map(([u]) => u).slice(0, 5);
+}
+
+/** Look past the home page for a mailing-list form. Returns { page, provider } or null. */
+export async function findSignup(firm) {
+  const home = await get(firm.website_url);
+  if (!home.ok) return null;
+  const onHome = scanHome(home.body, home.url).signup;
+  if (onHome?.action || onHome?.provider) return { page: onHome.page, provider: onHome.provider ?? null };
+  for (const url of formCandidates(home.body, home.url)) {
+    if (!(await allowed(url))) continue;
+    const res = await get(url);
+    if (!res.ok || !sameSite(res.url, home.url)) continue;
+    const found = scanHome(res.body, res.url).signup;
+    // A bare "subscribe" link is not a form; keep looking for the page that has one.
+    if (found && (found.action || found.provider) && planSignup(res.body, res.url).kind !== 'skip') return { page: res.url, provider: found.provider ?? null };
+  }
+  return null;
+}
+
 async function main() {
   let { firms, signup_tracking } = await api('firms');
   if (!signup_tracking && !flag('dry')) {
@@ -152,6 +197,27 @@ async function main() {
     console.log('Mailing lists: migration 20261124060000_signup_status.sql is not applied yet; nothing sent. Run with --dry to preview.');
     return;
   }
+  // Stage one: find forms at firms that have none on file. Each firm is searched once.
+  const findN = Number(opt('find', 0));
+  if (findN > 0) {
+    const rank0 = { sponsor: 0, advisor: 1, lender: 2, trade: 3 };
+    const todo = firms.filter((f) => !f.signup_page && !f.signup_status && f.website_url && !/\/lmm-sweep$/.test(f.website_url) && (!opt('kind') || f.source_kind === opt('kind')))
+      .sort((a, b) => (rank0[a.source_kind] ?? 9) - (rank0[b.source_kind] ?? 9) || (a.watch_tier ?? 9) - (b.watch_tier ?? 9)).slice(0, findN);
+    const found = [];
+    await pool(todo, 6, async (firm) => {
+      const hit = await findSignup(firm).catch(() => null);
+      found.push({ id: firm.id, name: firm.name, signup_page: hit?.page ?? null, signup_provider: hit?.provider ?? null });
+      if (hit) { firm.signup_page = hit.page; firm.signup_provider = hit.provider; }
+    });
+    const hits = found.filter((f) => f.signup_page);
+    console.log(`Form search: ${todo.length} firms checked, ${hits.length} sign-up forms found.`);
+    for (const h of hits.slice(0, 40)) console.log(`  ${h.name}: ${h.signup_page}`);
+    if (!flag('dry')) for (const part of chunk(found, 50)) await api('signup_found', { firms: part.map(({ id, signup_page, signup_provider }) => ({ id, signup_page, signup_provider })) });
+    if (process.env.GITHUB_STEP_SUMMARY) await appendFile(process.env.GITHUB_STEP_SUMMARY, `## Sign-up form search\n${todo.length} firms checked, **${hits.length} forms found**.\n\n${hits.map((h) => `- [${h.name}](${h.signup_page})`).join('\n')}\n\n`);
+    // Firms searched with nothing found are marked so they are not searched again; they are not sign-up candidates below.
+    for (const f of found) if (!f.signup_page) { const firm = firms.find((x) => x.id === f.id); if (firm) firm.signup_status = 'no_form'; }
+  }
+
   firms = firms.filter((f) => f.signup_page && !f.subscribed_at && (flag('retry') || !f.signup_status) && (!opt('kind') || f.source_kind === opt('kind')));
   // Sponsors first, then advisors, lenders and trade press; best tiers first.
   const rank = { sponsor: 0, advisor: 1, lender: 2, trade: 3 };

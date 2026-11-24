@@ -383,6 +383,37 @@ function referralBlock(o: IssueEmailOptions): string {
   </td></tr>`;
 }
 
+// One-click reader question. Each option is a link carrying the reader's own token, so a vote
+// is one tap and one vote per reader. Shown only when the issue carries a poll.
+function pollBlock(c: NewsletterContentV2, o: IssueEmailOptions): string {
+  const token = (o.preferencesUrl.match(/[?&]token=([^&]+)/) ?? [])[1] ?? "";
+  let out = "";
+  if (c.poll_result && c.poll_result.total > 0) {
+    const r = c.poll_result;
+    const rows = r.options.map((opt, i) => {
+      const pct = Math.round((r.counts[i] / r.total) * 100);
+      return `<tr><td style="padding:5px 0;font-family:${SANS};font-size:14px;color:${INK};">${escapeHtml(opt)}</td><td align="right" style="padding:5px 0 5px 12px;font-family:${MONO};font-size:13px;font-weight:700;color:${INK};white-space:nowrap;">${pct}%</td></tr>
+      <tr><td colspan="2" style="padding:0 0 6px 0;"><table width="100%" cellpadding="0" cellspacing="0" role="presentation"><tr><td width="${Math.max(pct, 1)}%" style="background-color:${INK};height:6px;font-size:0;line-height:0;">&nbsp;</td><td style="background-color:${CHIP};height:6px;font-size:0;line-height:0;">&nbsp;</td></tr></table></td></tr>`;
+    }).join("");
+    out += `<tr><td style="${RULE_MARK}padding:24px;">
+      <div style="font-family:${MONO};font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:${MUTED};">Last week you said · ${r.total} answers</div>
+      <div style="font-family:${SANS};font-size:16px;font-weight:700;line-height:1.4;color:${INK};margin:6px 0 10px 0;">${escapeHtml(r.question)}</div>
+      <table width="100%" cellpadding="0" cellspacing="0" role="presentation">${rows}</table>
+    </td></tr>`;
+  }
+  if (c.poll && token) {
+    const p = c.poll;
+    const links = p.options.map((opt, i) => `<tr><td style="padding:4px 0;"><a href="${escapeHtml(`${o.siteUrl}/vote?p=${p.id}&o=${i}&t=${token}`)}" style="display:block;border:1px solid ${INK};border-radius:6px;padding:10px 14px;font-family:${SANS};font-size:14px;color:${INK};text-decoration:none;">${escapeHtml(opt)}</a></td></tr>`).join("");
+    out += `<tr><td style="${RULE_MARK}padding:24px;">
+      <div style="font-family:${MONO};font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:${MUTED};">One question · one click</div>
+      <div style="font-family:${SANS};font-size:16px;font-weight:700;line-height:1.4;color:${INK};margin:6px 0 10px 0;">${escapeHtml(p.question)}</div>
+      <table width="100%" cellpadding="0" cellspacing="0" role="presentation">${links}</table>
+      <div style="font-family:${SANS};font-size:12px;color:${MUTED};margin-top:8px;">Answers are counted, never attributed. Results in next Tuesday's issue.</div>
+    </td></tr>`;
+  }
+  return out;
+}
+
 // ---- whole issue -------------------------------------------------------------
 
 export function renderIssueEmail(c: NewsletterContentV2, o: IssueEmailOptions): string {
@@ -410,6 +441,7 @@ export function renderIssueEmail(c: NewsletterContentV2, o: IssueEmailOptions): 
     overheard(c.overheard),
     theRead(c),
     editorItems("Jobs", "open seats in the LMM", c.jobs, "secondary"),
+    pollBlock(c, o),
     closing,
     referralBlock(o),
   ].join("\n");

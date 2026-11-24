@@ -1,6 +1,6 @@
 // Keeping the tracker honest: one row per deal, a real date on it, and nothing from an archive
 // passed off as today's news. The same rules live in the database (co_key, sponsor_key,
-// same_company in 20261124070000_tracker_integrity.sql) so they hold for rows written by any
+// same_company in 20261124090000_tracker_integrity.sql) so they hold for rows written by any
 // version of the generator; these are the copies the generator uses before it writes.
 
 /** "StationServ Holdings, LLC" → "stationserv". */

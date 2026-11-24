@@ -1,5 +1,6 @@
 # Signs the watch inbox (watch@in.thegppulse.com) up to the mailing lists of watchlist firms,
-# one attempt per firm, 40 firms a run. Announcements then arrive by email and are read by the
+# one attempt per firm, 40 firms a run. Each run first searches 150 more firms for a sign-up
+# form beyond the home page, so the list of newsletters to join keeps growing. Announcements then arrive by email and are read by the
 # inbound-email function. Forms behind a CAPTCHA or built entirely by script are recorded and
 # left alone. Uses the same secrets as firm-watch.yml.
 name: Mailing-list sign-ups
@@ -11,6 +12,9 @@ on:
       limit:
         description: "How many firms to try"
         default: "40"
+      find:
+        description: "How many firms with no form on file to search for one"
+        default: "150"
       dry:
         description: "Preview only: show what would be submitted (true/false)"
         default: "false"
@@ -40,4 +44,4 @@ jobs:
           cache-dependency-path: firm-watch/package-lock.json
       - run: npm ci
       - name: Sign up
-        run: node src/subscribe.mjs --limit ${{ github.event.inputs.limit || '40' }} ${{ github.event.inputs.dry == 'true' && '--dry' || '' }} ${{ github.event.inputs.retry == 'true' && '--retry' || '' }}
+        run: node src/subscribe.mjs --find ${{ github.event.inputs.find || '150' }} --limit ${{ github.event.inputs.limit || '40' }} ${{ github.event.inputs.dry == 'true' && '--dry' || '' }} ${{ github.event.inputs.retry == 'true' && '--retry' || '' }}

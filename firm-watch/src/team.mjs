@@ -264,6 +264,45 @@ async function read(url, render) {
   return res;
 }
 
+// Larger firms split the team over several pages: by group ("Investment Team", "Operations"),
+// or by page number. Junior investment staff are often on the second one. These are the
+// same-site links on a team page that lead to more of the team, not to one person's biography.
+const SUBPAGE_TEXT = /^(all|next|\d{1,2}|view all|show all|load more|more|investment( team| professionals)?|investment staff|deal team|partners|principals|vice presidents|associates|senior (team|leadership)|leadership|management|executive team|operating (team|partners)|operations( team)?|portfolio operations|business development|finance( and operations)?|professionals|our team)$/i;
+export function teamSubpages(html, pageUrl) {
+  const $ = cheerio.load(html);
+  const base = new URL(pageUrl);
+  const here = base.pathname.replace(/\/$/, '');
+  const out = new Set();
+  $('a[href]').each((_, el) => {
+    let u; try { u = new URL($(el).attr('href'), pageUrl); } catch { return; }
+    if (u.origin !== base.origin) return;
+    const path = u.pathname.replace(/\/$/, '');
+    const text = $(el).text().replace(/\s+/g, ' ').trim();
+    const paged = /\/(page|p)\/\d{1,2}$/.test(path) || /[?&](page|paged|pg)=\d{1,2}\b/.test(u.search);
+    const grouped = SUBPAGE_TEXT.test(text) && (path.startsWith(`${here}/`) || (path === here && u.search && u.search !== base.search));
+    if ((paged && path.startsWith(here)) || grouped) {
+      const href = u.href.split('#')[0];
+      if (href.replace(/\/$/, '') !== pageUrl.split('#')[0].replace(/\/$/, '')) out.add(href);
+    }
+  });
+  return [...out].slice(0, 5);
+}
+
+// A firm's whole team: the team page plus any group or numbered pages it links to.
+export async function readTeam(url, render) {
+  const res = await read(url, render);
+  if (!res.ok) return res;
+  const members = extractTeam(res.body);
+  const seen = new Set(members.map((m) => personKey(m.name)));
+  for (const sub of teamSubpages(res.body, res.url)) {
+    if (!(await allowed(sub))) continue;
+    const more = await read(sub, render);
+    if (!more.ok) return { ...res, ok: false, error: `sub-page unreadable: ${sub}` }; // a partial team would read as departures
+    for (const m of extractTeam(more.body)) { const k = personKey(m.name); if (!seen.has(k)) { seen.add(k); members.push(m); } }
+  }
+  return { ...res, members };
+}
+
 // The page on a firm's site with the most titled people.
 export async function findTeamPage(firm, { render = false } = {}) {
   const home = await read(firm.website_url, render);
@@ -291,11 +330,13 @@ export async function findTeamPage(firm, { render = false } = {}) {
     consider(res.url, res.body);
     if (best && best.members.length >= 8 && best.url === res.url) break;
   }
+  // Store the whole team, sub-pages included, so tomorrow's read compares like with like.
+  if (best) { const whole = await readTeam(best.url, render); if (whole.ok && whole.members.length >= best.members.length) best = { url: best.url, members: whole.members }; }
   return best;
 }
 
 const SENIOR = 40; // Director / Principal and up: worth an editor's eye when they arrive or leave
-const PUBLISH = 30; // Vice President and up: promotions that go to the People section
+const PUBLISH = 25; // Senior Associate and up: promotions that go to the People section
 
 export function describe(move, firm) {
   if (move.move_type === 'promotion') return `${move.person}: ${move.old_title} → ${move.new_title} at ${firm.name}`;
@@ -325,10 +366,10 @@ async function main() {
       return;
     }
     if (!(await allowed(firm.team_url))) return;
-    const res = await read(firm.team_url, render);
+    const res = await readTeam(firm.team_url, render);
     if (!res.ok) { count.unreadable++; return; }
     count.compared++;
-    const d = diffTeam(firm.team_members, extractTeam(res.body));
+    const d = diffTeam(firm.team_members, res.members);
     if (d.reason === 'unchanged') return;
     if (d.reason.startsWith('page looked incomplete')) { count.unreadable++; return; }
     if (d.reason.startsWith('large change')) count.redesign++;

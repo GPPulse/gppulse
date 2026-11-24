@@ -4,7 +4,7 @@ import { aiConfigured, chat, HOUSE_STYLE, parseJSON } from "../_shared/ai.ts";
 import { getStaff, isInternalCall, unauthorized } from "../_shared/auth.ts";
 import { CONFIG } from "../_shared/config.ts";
 import { lintIssue } from "../_shared/lint.ts";
-import { isFridayIssue, issueDateLabel } from "../_shared/issue-day.ts";
+import { isFridayIssue, issueDateLabel, issueDay } from "../_shared/issue-day.ts";
 import { dealContext, DealContext, fileLines, FOUND_VIA_LABEL, FoundVia, intelText, isBelowRadar, isCaughtUp, marketIntel } from "../_shared/intel.ts";
 import { announcedOn, archiveIds, lenderAsSponsor, sameDeal } from "../_shared/tracker.ts";
 import {
@@ -711,6 +711,25 @@ serve(async (req: Request): Promise<Response> => {
       quality_flags: qualityFlags,
     };
 
+    // Reader question: Tuesday's issue asks one from the bank and reports last week's answers
+    // once at least POLL_MIN readers have voted. Best effort; the issue never waits on it.
+    let pollToMark: string | null = null, resultToMark: string | null = null;
+    try {
+      const day = issueDay(now);
+      if (day.getUTCDay() === 2) {
+        const POLL_MIN = Number(Deno.env.get("POLL_MIN_VOTES") ?? 10);
+        const { data: last } = await supabase.from("polls").select("id, question, options").not("active_from", "is", null).is("result_newsletter_id", null).order("active_from", { ascending: false }).limit(1).maybeSingle();
+        if (last) {
+          const { data: votes } = await supabase.from("poll_votes").select("option_index").eq("poll_id", last.id).limit(20000);
+          const counts = (last.options as string[]).map((_o, i) => ((votes ?? []) as { option_index: number }[]).filter((v) => v.option_index === i).length);
+          const total = counts.reduce((x, y) => x + y, 0);
+          if (total >= POLL_MIN) { content.poll_result = { question: last.question, options: last.options, counts, total }; resultToMark = last.id; }
+        }
+        const { data: next } = await supabase.from("polls").select("id, question, options").is("active_from", null).order("sort", { ascending: true }).limit(1).maybeSingle();
+        if (next) { content.poll = { id: next.id, question: next.question, options: next.options }; pollToMark = next.id; }
+      }
+    } catch (e) { console.warn("poll step skipped:", e); }
+
     // Issue number + record
     const { data: last } = await supabase.from("newsletters").select("issue_number").order("issue_number", { ascending: false }).limit(1).maybeSingle();
     const issueNumber = (last?.issue_number ?? 0) + 1;
@@ -722,6 +741,9 @@ serve(async (req: Request): Promise<Response> => {
       subject, preheader: editorial?.preheader ?? null, issue_number: issueNumber, content, status: "draft", edition, slug,
     }).select().single();
     if (nlErr) throw new Error(nlErr.message);
+
+    if (pollToMark) await supabase.from("polls").update({ active_from: issueDay(now).toISOString().slice(0, 10), newsletter_id: newsletter.id }).eq("id", pollToMark);
+    if (resultToMark) await supabase.from("polls").update({ result_newsletter_id: newsletter.id }).eq("id", resultToMark);
 
     // Persist structured rows, link editor items, mark articles used
     const usedIds = [...headlines, ...dealSource, ...fundArticles, ...people, ...peopleMore, ...pulse].map((a) => a.id);

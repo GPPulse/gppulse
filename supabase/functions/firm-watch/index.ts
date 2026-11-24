@@ -15,6 +15,7 @@ import { getStaff, isInternalCall, unauthorized } from "../_shared/auth.ts";
 //   items       -> { items: [{ firm_id, url, title, content, published_at, source_name, category_hint, seen_only }] }
 //                  seen_only rows are archive entries recorded so they are never reported as new;
 //                  they skip the classifier.
+//   signup_found-> { firms: [{ id, signup_page, signup_provider }] }   forms found beyond the home page
 //   subscribed  -> { firms: [{ id, status, note }] }   one mailing-list sign-up attempt per firm
 //   portfolio   -> { firms: [{ id, portfolio_url, names }], signals: [{ headline, body, url, company?, sponsor? }] }
 //   team        -> { firms: [{ id, team_url, members }], moves: [{ firm_id, firm_name, person, person_key, move_type,
@@ -150,6 +151,23 @@ serve(async (req: Request): Promise<Response> => {
           queued += (data ?? []).filter((r: { processed: boolean }) => !r.processed).length;
         }
         return json({ created, queued });
+      }
+
+      case "signup_found": {
+        // Result of looking past the home page for a mailing-list form. A firm with none is
+        // marked no_form so it is searched once.
+        const firms = (body.firms ?? []) as Array<{ id: string; signup_page: string | null; signup_provider: string | null }>;
+        let found = 0;
+        for (const f of firms) {
+          if (!f.id) continue;
+          const patch = f.signup_page
+            ? { signup_page: f.signup_page.slice(0, 500), signup_provider: f.signup_provider ?? null }
+            : { signup_status: "no_form", signup_attempted_at: new Date().toISOString() };
+          const { error } = await supabase.from("pe_firm_sources").update(patch).eq("id", f.id).is("signup_page", null);
+          if (error) return json({ error: error.message }, 500);
+          if (f.signup_page) found++;
+        }
+        return json({ checked: firms.length, found });
       }
 
       case "subscribed": {

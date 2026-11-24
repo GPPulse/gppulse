@@ -30,7 +30,7 @@ on:
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     env:
       FN: https://${{ secrets.SUPABASE_PROJECT_REF }}.supabase.co/functions/v1/daily-newsletter-pipeline
       SECRET: ${{ secrets.PIPELINE_SECRET }}
@@ -93,7 +93,7 @@ jobs:
         if: github.event.inputs.step == '' && contains(fromJSON('["full","scrape"]'), steps.mode.outputs.mode)
         env: { RUN_ID: "${{ steps.mode.outputs.run_id }}", RUN_MODE: "${{ steps.mode.outputs.mode }}" }
         run: |
-          for i in $(seq 1 40); do
+          for i in $(seq 1 60); do
             ./step.sh process-content '"limit":8' || { echo "classifier call failed; stopping"; break; }
             remaining=$(jq -r '.remaining // 0' out.json); processed=$(jq -r '.processed // 0' out.json)
             echo "batch $i: processed=$processed remaining=$remaining"

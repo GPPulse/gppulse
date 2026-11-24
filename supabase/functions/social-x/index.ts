@@ -9,7 +9,8 @@ import { publishPost, rejectPost, XKeys } from "../_shared/x.ts";
 // The newsletter's X account, run from the issue itself.
 //
 //   { action: "generate" }  Write the day's posts from the latest sent issue and queue them,
-//                           spread across the working day. Once per issue.
+//                           spread across the working day. Once per issue. Also emails the
+//                           editor one LinkedIn post to paste himself (LINKEDIN_DRAFT=false to stop).
 //   { action: "post" }      Publish the oldest queued post that is due. One per call, so the
 //                           schedule in .github/workflows/social.yml sets the pace.
 //   { action: "status" }    Counts, for the workflow log.
@@ -67,7 +68,7 @@ serve(async (req: Request): Promise<Response> => {
 You write the X (Twitter) account of The GP Pulse, a weekday morning letter for lower-middle-market private equity investors ($2-25M EBITDA deals, sub-$1B funds). Followers are deal professionals. The account earns follows by posting facts they did not have: deals with no press release, counts from our own tracker, a sponsor on a run.
 
 Write 4 posts from TODAY'S ISSUE below. JSON only:
-{"posts":[{"kind":"lede|radar|number|pattern","text":"..."}]}
+{"posts":[{"kind":"lede|radar|number|pattern","text":"..."}],"linkedin":"..."}
 
 RULES
 - Each post stands alone and makes one point. 120 to 240 characters. Plain sentences. Numbers first where there is one.
@@ -76,9 +77,11 @@ RULES
 - No links, no @mentions, no emoji, no threads, no "1/". At most one hashtag in the whole set, and only if it reads naturally; none is better.
 - Do not mention lenders' filings, BDCs, stock indexes or rates. Do not give advice or predictions.
 - No teasers ("you won't believe", "here's why"). No rhetorical questions. Do not mention the newsletter or ask for follows; another post handles that.
-- Four different subjects. Lead with the most surprising fact.`;
-      const text = await chat("", system, `TODAY'S ISSUE (#${issue.issue_number})\n\n${material}`, { temperature: 0.6, maxTokens: 1200, tier: "editorial" });
-      const out = parseJSON<{ posts?: { kind?: string; text?: string }[] }>(text);
+- Four different subjects. Lead with the most surprising fact.
+
+ALSO write "linkedin": one LinkedIn post the editor will paste under his own name. 110 to 170 words, first person plural for the letter ("we found", "our tracker"). Open with the single most interesting fact from the issue in one plain sentence, no hook line. Then two or three short paragraphs: what happened, what our tracker shows around it, and one "Our read:" sentence. Same rules as above: only facts in the issue, no lenders' filings or BDCs, no emoji, no hashtags, no questions to the audience, no "thoughts?". Do not include a link or mention subscribing; that line is added for him.`;
+      const text = await chat("", system, `TODAY'S ISSUE (#${issue.issue_number})\n\n${material}`, { temperature: 0.6, maxTokens: 1800, tier: "editorial" });
+      const out = parseJSON<{ posts?: { kind?: string; text?: string }[]; linkedin?: string }>(text);
       const seen = new Set<string>();
       const rejected: string[] = [];
       const posts = (out?.posts ?? []).map((p) => ({ kind: ["lede", "radar", "number", "pattern"].includes(p.kind ?? "") ? p.kind! : "pattern", text: (p.text ?? "").replace(/\s+/g, " ").trim() }))
@@ -101,7 +104,29 @@ RULES
       const rows = posts.map((p, i) => ({ newsletter_id: issue.id, kind: p.kind, body: p.text, scheduled_for: new Date(start + SLOT_MINUTES[Math.min(i, SLOT_MINUTES.length - 1)] * 60000).toISOString() }));
       const { error } = await supabase.from("social_posts").insert(rows);
       if (error) throw error;
-      return json({ message: `queued ${rows.length} posts for issue #${issue.issue_number}`, rejected, posts: rows.map((r) => ({ kind: r.kind, at: r.scheduled_for, body: r.body })) });
+      // LinkedIn is where this audience reads, and it does not allow automated posting. So the
+      // editor gets one post a day by email, written from the issue, to paste himself.
+      let linkedin: string | null = null;
+      const draft = (out?.linkedin ?? "").replace(/\r/g, "").replace(/\n{3,}/g, "\n\n").trim();
+      const words = draft.split(/\s+/).filter(Boolean).length;
+      const draftOk = words >= 70 && words <= 230 && !/\b(BDC|business development compan)/i.test(draft) && !/\p{Extended_Pictographic}/u.test(draft) && !/#\w+/.test(draft) && !/https?:\/\//.test(draft);
+      const resendKey = Deno.env.get("RESEND_API_KEY");
+      if (draftOk && resendKey && (Deno.env.get("LINKEDIN_DRAFT") ?? "true").toLowerCase() !== "false") {
+        const issueUrl = `${CONFIG.siteUrl}/archive/${issue.slug ?? issue.id}`;
+        linkedin = `${draft}\n\nFrom today's issue of The GP Pulse, the lower middle market every weekday morning. Free: ${issueUrl}`;
+        const esc = (t: string) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        await fetch("https://api.resend.com/emails", {
+          method: "POST", headers: { Authorization: `Bearer ${resendKey.trim()}`, "Content-Type": "application/json" },
+          body: JSON.stringify({
+            from: CONFIG.from, to: [CONFIG.replyTo], subject: `LinkedIn post for issue #${issue.issue_number}, ready to paste`,
+            text: `${linkedin}\n\n---\nWritten from this morning's issue. Edit freely; nothing is posted for you.`,
+            html: `<div style="font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.6;color:#111827;max-width:560px;"><p style="font-size:12px;color:#6b7280;">Copy everything between the lines into LinkedIn. Written from this morning's issue; edit freely. Nothing is posted for you.</p><hr style="border:none;border-top:1px solid #e5e7eb;">${linkedin.split(/\n\n/).map((para) => `<p>${esc(para).replace(/\n/g, "<br>")}</p>`).join("")}<hr style="border:none;border-top:1px solid #e5e7eb;"></div>`,
+            tags: [{ name: "kind", value: "linkedin_draft" }],
+          }),
+        }).catch((e) => console.error("linkedin draft email failed", e));
+      }
+
+      return json({ message: `queued ${rows.length} posts for issue #${issue.issue_number}`, rejected, linkedin_draft_sent: Boolean(linkedin), posts: rows.map((r) => ({ kind: r.kind, at: r.scheduled_for, body: r.body })) });
     }
 
     if (action === "post") {
