@@ -15,7 +15,24 @@ interface ProcessedArticle {
   fund_size_relevant: boolean;
   relevance_score: number;
   estimated_publish_date: string | null;
+  moves: PersonMove[];
 }
+
+// One person's move read out of a people item. A release that names six promotions gives six.
+interface PersonMove { person: string; firm: string; move_type: string; new_title: string | null; old_title: string | null }
+
+const MOVE_TYPES = new Set(["promotion", "hire", "departure"]);
+function cleanMoves(raw: unknown): PersonMove[] {
+  if (!Array.isArray(raw)) return [];
+  const str = (v: unknown, max: number) => (typeof v === "string" && v.trim() ? v.trim().slice(0, max) : null);
+  return raw.slice(0, 25).map((m) => {
+    const r = (m ?? {}) as Record<string, unknown>;
+    return { person: str(r.person, 80) ?? "", firm: str(r.firm, 120) ?? "", move_type: String(r.move_type ?? "").toLowerCase(), new_title: str(r.new_title, 90), old_title: str(r.old_title, 90) };
+  }).filter((m) => m.person.split(/\s+/).length >= 2 && m.firm && MOVE_TYPES.has(m.move_type));
+}
+// Same key the team-page watch uses (firm-watch/src/team.mjs), so the two routes meet on one person.
+const personKey = (name: string) => name.toLowerCase().replace(/"[^"]*"|\([^)]*\)/g, " ").replace(/,?\s+(jr|sr|ii|iii|iv)\b\.?/i, " ")
+  .normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z\s-]/g, "").split(/\s+/).filter((w) => w.length > 1).join(" ");
 
 // Whole-phrase match of watchlist firm names in a headline or release. Names that are a single
 // word or very short only count next to a private-equity cue, to keep false matches out.
@@ -43,6 +60,7 @@ async function processWithAI(content: string, title: string, apiKey: string, wat
 3. Whether this is relevant to lower middle market PE (funds under $1B) - true/false. Set FALSE for mega-cap PE firms.
 4. A relevance score from 0-100 based on how valuable this is for North American LMM PE professionals
 5. The estimated publication date of this article in YYYY-MM-DD format. Look for dates in the URL, content, or any date indicators. If you cannot determine the date, return null.
+6. ONLY when the category is people_moves: a "moves" list with one entry for EVERY person the article says was promoted, hired or has left, at a private equity firm or investment bank. Use the titles exactly as written. old_title is the title held before the move at the same firm (null if not stated). For every other category return an empty list. Never guess a person or a title that is not in the text.
 
 CRITICAL FILTERING RULES — score 0 if ANY apply:
 - Non-North American firm, fund, or deal (European, Asian, Latin American, Middle Eastern, African)
@@ -63,8 +81,9 @@ Respond in JSON format only:
   "category": "headline" | "fund_tracker" | "people_moves" | "deal_flow" | "market_insight",
   "fund_size_relevant": true/false,
   "relevance_score": 0-100,
-  "estimated_publish_date": "YYYY-MM-DD" or null
-}`, `Title: ${title}\n\nContent: ${content}${watchlistFirm ? `\n\nEditor's note: ${watchlistFirm} is on our watchlist of US middle-market private equity firms (AUM under $2B). News about its deals, exits, fund closes and promotions is core coverage: set fund_size_relevant true, and score a genuine transaction, fund close or senior promotion at this firm 75 or higher.` : ""}`, { temperature: 0.3, maxTokens: 500 });
+  "estimated_publish_date": "YYYY-MM-DD" or null,
+  "moves": [{ "person": "Full Name", "firm": "Firm name", "move_type": "promotion" | "hire" | "departure", "new_title": "..." or null, "old_title": "..." or null }]
+}`, `Title: ${title}\n\nContent: ${content}${watchlistFirm ? `\n\nEditor's note: ${watchlistFirm} is on our watchlist of US middle-market private equity firms (AUM under $2B). News about its deals, exits, fund closes and promotions is core coverage: set fund_size_relevant true, and score a genuine transaction, fund close or senior promotion at this firm 75 or higher.` : ""}`, { temperature: 0.3, maxTokens: 1200 });
       return { ok: true, status: 200, json: async () => ({ choices: [{ message: { content: __text } }] }), text: async () => "" };
     })();
 
@@ -105,6 +124,7 @@ Respond in JSON format only:
         fund_size_relevant: Boolean(parsed.fund_size_relevant),
         relevance_score: Math.min(100, Math.max(0, Math.round(score))),
         estimated_publish_date: parsed.estimated_publish_date || null,
+        moves: category === "people_moves" ? cleanMoves(parsed.moves) : [],
       };
     }
     
@@ -269,6 +289,19 @@ serve(async (req: Request): Promise<Response> => {
             console.log(`Article created: ${article.id}`);
             articlesCreated++;
             
+            // Keep each named person as a row of their own. The team-page watch checks these
+            // before reporting a promotion, so an announced move is not reported twice.
+            if (result.moves.length) {
+              const rows = result.moves.map((m) => ({
+                firm_id: item.pe_firm_sources?.watchlist && item.pe_firm_sources.name.toLowerCase() === m.firm.toLowerCase() ? item.source_id : null,
+                firm_name: m.firm, person_name: m.person, person_key: personKey(m.person), move_type: m.move_type,
+                old_title: m.old_title, new_title: m.new_title, source: "announcement", source_url: item.url, status: "published", article_id: article.id,
+                move_key: `${m.firm.toLowerCase()}|${personKey(m.person)}|${m.move_type}|${(m.new_title ?? "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim()}`,
+              })).filter((r) => r.person_key);
+              const { error: movesError } = await supabase.from("people_moves").upsert(rows, { onConflict: "move_key", ignoreDuplicates: true });
+              if (movesError) console.error(`people_moves insert failed: ${movesError.message}`);
+            }
+
             // Link scraped content to article
             await supabase
               .from("scraped_content")
