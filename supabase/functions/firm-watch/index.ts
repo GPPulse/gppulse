@@ -15,6 +15,7 @@ import { getStaff, isInternalCall, unauthorized } from "../_shared/auth.ts";
 //   items       -> { items: [{ firm_id, url, title, content, published_at, source_name, category_hint, seen_only }] }
 //                  seen_only rows are archive entries recorded so they are never reported as new;
 //                  they skip the classifier.
+//   subscribed  -> { firms: [{ id, status, note }] }   one mailing-list sign-up attempt per firm
 //   portfolio   -> { firms: [{ id, portfolio_url, names }], signals: [{ headline, body, url, company?, sponsor? }] }
 //   team        -> { firms: [{ id, team_url, members }], moves: [{ firm_id, firm_name, person, person_key, move_type,
 //                  old_title, new_title, old_rank, new_rank, url, publish, review, line }] } (firm-watch/src/team.mjs)
@@ -40,14 +41,15 @@ serve(async (req: Request): Promise<Response> => {
     switch (String(body.action ?? "")) {
       case "firms": {
         const base = "id, name, website_url, domain, firm_type, watchlist, source_kind, watch_tier, news_url, feed_url, deals_url, portfolio_url, portfolio_names, portfolio_checked_at, discovered_at, last_scraped_at, linkedin_url, signup_page, signup_provider, subscribed_at, discovery_note";
-        // The team columns arrive with migration 20261121150000_team_watch. Until it is applied
-        // the crawl carries on without them rather than failing.
-        let columns = `${base}, team_url, team_members, team_checked_at`;
+        // The team columns arrive with migration 20261121150000_team_watch and signup_status with
+        // 20261124060000_signup_status. If either is missing the crawl carries on without both
+        // rather than failing; team watch and the list subscriber then wait.
+        let columns = `${base}, team_url, team_members, team_checked_at, signup_status`;
         const rows: unknown[] = [];
         for (let from = 0; ; from += 1000) {
           let { data, error } = await supabase.from("pe_firm_sources").select(columns)
             .or("watchlist.eq.true,source_kind.in.(advisor,lender,trade)").eq("is_active", true).order("watch_tier").order("name").range(from, from + 999);
-          if (error && columns !== base && /team_/.test(error.message)) {
+          if (error && columns !== base && /team_|signup_status/.test(error.message)) {
             columns = base;
             ({ data, error } = await supabase.from("pe_firm_sources").select(columns)
               .or("watchlist.eq.true,source_kind.in.(advisor,lender,trade)").eq("is_active", true).order("watch_tier").order("name").range(from, from + 999));
@@ -56,7 +58,7 @@ serve(async (req: Request): Promise<Response> => {
           rows.push(...(data ?? []));
           if ((data ?? []).length < 1000) break;
         }
-        return json({ firms: rows, team_ready: columns !== base });
+        return json({ firms: rows, team_ready: columns !== base, signup_tracking: columns !== base });
       }
 
       case "seed": {
@@ -148,6 +150,22 @@ serve(async (req: Request): Promise<Response> => {
           queued += (data ?? []).filter((r: { processed: boolean }) => !r.processed).length;
         }
         return json({ created, queued });
+      }
+
+      case "subscribed": {
+        // Outcome of one mailing-list sign-up attempt per firm (firm-watch/src/subscribe.mjs).
+        const firms = (body.firms ?? []) as Array<{ id: string; status: string; note?: string }>;
+        const now = new Date().toISOString();
+        let updated = 0;
+        for (const f of firms) {
+          if (!f.id || !f.status) continue;
+          const patch: Record<string, unknown> = { signup_status: f.status.slice(0, 30), signup_note: (f.note ?? "").slice(0, 300), signup_attempted_at: now };
+          if (f.status === "subscribed") patch.subscribed_at = now;
+          const { error } = await supabase.from("pe_firm_sources").update(patch).eq("id", f.id);
+          if (error) return json({ error: `could not record sign-ups (is migration 20261124060000 applied?): ${error.message}` }, 500);
+          updated++;
+        }
+        return json({ updated });
       }
 
       case "portfolio": {
