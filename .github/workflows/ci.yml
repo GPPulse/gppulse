@@ -12,6 +12,7 @@ jobs:
         with: { node-version: 22, cache: npm }
       - run: npm ci
       - run: npm run typecheck
+      - run: npm test
       - run: npm run build
         env:
           VITE_SUPABASE_URL: https://example.supabase.co
