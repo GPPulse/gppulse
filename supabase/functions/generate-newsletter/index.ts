@@ -223,6 +223,8 @@ HARD RULES
 - Deal takes and radar takes must use a fact from THE FILE, the advisor/lender, the seller type, the geography, or the platform history. A take that would fit any deal ("deploying on pace", "classic add-on", "route density") is banned. If you have nothing specific, skip the deal — fewer takes is better.
 - UNCONFIRMED signals (new names on a portfolio page) are described as exactly that: "now listed on X's portfolio page; we found no announcement". Never state a deal closed on the strength of a signal.
 - Use only figures that appear in the material. Never estimate.
+- LENDER FILINGS. Items found via \"SEC filing\" are loans listed in a lender's quarterly schedule. Our readers are sponsors; they do not follow BDCs. Never build the subject, the Lede, a by_the_numbers entry or the closing line on a lender, a BDC or a list of its borrowers, and never name a BDC or lender in the subject. A filing item may get one radar take about the borrower and its pricing. If filings are the only below-the-radar material, lead with a pattern from the Scoreboard or the most instructive announced deal instead.
+- SIZE. This is a lower-middle-market letter. Do not lead with, feature, or build a number on a deal above $1B in enterprise value or one where the only sponsor is a large-cap firm.
 ${input.edition === "weekly" ? `
 FRIDAY RULES. The keeper issue. The Lede is 3–4 paragraphs on the PATTERN across the week from OUR DATA (the Scoreboard numbers below): who was busiest, which platforms stacked add-ons, which banks closed the most, which sectors ran above their own pace, how many deals were below the radar. Open with the single number that best summarizes the week. Subject reads as a weekly verdict built on our data.` : ""}
 
@@ -284,6 +286,10 @@ ${input.weekStats ? `\nTHIS WEEK (computed from the tracker):\n${input.weekStats
     return null;
   }
 }
+
+// Sponsors whose flagship funds are well above our readers' range. A deal stays if any named
+// sponsor is not on this list (a smaller co-investor or seller makes it relevant).
+const LARGE_SPONSOR = /^(the )?(blackstone|kkr|kohlberg kravis roberts|carlyle|apollo|tpg|bain capital|advent international|warburg pincus|cvc|eqt|thoma bravo|vista equity|silver lake|hellman & friedman|hellman and friedman|clayton,? dubilier & rice|cd&r|platinum equity|clearlake|new mountain|american securities|madison dearborn|mdp|gtcr|veritas capital|genstar|audax|h\.?i\.?g\.?|leonard green|providence equity|permira|cinven|apax|brookfield|ares|stone point|onex|berkshire partners|ta associates|general atlantic|insight partners|francisco partners|golden gate capital|oak hill|kelso|welsh,? carson|wcas|roark|l catterton|partners group|mubadala|temasek|gic|adia|cppib|omers|ontario teachers)\b/i;
 
 // ---------------------------------------------------------------------------
 // Handler
@@ -442,6 +448,10 @@ serve(async (req: Request): Promise<Response> => {
       }
     }
 
+    // Lower middle market only: drop billion-dollar deals and deals whose only sponsor is a large-cap firm.
+    const tooBig = (d: DealRow) => (d.enterprise_value_millions ?? 0) >= 1000 || (d.sponsor.split(/[;,/&]| and /i).map((x) => x.trim()).filter(Boolean).every((x) => LARGE_SPONSOR.test(x)));
+    for (let i = deals.length - 1; i >= 0; i--) if (tooBig(deals[i])) deals.splice(i, 1);
+
     const edition0 = (): "daily" | "weekly" => new Date().getDay() === 5 ? "weekly" : "daily";
     // The file on every deal, and whether anyone else reported it.
     const contexts = await Promise.all(deals.map((d) => dealContext(supabase, d)));
@@ -467,6 +477,8 @@ serve(async (req: Request): Promise<Response> => {
       if (!m) continue;
       const [, company, sponsor] = m;
       if (/^[0-9a-f]{12,}$/i.test(company.replace(/[\s_-]/g, "")) || company.length < 3) continue;
+      // A news headline scraped off the page is not a company name.
+      if (company.split(/\s+/).length > 6 || /\b(leads?|acquires?|announces?|completes?|invests?|recapitali[sz]ation|acquisition|partners with)\b/i.test(company)) continue;
       signalIds.push(it.id);
       radar.push({
         headline: `${company} is now on ${sponsor}'s portfolio page`,
@@ -484,7 +496,7 @@ serve(async (req: Request): Promise<Response> => {
     const bdcRows = (bdcNew ?? []) as BdcRow[];
     const bdcSpreads = bdcRows.filter((r) => r.first_lien && r.spread_pct).map((r) => Number(r.spread_pct)).sort((x, y) => x - y);
     const bdcStat = bdcRows.length
-      ? `BDC filings (last 10 days): ${new Set(bdcRows.map((r) => r.issuer_key)).size} new borrowers across ${new Set(bdcRows.map((r) => r.bdc_ticker)).size} BDCs${bdcSpreads.length ? `; median spread on ${bdcSpreads.length} new first-lien loans ${bdcSpreads[Math.floor(bdcSpreads.length / 2)].toFixed(2)}% over the base rate` : ""}.`
+      ? `Lender filings, last 10 days (context only; see the LENDER FILINGS rule): ${bdcSpreads.length ? `median spread on ${bdcSpreads.length} new first-lien loans ${bdcSpreads[Math.floor(bdcSpreads.length / 2)].toFixed(2)}% over the base rate` : `${new Set(bdcRows.map((r) => r.issuer_key)).size} new borrowers, no spreads stated`}.`
       : "";
     const { data: usedBdc } = bdcRows.length
       ? await supabase.from("bdc_holdings").select("issuer_key").not("used_in_newsletter_id", "is", null).in("issuer_key", bdcRows.map((r) => r.issuer_key))
@@ -493,20 +505,25 @@ serve(async (req: Request): Promise<Response> => {
     const byBorrower = new Map<string, BdcRow[]>();
     for (const r of bdcRows) if (!bdcDone.has(r.issuer_key)) byBorrower.set(r.issuer_key, [...(byBorrower.get(r.issuer_key) ?? []), r]);
     const bdcIds: string[] = [];
-    const usd = (n: number | null) => (n ? fmtMillions(n / 1e6) : null);
-    for (const rows of [...byBorrower.values()].slice(0, edition0() === "weekly" ? 10 : 5)) {
+    // Lender filings are supporting material, never the story (the readers are sponsors, not
+    // credit investors). At most two a day, borrower first, and only loans with a stated spread.
+    const usd = (n: number | null) => (n && n >= 1e6 ? fmtMillions(n / 1e6) : null);
+    const filingRadar: RadarItem[] = [];
+    const priced = [...byBorrower.values()].filter((rows) => rows[0].first_lien && rows[0].spread_pct);
+    for (const rows of priced.slice(0, edition0() === "weekly" ? 4 : 2)) {
       const top = rows[0];
       rows.forEach((r) => bdcIds.push(r.id));
-      const lenders = [...new Set(rows.map((r) => r.bdc_name ?? r.bdc_ticker))];
-      const terms = [top.first_lien ? "first-lien" : null, usd(top.fair_value) ? `${usd(top.fair_value)} at fair value` : null, top.spread_pct ? `priced at ${Number(top.spread_pct).toFixed(2)}% over the base rate` : null, top.maturity ? `due ${top.maturity.slice(0, 4)}` : null].filter(Boolean).join(", ");
-      radar.push({
-        headline: `${top.issuer}: new borrower at ${lenders.join(" and ")}`,
-        body: `${lenders.length > 1 ? `${lenders.length} BDCs list` : `${lenders[0]} lists`} ${top.issuer} for the first time in the ${top.period_end ?? "latest"} schedule of investments${terms ? `: ${terms}` : ""}. It was not in the prior quarter's filing. The filing does not name a sponsor.`,
+      const lenders = [...new Set(rows.map((r) => (r.bdc_name ?? r.bdc_ticker).replace(/,? (Inc|Corp|Corporation|LLC)\.?$/i, "").replace(/\b([A-Z])([A-Z]{3,})\b/g, (_m, h: string, t: string) => h + t.toLowerCase())))];
+      const terms = [usd(top.fair_value) ? `${usd(top.fair_value)} at fair value` : null, `${Number(top.spread_pct).toFixed(2)}% over the base rate`, top.maturity ? `due ${top.maturity.slice(0, 4)}` : null].filter(Boolean).join(", ");
+      filingRadar.push({
+        headline: `${top.issuer} took a new first-lien loan`,
+        body: `${top.issuer} appears for the first time in a lender's quarterly schedule of investments (${lenders.join(", ")}, period ending ${top.period_end ?? "latest quarter"}): ${terms}. It was not in the prior quarter's filing, and the filing does not name a sponsor.`,
         found_via: FOUND_VIA_LABEL.sec_filing, source: `${lenders.join(", ")} 10-Q`, source_url: top.source_url, confirmed: true,
       });
     }
 
     radar.sort((x, y) => Number(y.confirmed) - Number(x.confirmed)); // confirmed finds before signals
+    radar.push(...filingRadar); // filings last: deals and signals lead the section
     // Below-the-radar deals lead the issue in their own section; the tracker keeps the announced ones.
     let announced = deals.filter((d) => !d.below_radar);
 
