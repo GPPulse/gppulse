@@ -17,6 +17,9 @@ import Deals from "./pages/Deals";
 import Funds from "./pages/Funds";
 import Tip from "./pages/Tip";
 import Comps from "./pages/Comps";
+import Pricing from "./pages/Pricing";
+import Sponsors from "./pages/Sponsors";
+import Vote from "./pages/Vote";
 import Privacy from "./pages/Privacy";
 import NotFound from "./pages/NotFound";
 
@@ -43,6 +46,9 @@ const App = () => (
           <Route path="/funds" element={<Funds />} />
           <Route path="/tip" element={<Tip />} />
           <Route path="/comps" element={<Comps />} />
+          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/sponsors" element={<Sponsors />} />
+          <Route path="/vote" element={<Vote />} />
           <Route path="/privacy" element={<Privacy />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

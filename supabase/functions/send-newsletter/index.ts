@@ -109,6 +109,13 @@ serve(async (req: Request): Promise<Response> => {
       return new Response(JSON.stringify({ message: `Issue #${nl.issue_number} is already ${nl.status}`, skipped: true }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
     const approved = nl.status === "approved" || nl.status === "scheduled";
+    // An issue that failed its own check never goes out unattended, even with AUTO_SEND on.
+    const flags = ((nl.content as { quality_flags?: string[] } | null)?.quality_flags ?? []).filter(Boolean);
+    if (!approved && !force && flags.length) {
+      return new Response(JSON.stringify({ message: `Issue #${nl.issue_number} is held for the editor: ${flags.join(" ")} Approve it in the Editor's Desk to send.`, skipped: true, held: true }), {
+        status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
     if (!approved && !force && !(internal && cfg.autoSend)) {
       return new Response(JSON.stringify({ message: `Issue #${nl.issue_number} is a draft. Approve it in the Editor's Desk first (or set AUTO_SEND=true for unattended sends).`, skipped: true }), {
         status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" },

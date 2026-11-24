@@ -128,6 +128,12 @@ export interface NewsletterContentV2 {
   the_read: TheRead | null;
   jobs: EditorItem[];
   closing_line: string | null;
+  /** This week's one-click reader question (Tuesdays). */
+  poll?: { id: string; question: string; options: string[] } | null;
+  /** Last week's answers, once enough readers voted. `counts` lines up with `options`. */
+  poll_result?: { question: string; options: string[]; counts: number[]; total: number } | null;
+  /** What the generator's own check found wrong. Non-empty means the issue is held for the editor. */
+  quality_flags?: string[];
 }
 
 export function emptyContent(edition: NewsletterContentV2["edition"] = "daily"): NewsletterContentV2 {

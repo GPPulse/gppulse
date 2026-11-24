@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       job:
-        description: "crawl | discover (firms not yet checked) | discover-all (re-check every firm)"
+        description: "crawl | discover (firms not yet checked) | discover-retry (also firms where nothing was found) | discover-all (re-check every firm)"
         default: "crawl"
   push:
     branches: [main]
@@ -39,6 +39,17 @@ jobs:
       - run: npm ci
       - run: npm test
 
+      # Headless Chromium, only for the few firm sites that are blank until JavaScript runs.
+      # If this fails the crawl still runs; those sites are just skipped as before.
+      - name: Cache headless browser
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('firm-watch/package-lock.json') }}
+      - name: Install headless browser
+        continue-on-error: true
+        run: npx playwright install --with-deps chromium
+
       # On a push the backend deploy runs in parallel; give it time to publish the function.
       - name: Wait for backend deploy
         if: github.event_name == 'push'
@@ -50,11 +61,11 @@ jobs:
       # discover.mjs only visits firms that have not been checked, so on most days this is a no-op.
       - name: Discover sources
         if: github.event.inputs.job != 'crawl' || github.event_name != 'workflow_dispatch'
-        run: node src/discover.mjs ${{ github.event.inputs.job == 'discover-all' && '--all' || '' }} ${{ github.event.schedule == '43 6 * * 0' && '--retry' || '' }}
+        run: node src/discover.mjs --render ${{ github.event.inputs.job == 'discover-all' && '--all' || '' }} ${{ (github.event.schedule == '43 6 * * 0' || github.event.inputs.job == 'discover-retry') && '--retry' || '' }}
 
       - name: Crawl
         if: github.event.schedule != '43 6 * * 0' && !startsWith(github.event.inputs.job, 'discover')
-        run: node src/crawl.mjs
+        run: node src/crawl.mjs --render
 
       # Compares each sponsor's portfolio page with yesterday's; new names go to the Editor's Desk.
       - name: Portfolio watch

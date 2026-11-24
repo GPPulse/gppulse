@@ -83,7 +83,7 @@ Times are UTC: `22:00 UTC` = 5pm CDT build, `11:00 UTC` = 6am EDT send. Shift bo
 - **Analytics**, **Issues**, **Subscribers** (role, firm vs. personal email, opens/clicks), **People**, **Pipeline**.
 
 ## Public pages
-`/` landing · `/deals` deal tracker · `/deal-stats` weekly index · `/people-moves` · `/archive` and `/archive/:slug` · `/about` · `/referrals` · `/preferences?token=` · `/unsubscribe?token=`
+`/` landing · `/deals` deal tracker · `/comps` disclosed multiples · `/pricing` first-lien spreads by quarter · `/deal-stats` weekly index · `/people-moves` · `/archive` and `/archive/:slug` · `/about` · `/referrals` · `/preferences?token=` · `/unsubscribe?token=`
 
 ## Voice
 `HOUSE_STYLE` in `supabase/functions/_shared/ai.ts` is the single source of truth for how the model writes: direct, numbers first, conviction-tagged, banned-word list, no invented figures. Edit it there and every section follows.
