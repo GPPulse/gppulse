@@ -164,8 +164,14 @@ serve(async (req: Request): Promise<Response> => {
     let articlesCreated = 0;
 
     // Watchlist firm names, for spotting them in wire releases and news-search items.
-    const { data: watchRows } = await supabase.from("pe_firm_sources").select("name").eq("watchlist", true).eq("is_active", true).limit(2000);
-    const matchWatchlist = buildWatchlistMatcher((watchRows ?? []).map((r: { name: string }) => r.name));
+    // Paged: the API returns at most 1,000 rows per request, and the watchlist is past 1,500.
+    const watchNames: string[] = [];
+    for (let from = 0; ; from += 1000) {
+      const { data: page } = await supabase.from("pe_firm_sources").select("name").eq("watchlist", true).eq("is_active", true).order("id").range(from, from + 999);
+      watchNames.push(...(page ?? []).map((r: { name: string }) => r.name));
+      if ((page ?? []).length < 1000) break;
+    }
+    const matchWatchlist = buildWatchlistMatcher(watchNames);
 
     for (const item of content) {
       try {

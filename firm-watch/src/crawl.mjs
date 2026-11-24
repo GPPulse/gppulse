@@ -3,10 +3,13 @@
 // the newsletter's classifier. Also runs a Google News search for the most active firms,
 // which catches coverage of firms whose own sites lag or can't be read.
 //
-//   node src/crawl.mjs [--tier 2] [--limit 50] [--no-gnews] [--gnews-tier 2] [--dry]
+//   node src/crawl.mjs [--tier 2] [--limit 50] [--no-gnews] [--gnews-tier 2] [--render] [--dry]
+//
+// Firms below the Google News tier that have no news page or feed of their own are searched too,
+// a dozen names to a query, so a firm with no readable site still gets its press coverage.
 import { appendFile } from 'node:fs/promises';
 import * as cheerio from 'cheerio';
-import { get, pool, sleep, allowed, extractItems, extractTombstones, parseFeed, looksLikeFeed, classify, RELEVANT, nameMatcher } from './lib.mjs';
+import { get, pool, sleep, allowed, extractItems, extractTombstones, parseFeed, looksLikeFeed, classify, RELEVANT, nameMatcher, readSource, sourceKind, render, closeRenderer } from './lib.mjs';
 import { api, chunk } from './api.mjs';
 
 const args = process.argv.slice(2);
@@ -44,12 +47,14 @@ async function readFirm(firm) {
   const found = [];
   let failed = 0;
   if (firm.feed_url) {
-    const res = await get(firm.feed_url, { accept: 'application/rss+xml,application/atom+xml,application/xml,text/xml,*/*' });
-    if (looksLikeFeed(res)) found.push(...parseFeed(res.body).slice(0, 40).map((i) => ({ ...i, via: 'firm feed' }))); else failed++;
+    const items = (await allowed(firm.feed_url)) ? await readSource(firm.feed_url) : null;
+    const via = { feed: 'firm feed', wp: 'firm site (WordPress API)', sitemap: 'firm sitemap' }[sourceKind(firm.feed_url)];
+    if (items) found.push(...items.slice(0, sourceKind(firm.feed_url) === 'sitemap' ? 60 : 40).map((i) => ({ ...i, via }))); else failed++;
   }
   if (firm.news_url && !found.length) {
     if (await allowed(firm.news_url)) {
-      const res = await get(firm.news_url);
+      const shell = /rendered/.test(firm.discovery_note || '') && flag('render');
+      const res = shell ? await render(firm.news_url) : await get(firm.news_url);
       if (res.ok) found.push(...extractItems(res.body, res.url).map((i) => ({ ...i, via: 'firm site' }))); else failed++;
     }
   }
@@ -65,7 +70,7 @@ async function googleNews(firms) {
   const out = [];
   await pool(firms, 2, async (firm) => {
     const q = `"${firm.name}" (acquires OR acquisition OR "invests in" OR recapitalization OR promotes OR "private equity") when:5d`;
-    const res = await get(`https://news.google.com/rss/search?q=${encodeURIComponent(q)}&hl=en-US&gl=US&ceid=US:en`, { accept: 'application/rss+xml,application/xml,text/xml,*/*' });
+    const res = await get(`https://news.google.com/rss/search?q=${encodeURIComponent(q)}&hl=en-US&gl=US&ceid=US:en`, { accept: 'application/rss+xml,application/xml,text/xml,*/*', gap: 0 });
     await sleep(700);
     if (!looksLikeFeed(res)) return;
     const match = nameMatcher([firm]);
@@ -76,6 +81,44 @@ async function googleNews(firms) {
       if (RELEVANT.has(kind)) out.push({ ...it, title, kind, firm, via: `Google News${it.source ? ` — ${it.source}` : ''}` });
     }
   });
+  return out;
+}
+
+// Firms with no site of their own to read: search a dozen names at a time. A result counts for a
+// firm only if the whole name appears in the headline or snippet (short or common-word names also
+// need a private-equity cue), so one query can safely cover several firms.
+export function nameQueries(firms, size = 12, maxLen = 480) {
+  const out = [];
+  let cur = [];
+  const q = (group) => `(${group.map((f) => `"${f.name.replace(/"/g, '')}"`).join(' OR ')}) when:3d`;
+  for (const f of firms) {
+    if (cur.length && (cur.length >= size || q([...cur, f]).length > maxLen)) { out.push({ q: q(cur), firms: cur }); cur = []; }
+    cur.push(f);
+  }
+  if (cur.length) out.push({ q: q(cur), firms: cur });
+  return out;
+}
+
+async function googleNewsBatched(firms) {
+  const out = [];
+  const statuses = {};
+  for (const { q, firms: group } of nameQueries(firms)) {
+    const res = await get(`https://news.google.com/rss/search?q=${encodeURIComponent(q)}&hl=en-US&gl=US&ceid=US:en`, { accept: 'application/rss+xml,application/xml,text/xml,*/*', gap: 0 });
+    statuses[res.status] = (statuses[res.status] || 0) + 1;
+    await sleep(900);
+    if (!looksLikeFeed(res)) continue;
+    const match = nameMatcher(group);
+    for (const it of parseFeed(res.body).slice(0, 40)) {
+      const title = it.title.replace(/\s+-\s+[^-]+$/, '');
+      if ((daysAgo(it.date) ?? 99) > 3) continue;
+      // No cue added here: with twelve names in one query, a one-word name must earn its match.
+      const [firm] = match(`${title} ${it.summary || ''}`);
+      if (!firm) continue;
+      const kind = classify(title, it.summary);
+      if (RELEVANT.has(kind)) out.push({ ...it, title, kind, firm, via: `Google News${it.source ? ` — ${it.source}` : ''}` });
+    }
+  }
+  console.log(`Google News name search for ${firms.length} firms with no site to read: HTTP ${JSON.stringify(statuses)}, ${out.length} hits`);
   return out;
 }
 
@@ -102,7 +145,7 @@ async function sweep(firm, days = 2) {
   const statuses = {};
   let raw = 0;
   for (const q of SWEEP_QUERIES) {
-    const res = await get(`https://news.google.com/rss/search?q=${encodeURIComponent(`${q} when:${days}d`)}&hl=en-US&gl=US&ceid=US:en`, { accept: 'application/rss+xml,application/xml,text/xml,*/*' });
+    const res = await get(`https://news.google.com/rss/search?q=${encodeURIComponent(`${q} when:${days}d`)}&hl=en-US&gl=US&ceid=US:en`, { accept: 'application/rss+xml,application/xml,text/xml,*/*', gap: 0 });
     await sleep(900);
     statuses[res.status] = (statuses[res.status] || 0) + 1;
     if (!looksLikeFeed(res)) continue;
@@ -158,8 +201,9 @@ async function main() {
 
   if (!flag('no-gnews')) {
     const active = firms.filter((f) => f.watchlist && (f.watch_tier ?? 4) <= Number(opt('gnews-tier', 2)));
+    const unread = firms.filter((f) => f.watchlist && (f.watch_tier ?? 4) > Number(opt('gnews-tier', 2)) && !f.news_url && !f.feed_url);
     console.log(`Searching Google News for the ${active.length} most active firms`);
-    const news = await googleNews(active);
+    const news = [...(await googleNews(active)), ...(await googleNewsBatched(unread))];
     const fresh = new Set();
     for (const part of chunk([...new Set(news.map((i) => i.url))], 200)) (await api('check', { urls: part })).unknown.forEach((u) => fresh.add(u));
     // Skip coverage of a headline the firm's own site already gave us this run.
@@ -173,6 +217,8 @@ async function main() {
     const res = await get(it.url);
     if (res.ok) it.content = articleText(res.body);
   });
+
+  await closeRenderer();
 
   const counts = queue.reduce((c, r) => ((c[r.kind] = (c[r.kind] || 0) + 1), c), {});
   console.log(`\n${queue.length} new items for the classifier:`, counts, `| ${seenOnly.length} recorded as already seen`);
