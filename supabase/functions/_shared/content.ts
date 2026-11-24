@@ -128,6 +128,8 @@ export interface NewsletterContentV2 {
   the_read: TheRead | null;
   jobs: EditorItem[];
   closing_line: string | null;
+  /** What the generator's own check found wrong. Non-empty means the issue is held for the editor. */
+  quality_flags?: string[];
 }
 
 export function emptyContent(edition: NewsletterContentV2["edition"] = "daily"): NewsletterContentV2 {
