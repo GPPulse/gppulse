@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { scanHome, extractItems, parseFeed, parseDate, parseRobots, classify, nameMatcher, itemKey, extractTombstones, extractPortfolio, diffPortfolio, findLinks } from '../src/lib.mjs';
+import { scanHome, extractItems, parseFeed, parseDate, parseRobots, classify, nameMatcher, itemKey, extractTombstones, extractPortfolio, diffPortfolio, findLinks, stillOnPage } from '../src/lib.mjs';
 import { triage, articleText } from '../src/crawl.mjs';
 
 const fx = (n) => readFileSync(new URL(`./fixtures/${n}`, import.meta.url), 'utf8');
@@ -162,4 +162,19 @@ test('tombstones: several one-line deals in one block are split', () => {
 test('portfolio names skip hashed image names and CMS ids', () => {
   const html = `<main><img alt="e28b8c848da2809091cc818d8f"><img alt="a7cec9c1c8e7c5d5d489c4c8ca"><img alt="img_20240312_0041"><h3>AFI Industries</h3><h3>3D Corporate Solutions</h3></main>`;
   assert.deepEqual(extractPortfolio(html, 'https://brs.example/portfolio/'), ['AFI Industries', '3D Corporate Solutions']);
+});
+
+test('exit watch: a removed name is reported, and only when it is really gone from the page', () => {
+  const old = ['Albireo Energy', 'The Exigent Group', 'Rampart Exterior Services', 'Horsepower Automotive Group', 'Sciens Water', 'Acme Co.'];
+  const d = diffPortfolio(old, old.filter((n) => n !== 'Sciens Water'));
+  assert.deepEqual(d.removed, ['Sciens Water']);
+  assert.deepEqual(d.added, []);
+  const page = '<main><h3>Albireo Energy</h3><img alt="Rampart Exterior Services logo"><p>Realized: Sciens Water, LLC (2019–2026)</p><script>var x = "Hidden Co";</script></main>';
+  assert.equal(stillOnPage('Sciens Water', page), true, 'moved to a realized list, still named');
+  assert.equal(stillOnPage('Rampart Exterior Services', page), true, 'named only in a logo label');
+  assert.equal(stillOnPage('The Exigent Group', page), false);
+  assert.equal(stillOnPage('Hidden Co', page), false, 'script text does not count');
+  assert.equal(stillOnPage('Albireo', '<p>Albireo Energy</p>'), true);
+  assert.equal(stillOnPage('Energy Co', '<p>Albireo Energy</p>'), true, 'a one-word remainder is not enough to call it gone');
+  assert.equal(stillOnPage('AB', '<p>nothing</p>'), true, 'too short to judge');
 });
