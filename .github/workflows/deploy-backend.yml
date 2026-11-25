@@ -34,7 +34,7 @@ jobs:
                    NEWSLETTER_FROM NEWSLETTER_REPLY_TO NEWSLETTER_POSTAL_ADDRESS NEWSLETTER_EDITOR_NAME NEWSLETTER_EDITOR_TITLE \
                    SITE_URL RESEND_WEBHOOK_SECRET RESEND_INBOUND_WEBHOOK_SECRET PIPELINE_SECRET AUTO_SEND \
                    X_API_KEY X_API_SECRET X_ACCESS_TOKEN X_ACCESS_TOKEN_SECRET X_DAILY_CAP X_SIGNUP_POST \
-                   READING_ADDRESS READING_SENDERS; do
+                   READING_ADDRESS READING_SENDERS READING_FORWARDERS; do
             v="${!k:-}"; [ -n "$v" ] && printf '%s=%s\n' "$k" "$v" >> .secrets.env
           done
           if [ -s .secrets.env ]; then supabase secrets set --project-ref "$PROJECT_REF" --env-file .secrets.env --yes; else echo "no secrets provided"; fi
@@ -59,6 +59,7 @@ jobs:
           AUTO_SEND: ${{ secrets.AUTO_SEND }}
           READING_ADDRESS: ${{ secrets.READING_ADDRESS }}
           READING_SENDERS: ${{ secrets.READING_SENDERS }}
+          READING_FORWARDERS: ${{ secrets.READING_FORWARDERS }}
           X_API_KEY: ${{ secrets.X_API_KEY }}
           X_API_SECRET: ${{ secrets.X_API_SECRET }}
           X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}

@@ -28,6 +28,13 @@ const isForwarder = (addr: string) => forwarders.some((f) => (f.startsWith("@") 
 const readingAddress = (env("READING_ADDRESS") || "reading@in.thegppulse.com").toLowerCase();
 const readingSenders = env("READING_SENDERS").toLowerCase().split(",").map((s) => s.trim()).filter(Boolean);
 const isReadingSender = (addr: string) => readingSenders.some((f) => (f.startsWith("@") ? addr.endsWith(f) : addr === f));
+// An inbox rule that forwards automatically keeps the letter's own From line. Gmail and Outlook
+// record whose rule sent it on in X-Forwarded-For; when that names an editor, the mail is accepted.
+const readingForwarders = [...forwarders, ...(env("READING_FORWARDERS") || "schlotmanc4@gmail.com").toLowerCase().split(",").map((s) => s.trim()).filter(Boolean)];
+export const autoForwardedBy = (headers: Record<string, unknown> | null | undefined): string | null => {
+  const raw = Object.entries(headers ?? {}).filter(([k]) => /^x-forwarded-(for|to)$|^x-ms-exchange-inbox-rules-loop$/i.test(k)).map(([, v]) => String(v).toLowerCase()).join(" ");
+  return readingForwarders.find((f) => !f.startsWith("@") && raw.includes(f)) ?? null;
+};
 
 async function verifySvix(req: Request, body: string): Promise<boolean> {
   const secret = env("RESEND_INBOUND_WEBHOOK_SECRET");
@@ -92,7 +99,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
   if (toList.some((t) => t.includes(readingAddress))) {
     const fwdRead = isForwarder(envelope) ? findForwarded(subject, fullText) : null;
     const origin = fwdRead?.address ?? envelope;
-    if (!isForwarder(envelope) && !isReadingSender(envelope)) return new Response(JSON.stringify({ ok: true, reading: "ignored: sender not on the reading list" }), { headers: { "content-type": "application/json" } });
+    if (!isForwarder(envelope) && !readingForwarders.includes(envelope) && !isReadingSender(envelope) && !autoForwardedBy(email.headers)) return new Response(JSON.stringify({ ok: true, reading: "ignored: sender not on the reading list" }), { headers: { "content-type": "application/json" } });
     const found = extractReads(html).slice(0, 15);
     // Opened together, 8 seconds at most, so the webhook answers before Resend retries.
     const pages = await Promise.all(found.map((l) => resolve(l.url)));
