@@ -4446,7 +4446,7 @@
   "list": "wsp"
  },
  {
-  "name": "Vérto Group",
+  "name": "V\u00e9rto Group",
   "website": "http://www.vertogroup.com",
   "domain": "vertogroup.com",
   "kind": "advisor",
@@ -6021,7 +6021,7 @@
   "list": "contacts-2026-02"
  },
  {
-  "name": "Quilvest – QS Capital Strategies",
+  "name": "Quilvest \u2013 QS Capital Strategies",
   "website": "https://www.quilvestusa.com",
   "domain": "quilvestusa.com",
   "kind": "lender",
@@ -6364,7 +6364,7 @@
   "list": "contacts-2026-02"
  },
  {
-  "name": "First Bank – Commercial Banking",
+  "name": "First Bank \u2013 Commercial Banking",
   "website": "https://www.fbol.com",
   "domain": "fbol.com",
   "kind": "lender",
@@ -6858,5 +6858,341 @@
   "website": "https://www.croft-bender.com",
   "domain": "croft-bender.com",
   "kind": "advisor"
+ },
+ {
+  "name": "Honigman",
+  "website": "https://www.honigman.com",
+  "domain": "honigman.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Benesch",
+  "website": "https://www.beneschlaw.com",
+  "domain": "beneschlaw.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Taft",
+  "website": "https://www.taftlaw.com",
+  "domain": "taftlaw.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Baker Donelson",
+  "website": "https://www.bakerdonelson.com",
+  "domain": "bakerdonelson.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Polsinelli",
+  "website": "https://www.polsinelli.com",
+  "domain": "polsinelli.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Foley & Lardner",
+  "website": "https://www.foley.com",
+  "domain": "foley.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Holland & Knight",
+  "website": "https://www.hklaw.com",
+  "domain": "hklaw.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "McDermott Will & Emery",
+  "website": "https://www.mwe.com",
+  "domain": "mwe.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Choate",
+  "website": "https://www.choate.com",
+  "domain": "choate.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Katten",
+  "website": "https://www.katten.com",
+  "domain": "katten.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Dykema",
+  "website": "https://www.dykema.com",
+  "domain": "dykema.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Husch Blackwell",
+  "website": "https://www.huschblackwell.com",
+  "domain": "huschblackwell.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Lathrop GPM",
+  "website": "https://www.lathropgpm.com",
+  "domain": "lathropgpm.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Thompson Hine",
+  "website": "https://www.thompsonhine.com",
+  "domain": "thompsonhine.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Calfee",
+  "website": "https://www.calfee.com",
+  "domain": "calfee.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Bass, Berry & Sims",
+  "website": "https://www.bassberry.com",
+  "domain": "bassberry.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Nelson Mullins",
+  "website": "https://www.nelsonmullins.com",
+  "domain": "nelsonmullins.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Vedder Price",
+  "website": "https://www.vedderprice.com",
+  "domain": "vedderprice.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Winston & Strawn",
+  "website": "https://www.winston.com",
+  "domain": "winston.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Blank Rome",
+  "website": "https://www.blankrome.com",
+  "domain": "blankrome.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Troutman Pepper Locke",
+  "website": "https://www.troutman.com",
+  "domain": "troutman.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Akerman",
+  "website": "https://www.akerman.com",
+  "domain": "akerman.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Greenberg Traurig",
+  "website": "https://www.gtlaw.com",
+  "domain": "gtlaw.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Bradley",
+  "website": "https://www.bradley.com",
+  "domain": "bradley.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Barnes & Thornburg",
+  "website": "https://www.btlaw.com",
+  "domain": "btlaw.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Faegre Drinker",
+  "website": "https://www.faegredrinker.com",
+  "domain": "faegredrinker.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Dorsey & Whitney",
+  "website": "https://www.dorsey.com",
+  "domain": "dorsey.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Stinson",
+  "website": "https://www.stinson.com",
+  "domain": "stinson.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Frost Brown Todd",
+  "website": "https://www.frostbrowntodd.com",
+  "domain": "frostbrowntodd.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Dinsmore",
+  "website": "https://www.dinsmore.com",
+  "domain": "dinsmore.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Ice Miller",
+  "website": "https://www.icemiller.com",
+  "domain": "icemiller.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "McAfee & Taft",
+  "website": "https://www.mcafeetaft.com",
+  "domain": "mcafeetaft.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Munsch Hardt",
+  "website": "https://www.munsch.com",
+  "domain": "munsch.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Jackson Walker",
+  "website": "https://www.jw.com",
+  "domain": "jw.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Fox Rothschild",
+  "website": "https://www.foxrothschild.com",
+  "domain": "foxrothschild.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Cozen O'Connor",
+  "website": "https://www.cozen.com",
+  "domain": "cozen.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Duane Morris",
+  "website": "https://www.duanemorris.com",
+  "domain": "duanemorris.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Goodwin",
+  "website": "https://www.goodwinlaw.com",
+  "domain": "goodwinlaw.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Morris, Manning & Martin",
+  "website": "https://www.mmmlaw.com",
+  "domain": "mmmlaw.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Womble Bond Dickinson",
+  "website": "https://www.womblebonddickinson.com",
+  "domain": "womblebonddickinson.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Moore & Van Allen",
+  "website": "https://www.mvalaw.com",
+  "domain": "mvalaw.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Robinson Bradshaw",
+  "website": "https://www.robinsonbradshaw.com",
+  "domain": "robinsonbradshaw.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Godfrey & Kahn",
+  "website": "https://www.gklaw.com",
+  "domain": "gklaw.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Reinhart",
+  "website": "https://www.reinhartlaw.com",
+  "domain": "reinhartlaw.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Varnum",
+  "website": "https://www.varnumlaw.com",
+  "domain": "varnumlaw.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Fredrikson",
+  "website": "https://www.fredlaw.com",
+  "domain": "fredlaw.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Koley Jessen",
+  "website": "https://www.koleyjessen.com",
+  "domain": "koleyjessen.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
+ },
+ {
+  "name": "Jones Walker",
+  "website": "https://www.joneswalker.com",
+  "domain": "joneswalker.com",
+  "kind": "advisor",
+  "list": "law-firms-2026-11"
  }
 ]

@@ -83,7 +83,7 @@ Times are UTC: `22:00 UTC` = 5pm CDT build, `11:00 UTC` = 6am EDT send. Shift bo
 - **Analytics**, **Issues**, **Subscribers** (role, firm vs. personal email, opens/clicks), **People**, **Pipeline**.
 
 ## Public pages
-`/` landing · `/deals` deal tracker · `/deal-stats` weekly index · `/people-moves` · `/archive` and `/archive/:slug` · `/about` · `/referrals` · `/preferences?token=` · `/unsubscribe?token=`
+`/` landing · `/deals` deal tracker · `/comps` disclosed multiples · `/pricing` first-lien spreads by quarter · `/deal-stats` weekly index · `/people-moves` · `/archive` and `/archive/:slug` · `/about` · `/referrals` · `/preferences?token=` · `/unsubscribe?token=`
 
 ## Voice
 `HOUSE_STYLE` in `supabase/functions/_shared/ai.ts` is the single source of truth for how the model writes: direct, numbers first, conviction-tagged, banned-word list, no invented figures. Edit it there and every section follows.
@@ -94,3 +94,24 @@ npm i
 npm run dev
 ```
 Backend deploys from GitHub Actions on push to `main` (`.github/workflows/deploy-backend.yml`); the schedule runs in `pipeline.yml`. `supabase/functions/_shared/` holds code shared across functions. `npm run check:functions` typechecks them with Deno.
+
+## Search engines and AI assistants
+
+The site is a single-page app, so on its own it would hand crawlers an empty page. On Vercel every
+public page is instead sent as real HTML by `api/page.js`: the page's own title and description,
+its canonical address, structured data (schema.org) and the full text, with the app loading on top.
+Everyone gets the same document; there is no user-agent switching.
+
+| Address | What it is | Where it lives |
+| --- | --- | --- |
+| every public page | title, description, canonical, structured data, text | `api/page.js`, `api/_lib/pages.js` |
+| `/sitemap.xml` | standing pages and every sent issue | `api/sitemap.js` |
+| `/feed.xml` | RSS of sent issues | `api/feed.js` |
+| `/llms.txt`, `/llms-full.txt` | plain-text map and full text for AI assistants | `api/llms.js` |
+| `/robots.txt` | open to search and AI crawlers; private pages kept out | `public/robots.txt` |
+
+- Copy printed both by the app and by the server (FAQ, principles, page titles) is in `api/_lib/copy.js`. Edit it there once.
+- To add a public page: add the route in `src/App.tsx`, a renderer in `api/_lib/pages.js`, a title in `copy.js` and a line in `api/sitemap.js`. An address with no renderer returns a real 404.
+- When an issue sends, `send-newsletter` notifies Bing and the other IndexNow search engines (`supabase/functions/_shared/indexnow.ts`).
+- Social profile addresses go in `SITE.sameAs` in `api/_lib/core.js`.
+- `gppulse.vercel.app` redirects to `thegppulse.com`, so there is one address for every page.

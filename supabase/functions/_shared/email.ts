@@ -142,16 +142,15 @@ function belowRadar(items: RadarItem[] | undefined): string {
       const take = (r as RadarItem & { take?: string }).take;
       return item(`
         <div style="border-left:3px solid ${INK};padding-left:12px;">
-          <div style="margin-bottom:6px;">${chip(r.found_via, true)}${r.confirmed ? "" : `<span style="display:inline-block;font-family:${MONO};font-size:11px;padding:1px 6px;border-radius:4px;border:1px solid ${DOWN};color:${DOWN};">UNCONFIRMED</span>`}</div>
-          ${headline(r.source_url, r.headline)}
+          ${r.confirmed ? "" : `<div style="margin-bottom:6px;"><span style="display:inline-block;font-family:${MONO};font-size:11px;padding:1px 6px;border-radius:4px;border:1px solid ${DOWN};color:${DOWN};">UNCONFIRMED</span></div>`}
+          ${headline(null, r.headline)}
           ${summary(r.body)}
           ${take ? takeLine("Our read", take) : ""}
           ${fileBlock(r.file)}
-          ${meta(`Found at: ${r.source}`)}
         </div>`, i);
     })
     .join("");
-  return sectionLabel("Below the Radar", "no press release, no wire story — found by us", "default") + body(rows);
+  return sectionLabel("Below the Radar", "deals you won't read anywhere else", "default") + body(rows);
 }
 
 function scoreboard(sb: Scoreboard | null | undefined, weekly = false): string {
@@ -179,7 +178,7 @@ function scoreboard(sb: Scoreboard | null | undefined, weekly = false): string {
       : "",
   ].filter(Boolean);
   if (!parts.length) return "";
-  const sub = sb.radar?.total ? `last ${sb.window_days} days · ${sb.radar.total} deals tracked · ${sb.radar.below} had no press release` : `last ${sb.window_days} days`;
+  const sub = sb.radar?.total ? `last ${sb.window_days} days · ${sb.radar.total} deals tracked · ${sb.radar.below} reported only here` : `last ${sb.window_days} days`;
   return sectionLabel("The Scoreboard", sub, "secondary") + body(parts.join(""), "16px 24px 8px 24px");
 }
 
@@ -265,7 +264,7 @@ function dealTracker(deals: DealRow[], weekly = false): string {
       const verb = d.deal_type === "exit" ? "exits" : d.deal_type === "add-on" ? "adds on" : d.deal_type === "recap" ? "recaps" : d.deal_type === "growth" ? "invests in" : "acquires";
       const parties = [d.advisors ? `Advisors: ${d.advisors}` : "", d.lender ? `Debt: ${d.lender}` : ""].filter(Boolean).join("  ·  ");
       return item(`
-        <div style="margin-bottom:6px;">${chip(DEAL_TYPE_LABEL[d.deal_type] ?? "Deal", !!d.featured)}${d.featured ? chip("Deal of the day", true) : ""}</div>
+        <div style="margin-bottom:6px;">${chip(DEAL_TYPE_LABEL[d.deal_type] ?? "Deal", !!d.featured)}${d.featured ? chip("Deal of the day", true) : ""}${d.first_seen ? chip(`First here ${new Date(d.first_seen + "T12:00:00Z").toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" })}`, true) : ""}</div>
         <div style="font-family:${SANS};font-size:14px;line-height:1.4;color:${INK};"><strong>${escapeHtml(d.sponsor)}</strong> ${verb} ${link(d.source_url, d.target)}${d.platform && d.deal_type === "add-on" ? ` <span style="color:${MUTED};">via ${escapeHtml(d.platform)}</span>` : ""}</div>
         ${facts.length ? meta(facts.join("  ·  ")) : ""}
         ${summary(d.summary)}
@@ -369,6 +368,29 @@ function theRead(c: NewsletterContentV2): string {
     </td></tr></table>`);
 }
 
+function weekendReads(c: NewsletterContentV2): string {
+  const reads = c.weekend_reads ?? [];
+  if (!reads.length) return "";
+  const rows = reads.map((r, i) => item(`
+      <div style="font-family:${MONO};font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:${MUTED};margin-bottom:4px;">${String(i + 1).padStart(2, "0")} &middot; ${escapeHtml(r.publisher)}${r.minutes ? ` &middot; ${r.minutes} min` : ""}</div>
+      <div style="font-family:${SANS};font-size:16px;line-height:1.35;font-weight:700;">${link(r.url, r.title)}</div>
+      <div style="font-family:${SERIF};font-size:15px;line-height:1.6;color:${INK};margin-top:6px;">${escapeHtml(r.note)}</div>`, i)).join("");
+  return sectionLabel("Weekend Reading", "the week's best long reads, picked by the desk", "default") + body(rows);
+}
+
+// The standing ask. Bankers, lenders and sponsors want their closings seen; most never issue a
+// release. Daily and Friday issues only.
+function sendUsYourClosing(c: NewsletterContentV2, o: IssueEmailOptions): string {
+  if ((c.weekend_reads ?? []).length) return "";
+  return `
+  <tr><td style="${RULE_MARK}padding:18px 24px;">
+    <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="border:1px solid ${INK};"><tr><td style="padding:14px 16px;">
+      <div style="font-family:${MONO};font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:${MUTED};font-weight:700;margin-bottom:4px;">Closed a deal?</div>
+      <div style="font-family:${SANS};font-size:14px;line-height:1.5;color:${INK};">Sponsors, bankers and lenders: send us your closing and it runs here, with your firm credited on the Scoreboard. No release needed. Reply to this email or use <a href="${escapeHtml(o.siteUrl)}/tip?kind=closing" style="color:${INK};font-weight:700;text-decoration:underline;">the closing form</a>.</div>
+    </td></tr></table>
+  </td></tr>`;
+}
+
 function referralBlock(o: IssueEmailOptions): string {
   const next = o.referralCount < 3 ? 3 : o.referralCount < 10 ? 10 : o.referralCount < 25 ? 25 : null;
   const progress = next ? `${o.referralCount} of ${next} toward your next unlock.` : `${o.referralCount} referrals. You're carrying this thing.`;
@@ -381,6 +403,37 @@ function referralBlock(o: IssueEmailOptions): string {
       <div style="font-family:${SANS};font-size:12px;color:${FAINT};margin-top:8px;">${escapeHtml(progress)}</div>
     </td></tr></table>
   </td></tr>`;
+}
+
+// One-click reader question. Each option is a link carrying the reader's own token, so a vote
+// is one tap and one vote per reader. Shown only when the issue carries a poll.
+function pollBlock(c: NewsletterContentV2, o: IssueEmailOptions): string {
+  const token = (o.preferencesUrl.match(/[?&]token=([^&]+)/) ?? [])[1] ?? "";
+  let out = "";
+  if (c.poll_result && c.poll_result.total > 0) {
+    const r = c.poll_result;
+    const rows = r.options.map((opt, i) => {
+      const pct = Math.round((r.counts[i] / r.total) * 100);
+      return `<tr><td style="padding:5px 0;font-family:${SANS};font-size:14px;color:${INK};">${escapeHtml(opt)}</td><td align="right" style="padding:5px 0 5px 12px;font-family:${MONO};font-size:13px;font-weight:700;color:${INK};white-space:nowrap;">${pct}%</td></tr>
+      <tr><td colspan="2" style="padding:0 0 6px 0;"><table width="100%" cellpadding="0" cellspacing="0" role="presentation"><tr><td width="${Math.max(pct, 1)}%" style="background-color:${INK};height:6px;font-size:0;line-height:0;">&nbsp;</td><td style="background-color:${CHIP};height:6px;font-size:0;line-height:0;">&nbsp;</td></tr></table></td></tr>`;
+    }).join("");
+    out += `<tr><td style="${RULE_MARK}padding:24px;">
+      <div style="font-family:${MONO};font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:${MUTED};">Last week you said · ${r.total} answers</div>
+      <div style="font-family:${SANS};font-size:16px;font-weight:700;line-height:1.4;color:${INK};margin:6px 0 10px 0;">${escapeHtml(r.question)}</div>
+      <table width="100%" cellpadding="0" cellspacing="0" role="presentation">${rows}</table>
+    </td></tr>`;
+  }
+  if (c.poll && token) {
+    const p = c.poll;
+    const links = p.options.map((opt, i) => `<tr><td style="padding:4px 0;"><a href="${escapeHtml(`${o.siteUrl}/vote?p=${p.id}&o=${i}&t=${token}`)}" style="display:block;border:1px solid ${INK};border-radius:6px;padding:10px 14px;font-family:${SANS};font-size:14px;color:${INK};text-decoration:none;">${escapeHtml(opt)}</a></td></tr>`).join("");
+    out += `<tr><td style="${RULE_MARK}padding:24px;">
+      <div style="font-family:${MONO};font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:${MUTED};">One question · one click</div>
+      <div style="font-family:${SANS};font-size:16px;font-weight:700;line-height:1.4;color:${INK};margin:6px 0 10px 0;">${escapeHtml(p.question)}</div>
+      <table width="100%" cellpadding="0" cellspacing="0" role="presentation">${links}</table>
+      <div style="font-family:${SANS};font-size:12px;color:${MUTED};margin-top:8px;">Answers are counted, never attributed. Results in next Tuesday's issue.</div>
+    </td></tr>`;
+  }
+  return out;
 }
 
 // ---- whole issue -------------------------------------------------------------
@@ -408,9 +461,12 @@ export function renderIssueEmail(c: NewsletterContentV2, o: IssueEmailOptions): 
     peopleMoves(c.people_moves),
     marketPulse(c.market_pulse),
     overheard(c.overheard),
+    weekendReads(c),
     theRead(c),
     editorItems("Jobs", "open seats in the LMM", c.jobs, "secondary"),
+    pollBlock(c, o),
     closing,
+    sendUsYourClosing(c, o),
     referralBlock(o),
   ].join("\n");
   const sections = blocks.replace(RULE_MARK, "").split(RULE_MARK).join(RULE_CSS);

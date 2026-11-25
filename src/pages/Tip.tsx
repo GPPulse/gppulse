@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { Check, Loader2 } from "lucide-react";
 
 const KINDS = [
+  { value: "closing", label: "A closed deal", hint: "Buyer, target, what the company does, who advised and who financed it. No press release needed. Sponsors, bankers and lenders are credited on the Scoreboard." },
   { value: "on_the_market", label: "A process", hint: "Something launching, a teaser you've seen, a founder taking calls. Size, sector, geography, timing." },
   { value: "overheard", label: "Something you heard", hint: "A lender quote, a multiple that surprised you, what an LP said at the annual meeting." },
   { value: "reader_question", label: "A question", hint: "Something you'd want other readers' take on. We'll run it and print the best answers." },
@@ -19,7 +20,7 @@ const KINDS = [
 ];
 
 export default function Tip() {
-  const [form, setForm] = useState({ kind: "on_the_market", headline: "", body: "", url: "", email: "", role: "", attribution: "", attribution_ok: false });
+  const [form, setForm] = useState({ kind: new URLSearchParams(window.location.search).get("kind") === "closing" ? "closing" : "on_the_market", headline: "", body: "", url: "", email: "", role: "", attribution: "", attribution_ok: false });
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
@@ -29,7 +30,7 @@ export default function Tip() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setBusy(true); setErr(null);
-    const { data, error } = await supabase.functions.invoke("manage-subscribers", { body: { action: "submit-tip", ...form } });
+    const { data, error } = await supabase.functions.invoke("manage-subscribers", { body: { action: "submit-tip", ...form, ...(form.kind === "closing" ? { kind: "overheard", headline: `Closing: ${form.headline}` } : {}) } });
     setBusy(false);
     if (error || data?.error) setErr(data?.error ?? "Something went wrong. Reply to any issue instead.");
     else setDone(data.message);
@@ -77,7 +78,7 @@ export default function Tip() {
 
                 <div>
                   <Label htmlFor="headline" className="font-mono text-[11px] uppercase tracking-wider">The one-liner</Label>
-                  <Input id="headline" value={form.headline} onChange={(e) => setForm({ ...form, headline: e.target.value })} placeholder={form.kind === "on_the_market" ? "Specialty distributor, Southeast, ~$9M EBITDA, process launching next week" : "What's the line?"} className="mt-1 border-2 border-foreground" maxLength={160} required />
+                  <Input id="headline" value={form.headline} onChange={(e) => setForm({ ...form, headline: e.target.value })} placeholder={form.kind === "closing" ? "Sponsor acquired Target (city, state), a $6M EBITDA HVAC services company" : form.kind === "on_the_market" ? "Specialty distributor, Southeast, ~$9M EBITDA, process launching next week" : "What's the line?"} className="mt-1 border-2 border-foreground" maxLength={160} required />
                 </div>
                 <div>
                   <Label htmlFor="body" className="font-mono text-[11px] uppercase tracking-wider">Detail <span className="normal-case text-muted-foreground font-normal">(optional)</span></Label>

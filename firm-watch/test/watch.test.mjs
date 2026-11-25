@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { scanHome, extractItems, parseFeed, parseDate, parseRobots, classify, nameMatcher, itemKey, extractTombstones, extractPortfolio, diffPortfolio, findLinks } from '../src/lib.mjs';
+import { scanHome, extractItems, parseFeed, parseDate, parseRobots, classify, nameMatcher, itemKey, extractTombstones, extractPortfolio, diffPortfolio, findLinks, stillOnPage } from '../src/lib.mjs';
 import { triage, articleText } from '../src/crawl.mjs';
 
 const fx = (n) => readFileSync(new URL(`./fixtures/${n}`, import.meta.url), 'utf8');
@@ -99,6 +99,24 @@ test('first crawl records the archive as seen; later crawls queue new deal news 
   assert.equal(later.queue[0].kind, 'platform');
 });
 
+test('a back catalogue arriving on a later crawl is not queued as news', () => {
+  const now = Date.parse('2026-11-16T12:00:00Z');
+  // Seaport Capital, Nov 16 2026: four undated links on a site already crawled, two of them from 2023.
+  const seaport = [
+    { url: 'https://www.seaportcapital.com/news/2023/seaport-capital-completes-acquisition-of-cyberlinkasp', title: 'Seaport Capital Completes Acquisition of CyberlinkASP', date: null },
+    { url: 'https://www.seaportcapital.com/news/2023/all-traffic-data-acquires-traffic-survey-specialists', title: 'All Traffic Data Acquires Traffic Survey Specialists', date: null },
+    { url: 'https://www.seaportcapital.com/news/2026/cyberlinkasp-completes-acquisition-of-fresh-managed-it', title: 'CyberlinkASP Completes Acquisition of Fresh Managed IT', date: null },
+  ];
+  const t = triage(seaport, { firstCrawl: false, now });
+  assert.deepEqual(t.queue.map((i) => i.url), [seaport[2].url], 'a past year in the address is old; this year\'s link is news');
+
+  const dump = ['mplt-healthcare', 'duggal-visual-solutions', 'rotating-machinery-services', 'chauvet'].map((x) => ({ url: `https://cortecgroup.com/cortec-group-announces-acquisition-of-${x}/`, title: `Cortec Group Announces Acquisition of ${x}`, date: null }));
+  assert.equal(triage(dump, { firstCrawl: false, now }).queue.length, 0, 'four undated deal links at once is an archive');
+  assert.equal(triage(dump.slice(0, 2), { firstCrawl: false, now }).queue.length, 2, 'one or two undated links are news');
+  const mixed = [...dump, { url: 'https://cortecgroup.com/new', title: 'Cortec Group Acquires Dated Company', date: '2026-11-15' }];
+  assert.deepEqual(triage(mixed, { firstCrawl: false, now }).queue.map((i) => i.url), ['https://cortecgroup.com/new'], 'dated news still goes through beside an archive');
+});
+
 test('article text extraction', () => {
   const p = 'Huron Capital announced today that it has completed the sale of its portfolio company to a strategic buyer. ';
   const html = `<html><body><nav><p>${p}${p}</p></nav><article><h1>T</h1><p>${p}${p}</p><p>short</p><p>${p}</p></article><footer><p>${p}</p></footer></body></html>`;
@@ -162,4 +180,19 @@ test('tombstones: several one-line deals in one block are split', () => {
 test('portfolio names skip hashed image names and CMS ids', () => {
   const html = `<main><img alt="e28b8c848da2809091cc818d8f"><img alt="a7cec9c1c8e7c5d5d489c4c8ca"><img alt="img_20240312_0041"><h3>AFI Industries</h3><h3>3D Corporate Solutions</h3></main>`;
   assert.deepEqual(extractPortfolio(html, 'https://brs.example/portfolio/'), ['AFI Industries', '3D Corporate Solutions']);
+});
+
+test('exit watch: a removed name is reported, and only when it is really gone from the page', () => {
+  const old = ['Albireo Energy', 'The Exigent Group', 'Rampart Exterior Services', 'Horsepower Automotive Group', 'Sciens Water', 'Acme Co.'];
+  const d = diffPortfolio(old, old.filter((n) => n !== 'Sciens Water'));
+  assert.deepEqual(d.removed, ['Sciens Water']);
+  assert.deepEqual(d.added, []);
+  const page = '<main><h3>Albireo Energy</h3><img alt="Rampart Exterior Services logo"><p>Realized: Sciens Water, LLC (2019–2026)</p><script>var x = "Hidden Co";</script></main>';
+  assert.equal(stillOnPage('Sciens Water', page), true, 'moved to a realized list, still named');
+  assert.equal(stillOnPage('Rampart Exterior Services', page), true, 'named only in a logo label');
+  assert.equal(stillOnPage('The Exigent Group', page), false);
+  assert.equal(stillOnPage('Hidden Co', page), false, 'script text does not count');
+  assert.equal(stillOnPage('Albireo', '<p>Albireo Energy</p>'), true);
+  assert.equal(stillOnPage('Energy Co', '<p>Albireo Energy</p>'), true, 'a one-word remainder is not enough to call it gone');
+  assert.equal(stillOnPage('AB', '<p>nothing</p>'), true, 'too short to judge');
 });

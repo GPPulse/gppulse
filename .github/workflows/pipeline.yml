@@ -10,10 +10,11 @@ on:
   schedule:
     - cron: "50 21 * * 0-4"   # 4:50pm CDT / 5:50pm EDT — build tonight's draft (Sun–Thu)
     - cron: "50 10 * * 1-5"   # 5:50am EDT — morning send (Mon–Fri)
+    - cron: "20 12 * * 6"     # Saturday 7:20am EST — Weekend Reading: build, then send
   workflow_dispatch:
     inputs:
       mode:
-        description: "full | send | scrape | generate"
+        description: "full | send | scrape | generate | weekend"
         default: "full"
       force:
         description: "Rebuild even if a draft exists today (true/false)"
@@ -30,7 +31,7 @@ on:
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 100
     env:
       FN: https://${{ secrets.SUPABASE_PROJECT_REF }}.supabase.co/functions/v1/daily-newsletter-pipeline
       SECRET: ${{ secrets.PIPELINE_SECRET }}
@@ -40,6 +41,7 @@ jobs:
         id: mode
         run: |
           if [ -n "${{ github.event.inputs.mode }}" ]; then echo "mode=${{ github.event.inputs.mode }}" >> $GITHUB_OUTPUT
+          elif [ "$(date -u +%u)" = "6" ]; then echo "mode=weekend" >> $GITHUB_OUTPUT
           elif [ "$(date -u +%H)" -lt 15 ]; then echo "mode=send" >> $GITHUB_OUTPUT
           else echo "mode=full" >> $GITHUB_OUTPUT; fi
           echo "run_id=$(cat /proc/sys/kernel/random/uuid)" >> $GITHUB_OUTPUT
@@ -93,7 +95,7 @@ jobs:
         if: github.event.inputs.step == '' && contains(fromJSON('["full","scrape"]'), steps.mode.outputs.mode)
         env: { RUN_ID: "${{ steps.mode.outputs.run_id }}", RUN_MODE: "${{ steps.mode.outputs.mode }}" }
         run: |
-          for i in $(seq 1 40); do
+          for i in $(seq 1 130); do
             ./step.sh process-content '"limit":8' || { echo "classifier call failed; stopping"; break; }
             remaining=$(jq -r '.remaining // 0' out.json); processed=$(jq -r '.processed // 0' out.json)
             echo "batch $i: processed=$processed remaining=$remaining"
@@ -105,8 +107,18 @@ jobs:
         if: github.event.inputs.step == '' && contains(fromJSON('["full","generate"]'), steps.mode.outputs.mode)
         env: { RUN_ID: "${{ steps.mode.outputs.run_id }}", RUN_MODE: "${{ steps.mode.outputs.mode }}" }
         run: |
-          ./step.sh generate-newsletter "\"force\":${{ github.event.inputs.force || 'false' }}"
+          # The weekly index goes first: Friday's week-in-review issue reads this week's narrative from it.
           ./step.sh generate-gp-index || true
+          ./step.sh generate-newsletter "\"force\":${{ github.event.inputs.force || 'false' }}"
+
+      - name: Weekend Reading (Saturday)
+        if: github.event.inputs.step == '' && steps.mode.outputs.mode == 'weekend'
+        env: { RUN_ID: "${{ steps.mode.outputs.run_id }}", RUN_MODE: "${{ steps.mode.outputs.mode }}" }
+        run: |
+          # Builds from the reading queue and the week's long reads. With too few pieces it skips,
+          # and the send below is not attempted, so an older unsent draft never goes out on a Saturday.
+          ./step.sh generate-weekend "\"force\":${{ github.event.inputs.force || 'false' }}"
+          if jq -e '.newsletter_id and (.skipped | not)' out.json >/dev/null; then ./step.sh send-newsletter; else echo "no weekend issue this week"; fi
 
       - name: Send
         if: github.event.inputs.step == '' && steps.mode.outputs.mode == 'send'

@@ -3,7 +3,8 @@
 // function. We fetch the message, match the sender to a watchlist firm, log it in
 // watch_inbox, and copy announcements into scraped_content so the nightly classifier
 // treats them like any other source. Subscription-confirmation emails are logged with
-// their confirmation link and are not sent to the classifier.
+// their confirmation link and are not sent to the classifier; the link is opened automatically
+// when it belongs to a mailing-list service or to the firm itself (confirm.ts).
 //
 // Forwards: a firm email forwarded from one of the editors' own inboxes (WATCH_FORWARDERS,
 // comma-separated addresses or @domains; default cschlotman@littlejohncapital.com) is credited
@@ -14,11 +15,26 @@
 // email.received webhook). verify_jwt is off; the Svix signature authenticates the call.
 // Webhook and receiving domain (in.thegppulse.com) were created in Resend on 2026-11-16.
 
+import { mayAutoConfirm, openConfirmLink } from "./confirm.ts";
 import { cleanSubject, findForwarded } from "./forwarded.ts";
+import { cleanUrl, extractReads, pageFacts, publisherFromHost, resolve } from "../_shared/reading.ts";
 
 const env = (k: string) => Deno.env.get(k) ?? "";
 const forwarders = (env("WATCH_FORWARDERS") || "cschlotman@littlejohncapital.com").toLowerCase().split(",").map((s) => s.trim()).filter(Boolean);
 const isForwarder = (addr: string) => forwarders.some((f) => (f.startsWith("@") ? addr.endsWith(f) : addr === f));
+// Weekend Reading: mail to this address is a digest of long reads. It is accepted from the editors
+// (a forward, by hand or by an inbox rule) and from the senders named in READING_SENDERS
+// (addresses or @domains of letters the reading address is itself subscribed to).
+const readingAddress = (env("READING_ADDRESS") || "reading@in.thegppulse.com").toLowerCase();
+const readingSenders = env("READING_SENDERS").toLowerCase().split(",").map((s) => s.trim()).filter(Boolean);
+const isReadingSender = (addr: string) => readingSenders.some((f) => (f.startsWith("@") ? addr.endsWith(f) : addr === f));
+// An inbox rule that forwards automatically keeps the letter's own From line. Gmail and Outlook
+// record whose rule sent it on in X-Forwarded-For; when that names an editor, the mail is accepted.
+const readingForwarders = [...forwarders, ...(env("READING_FORWARDERS") || "schlotmanc4@gmail.com").toLowerCase().split(",").map((s) => s.trim()).filter(Boolean)];
+export const autoForwardedBy = (headers: Record<string, unknown> | null | undefined): string | null => {
+  const raw = Object.entries(headers ?? {}).filter(([k]) => /^x-forwarded-(for|to)$|^x-ms-exchange-inbox-rules-loop$/i.test(k)).map(([, v]) => String(v).toLowerCase()).join(" ");
+  return readingForwarders.find((f) => !f.startsWith("@") && raw.includes(f)) ?? null;
+};
 
 async function verifySvix(req: Request, body: string): Promise<boolean> {
   const secret = env("RESEND_INBOUND_WEBHOOK_SECRET");
@@ -77,6 +93,31 @@ Deno.serve(async (req: Request): Promise<Response> => {
   let text: string = fullText.slice(0, 6000);
   const messageId: string = email.message_id ?? email.id;
 
+  // Weekend Reading intake. Only links are kept: resolved to the page they land on, with that
+  // page's own title and publisher. Nothing from the digest's text is stored.
+  const toList: string[] = [email.to, email.headers?.to, event.data?.to].flat().filter(Boolean).map((t: unknown) => String(t).toLowerCase());
+  // Anything else sent there (Gmail's forwarding-verification code, a stranger) falls through
+  // to the ordinary log below, where the editor can see it.
+  const readingOk = isForwarder(envelope) || readingForwarders.includes(envelope) || isReadingSender(envelope) || Boolean(autoForwardedBy(email.headers));
+  if (readingOk && toList.some((t) => t.includes(readingAddress))) {
+    const fwdRead = isForwarder(envelope) ? findForwarded(subject, fullText) : null;
+    const origin = fwdRead?.address ?? envelope;
+    const found = extractReads(html).slice(0, 15);
+    // Opened together, 8 seconds at most, so the webhook answers before Resend retries.
+    const pages = await Promise.all(found.map((l) => resolve(l.url)));
+    const rows: { url: string; title: string | null; publisher: string | null; via: string }[] = [];
+    found.forEach((link, i) => {
+      const page = pages[i];
+      const url = page ? cleanUrl(page.url) : null;
+      if (!url || !page) return; // a link we cannot open is not one we can recommend
+      const facts = pageFacts(page.html);
+      if (rows.some((r) => r.url === url)) return;
+      rows.push({ url, title: (facts.title ?? link.text).slice(0, 300), publisher: facts.site ?? publisherFromHost(url), via: (fwdRead?.display || origin).slice(0, 120) });
+    });
+    if (rows.length) await db("reading_queue?on_conflict=url", { method: "POST", headers: { prefer: "resolution=ignore-duplicates,return=minimal" }, body: JSON.stringify(rows) });
+    return new Response(JSON.stringify({ ok: true, reading: rows.length }), { headers: { "content-type": "application/json" } });
+  }
+
   // A forward from an editor: use the original sender, subject and body.
   const fwd = isForwarder(envelope) ? findForwarded(subject, fullText) : null;
   const forwardedBy = fwd ? envelope : null;
@@ -93,22 +134,22 @@ Deno.serve(async (req: Request): Promise<Response> => {
   const tracked = "or=(watchlist.eq.true,source_kind.in.(advisor,lender))&is_active=is.true";
   const parts = senderDomain.split(".");
   const candidates = [senderDomain, parts.slice(-2).join(".")].filter((d, i, a) => d && a.indexOf(d) === i);
-  let firm: { id: string; name: string; source_kind: string } | null = null;
+  let firm: { id: string; name: string; source_kind: string; domain?: string | null } | null = null;
   if (candidates.length) {
-    const r = await db(`pe_firm_sources?select=id,name,source_kind&${tracked}&domain=in.(${candidates.map((d) => `"${d}"`).join(",")})&limit=1`);
+    const r = await db(`pe_firm_sources?select=id,name,source_kind,domain&${tracked}&domain=in.(${candidates.map((d) => `"${d}"`).join(",")})&limit=1`);
     firm = r.ok ? (await r.json())[0] ?? null : null;
   }
   // A parent company's mail system can send for a subsidiary (KippsDeSanto mails from
   // kippsdesanto@cm.capitalone.com). When the mailbox name is itself a tracked firm, that firm wins.
   const local = (address.split("@")[0] ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
   if (local.length >= 6 && !/^(info|news|newsletter|marketing|contact|update|updates|noreply|donotreply|nonreply|communications?|team|admin|hello|mail|mailer|email|events|ibmarketing)$/.test(local)) {
-    const r = await db(`pe_firm_sources?select=id,name,source_kind&${tracked}&name=ilike.${encodeURIComponent(local)}*&limit=2`);
-    const hits = r.ok ? ((await r.json()) as Array<{ id: string; name: string; source_kind: string }>) : [];
+    const r = await db(`pe_firm_sources?select=id,name,source_kind,domain&${tracked}&name=ilike.${encodeURIComponent(local)}*&limit=2`);
+    const hits = r.ok ? ((await r.json()) as Array<{ id: string; name: string; source_kind: string; domain?: string | null }>) : [];
     if (hits.length === 1 && hits[0].id !== firm?.id) firm = hits[0];
   }
   // Mailing-list tools often send from their own domains; fall back to the display name.
   if (!firm && display.length >= 6 && !isForwarder(address)) {
-    const r = await db(`pe_firm_sources?select=id,name,source_kind&${tracked}&name=ilike.${encodeURIComponent(display.replace(/[*%,()]/g, " "))}&limit=1`);
+    const r = await db(`pe_firm_sources?select=id,name,source_kind,domain&${tracked}&name=ilike.${encodeURIComponent(display.replace(/[*%,()]/g, " "))}&limit=1`);
     firm = r.ok ? (await r.json())[0] ?? null : null;
   }
 
@@ -142,6 +183,14 @@ Deno.serve(async (req: Request): Promise<Response> => {
     });
   }
 
+  // Double opt-in: open the confirmation link when it plainly belongs to a list service or to the
+  // firm itself. A forwarded confirmation is never opened; it was not addressed to this inbox.
+  let confirmed = false;
+  if (isNew && isConfirm && confirmLink && !forwardedBy && mayAutoConfirm(confirmLink, firm?.domain ?? null)) {
+    confirmed = await openConfirmLink(confirmLink);
+    if (confirmed) await db(`watch_inbox?message_id=eq.${encodeURIComponent(messageId)}`, { method: "PATCH", body: JSON.stringify({ confirmed_at: new Date().toISOString() }) });
+  }
+
   // Only mail from a known firm goes to the classifier; anything else stays in the log for the editor.
   if (isNew && firm && !isConfirm) {
     await db("scraped_content?on_conflict=url", {
@@ -160,5 +209,5 @@ Deno.serve(async (req: Request): Promise<Response> => {
     // First real email from a firm proves the watch inbox's own subscription is live (a forward doesn't).
     if (!forwardedBy) await db(`pe_firm_sources?id=eq.${firm.id}&subscribed_at=is.null`, { method: "PATCH", body: JSON.stringify({ subscribed_at: new Date().toISOString() }) });
   }
-  return new Response(JSON.stringify({ ok: true, firm: firm?.name ?? null, forwarded_by: forwardedBy, kind: isConfirm ? "confirm" : "news" }), { headers: { "content-type": "application/json" } });
+  return new Response(JSON.stringify({ ok: true, firm: firm?.name ?? null, forwarded_by: forwardedBy, kind: isConfirm ? "confirm" : "news", confirmed }), { headers: { "content-type": "application/json" } });
 });

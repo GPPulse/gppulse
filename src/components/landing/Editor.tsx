@@ -1,27 +1,6 @@
 import { SITE } from "@/lib/site";
 
-const faqs = [
-  {
-    q: "Is it free?",
-    a: "Yes. The daily issue is free and will stay free. If we ever add a paid product it'll be something separate, like the deal database or the quarterly multiples report, and current subscribers will hear first.",
-  },
-  {
-    q: "How is this different from PE Hub, Axios Pro Rata or PitchBook?",
-    a: "Those are good at the whole market. This is only the lower middle market. Mega-cap firms are filtered out by rule, fund coverage stops at $1B, and every deal figure is disclosed or marked undisclosed. The Lede is an opinion from a working GP, not a wire summary.",
-  },
-  {
-    q: "Who writes it?",
-    a: `${SITE.editor.name}, ${SITE.editor.title.toLowerCase()}. Software does the gathering overnight. A person writes the Lede, picks what makes the cut, and signs it.`,
-  },
-  {
-    q: "Can I send you a deal, a process, or a tip?",
-    a: "Please. Reply to any issue or use the tip form at /tip. Everything is off the record and attributed by role only unless you say otherwise. If you're a banker with a process launching, \"On the market\" is read by exactly the buyers you want.",
-  },
-  {
-    q: "What's the conflict-of-interest policy?",
-    a: "The editor is a partner at an active PE firm. The newsletter doesn't cover deals or processes that firm is party to while they're live, and it doesn't take payment for placement. Nothing here is investment advice.",
-  },
-];
+import { FAQS as faqs } from "../../../api/_lib/copy.js";
 
 export const Editor = () => {
   return (

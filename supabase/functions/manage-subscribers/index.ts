@@ -1,10 +1,11 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getStaff, isInternalCall, unauthorized } from "../_shared/auth.ts";
+import { cleanFollowList } from "../_shared/sponsor.ts";
 import { renderWelcomeEmail } from "../_shared/email.ts";
 import { CONFIG } from "../_shared/config.ts";
 
-// Public actions (anyone):  add · unsubscribe-token · get-preferences · update-preferences · referral-dashboard
+// Public actions (anyone):  add · unsubscribe-token · get-preferences · update-preferences · vote · referral-dashboard
 // Staff actions (admin JWT): list · stats · unsubscribe · reactivate · delete · bulk-import · export · add-role
 
 const corsHeaders = {
@@ -138,10 +139,34 @@ serve(async (req: Request): Promise<Response> => {
       return json({ message: "Unsubscribed", email: data.email });
     }
 
+    // One-click poll vote from the email. One vote per subscriber per poll; voting again changes it.
+    if (action === "vote") {
+      const token = String(body.token ?? ""), pollId = String(body.poll_id ?? ""), option = Number(body.option);
+      if (!token || !/^[0-9a-f-]{36}$/i.test(pollId) || !Number.isInteger(option)) return json({ error: "That voting link is incomplete." }, 400);
+      const [{ data: sub }, { data: poll }] = await Promise.all([
+        supabase.from("subscribers").select("id").eq("unsubscribe_token", token).maybeSingle(),
+        supabase.from("polls").select("id, question, options, active_from").eq("id", pollId).maybeSingle(),
+      ]);
+      if (!sub) return json({ error: "Link not recognized" }, 404);
+      if (!poll || !poll.active_from) return json({ error: "That question isn't open." }, 404);
+      const options = poll.options as string[];
+      if (option < 0 || option >= options.length) return json({ error: "That isn't one of the answers." }, 400);
+      const open = Date.now() - new Date(`${poll.active_from}T00:00:00Z`).getTime() < 8 * 86400000;
+      if (open) {
+        const { error } = await supabase.from("poll_votes").upsert({ poll_id: poll.id, subscriber_id: sub.id, option_index: option }, { onConflict: "poll_id,subscriber_id" });
+        if (error) throw error;
+      }
+      const { data: votes } = await supabase.from("poll_votes").select("option_index").eq("poll_id", poll.id).limit(20000);
+      const counts = options.map((_o, i) => ((votes ?? []) as { option_index: number }[]).filter((v) => v.option_index === i).length);
+      const total = counts.reduce((x, y) => x + y, 0);
+      // Small samples are not shown: with a handful of votes the bars would identify people.
+      return json({ question: poll.question, options, voted: open ? option : null, closed: !open, total, counts: total >= 10 ? counts : null });
+    }
+
     if (action === "get-preferences") {
       const token = body.token ?? url.searchParams.get("token");
       if (!token) return json({ error: "token required" }, 400);
-      const { data } = await supabase.from("subscribers").select("email, first_name, company, role, status, referral_code, sectors").eq("unsubscribe_token", token).maybeSingle();
+      const { data } = await supabase.from("subscribers").select("email, first_name, company, role, status, referral_code, sectors, followed_firms").eq("unsubscribe_token", token).maybeSingle();
       if (!data) return json({ error: "Link not recognized" }, 404);
       return json({ subscriber: data, roles: ROLES, sectors: SECTORS });
     }
@@ -154,8 +179,9 @@ serve(async (req: Request): Promise<Response> => {
       if (body.company !== undefined) patch.company = String(body.company).trim().slice(0, 120) || null;
       if (body.role !== undefined) patch.role = ROLES.includes(body.role) ? body.role : null;
       if (Array.isArray(body.sectors)) patch.sectors = body.sectors.filter((x: unknown) => typeof x === "string" && SECTORS.includes(x)).slice(0, 9);
+      if (Array.isArray(body.followed_firms)) patch.followed_firms = cleanFollowList(body.followed_firms);
       if (body.status === "active") { patch.status = "active"; patch.unsubscribed_at = null; }
-      const { data, error } = await supabase.from("subscribers").update(patch).eq("unsubscribe_token", token).select("email, first_name, company, role, status, referral_code, sectors").maybeSingle();
+      const { data, error } = await supabase.from("subscribers").update(patch).eq("unsubscribe_token", token).select("email, first_name, company, role, status, referral_code, sectors, followed_firms").maybeSingle();
       if (error) throw error;
       if (!data) return json({ error: "Link not recognized" }, 404);
       return json({ message: "Saved", subscriber: data });

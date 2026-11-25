@@ -43,6 +43,8 @@ export interface DealRow {
   hq_state?: string | null;
   found_via?: string | null;
   below_radar?: boolean;
+  /** The day we first had this deal, when it was in our tracker before today's report (YYYY-MM-DD). */
+  first_seen?: string;
   file?: string[];
 }
 
@@ -109,6 +111,15 @@ export interface TheRead {
   take: string;
 }
 
+/** One pick in the Saturday Weekend Reading edition: the piece, where it ran, and our note on it. */
+export interface WeekendRead {
+  title: string;
+  publisher: string;
+  url: string;
+  note: string;
+  minutes?: number | null;
+}
+
 export interface NewsletterContentV2 {
   version: 2;
   edition: "daily" | "weekly" | "special";
@@ -125,8 +136,16 @@ export interface NewsletterContentV2 {
   overheard: EditorItem[];
   market_pulse: Article[];
   the_read: TheRead | null;
+  /** Saturday edition only. */
+  weekend_reads?: WeekendRead[];
   jobs: EditorItem[];
   closing_line: string | null;
+  /** This week's one-click reader question (Tuesdays). */
+  poll?: { id: string; question: string; options: string[] } | null;
+  /** Last week's answers, once enough readers voted. `counts` lines up with `options`. */
+  poll_result?: { question: string; options: string[]; counts: number[]; total: number } | null;
+  /** What the generator's own check found wrong. Non-empty means the issue is held for the editor. */
+  quality_flags?: string[];
 }
 
 export function emptyContent(edition: NewsletterContentV2["edition"] = "daily"): NewsletterContentV2 {

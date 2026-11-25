@@ -1,0 +1,56 @@
+# Signs the watch inbox (watch@in.thegppulse.com) up to the mailing lists of watchlist firms,
+# one attempt per firm, 400 firms a run. Each run first searches 600 more firms for a sign-up
+# form beyond the home page, so the list of newsletters to join keeps growing. Announcements then arrive by email and are read by the
+# inbound-email function. Forms behind a CAPTCHA or built entirely by script are recorded and
+# left alone. Uses the same secrets as firm-watch.yml.
+name: Mailing-list sign-ups
+on:
+  schedule:
+    - cron: "23 15 * * *"   # daily, mid-morning Eastern, until every firm has been tried once
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: "How many firms to try"
+        default: "400"
+      find:
+        description: "How many firms with no form on file to search for one"
+        default: "600"
+      dry:
+        description: "Preview only: show what would be submitted (true/false)"
+        default: "false"
+      retry:
+        description: "Also retry firms that failed before (true/false)"
+        default: "false"
+concurrency:
+  group: list-subscribe
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    defaults:
+      run:
+        working-directory: firm-watch
+    env:
+      SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      PIPELINE_SECRET: ${{ secrets.PIPELINE_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: firm-watch/package-lock.json
+      - run: npm ci
+      # Headless Chromium for sign-up forms that only exist once the page's script has run.
+      - name: Cache headless browser
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('firm-watch/package-lock.json') }}
+      - name: Install headless browser
+        continue-on-error: true
+        run: npx playwright install --with-deps chromium
+      - name: Sign up
+        run: node src/subscribe.mjs --browser --find ${{ github.event.inputs.find || '600' }} --limit ${{ github.event.inputs.limit || '400' }} ${{ github.event.inputs.dry == 'true' && '--dry' || '' }} ${{ github.event.inputs.retry == 'true' && '--retry' || '' }}

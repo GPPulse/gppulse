@@ -4,10 +4,15 @@ import { getStaff, isInternalCall, unauthorized } from "../_shared/auth.ts";
 import { DEAL_TYPE_LABEL, fmtMillions, fmtMultiple } from "../_shared/content.ts";
 import { escapeHtml } from "../_shared/email.ts";
 import { CONFIG } from "../_shared/config.ts";
+import { followedIn } from "../_shared/sponsor.ts";
 
 // Sector deal alerts. Fires when an editor approves an issue: every deal in that
 // issue with a disclosed multiple goes, as a one-paragraph email, to subscribers
 // who picked that sector in preferences. One alert per deal, ever (deals.alerted_at).
+//
+// Followed sponsors. Subscribers can also list firms to follow. Every new deal in the tracker
+// (disclosed terms or not) that names one of a reader's firms goes to that reader in one short
+// digest per evening. A deal is considered once (deals.firm_alerted_at).
 //
 // Body: { newsletter_id } — alert the disclosed deals in that issue
 //       { deal_id }       — alert one specific deal (manual)
@@ -54,6 +59,73 @@ function render(d: Deal, siteUrl: string, token: string, issueUrl: string | null
 </table></td></tr></table></body></html>`;
 }
 
+interface FollowDeal { id: string; sponsor: string; target: string; deal_type: keyof typeof DEAL_TYPE_LABEL; sector: string | null; platform: string | null; summary: string | null; source_url: string | null; below_radar: boolean | null }
+
+function renderFollowDigest(items: { deal: FollowDeal; firms: string[] }[], siteUrl: string, token: string): string {
+  const rows = items.map(({ deal: d, firms }) => {
+    const verb = d.deal_type === "exit" ? "sold" : d.deal_type === "add-on" ? "added" : d.deal_type === "recap" ? "recapitalized" : d.deal_type === "growth" ? "invested in" : "acquired";
+    const target = d.source_url ? `<a href="${escapeHtml(d.source_url)}" style="color:${INK};font-weight:700;">${escapeHtml(d.target)}</a>` : `<strong>${escapeHtml(d.target)}</strong>`;
+    return `<tr><td style="padding:14px 0;border-top:1px solid #d9d9d6;">
+      <div style="font-family:${MONO};font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:${MUTED};">${escapeHtml(DEAL_TYPE_LABEL[d.deal_type] ?? "Deal")}${d.sector ? ` · ${escapeHtml(d.sector)}` : ""}${d.below_radar ? " · no press release" : ""}</div>
+      <div style="font-family:${SANS};font-size:16px;line-height:1.4;color:${INK};margin-top:4px;"><strong>${escapeHtml(firms.join(" and "))}</strong> ${verb} ${target}${d.deal_type === "add-on" && d.platform ? ` to ${escapeHtml(d.platform)}` : ""}</div>
+      ${d.summary ? `<p style="font-family:${SANS};font-size:14px;line-height:1.55;color:#333;margin:6px 0 0 0;">${escapeHtml(d.summary)}</p>` : ""}
+    </td></tr>`;
+  }).join("");
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#e9e9e6;">
+<table width="100%" cellpadding="0" cellspacing="0" role="presentation"><tr><td align="center" style="padding:18px 8px;">
+<table width="560" cellpadding="0" cellspacing="0" role="presentation" style="width:560px;max-width:560px;background:#fff;border:2px solid ${INK};">
+  <tr><td style="padding:14px 24px;border-bottom:2px solid ${INK};">
+    <span style="font-family:${SANS};font-size:16px;font-weight:800;letter-spacing:-0.02em;">THE GP PULSE</span>
+    <span style="font-family:${MONO};font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:${MUTED};margin-left:10px;">Sponsors you follow</span>
+  </td></tr>
+  <tr><td style="padding:8px 24px 6px 24px;"><table width="100%" cellpadding="0" cellspacing="0" role="presentation">${rows}</table></td></tr>
+  <tr><td style="padding:6px 24px 18px 24px;"><table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="border-top:1px solid #d9d9d6;"><tr><td style="padding-top:10px;font-family:${SANS};font-size:11px;line-height:1.6;color:${MUTED};">
+    You get this because you follow ${items.length === 1 ? "this firm" : "these firms"} in your preferences. Details are in the issue. <a href="${siteUrl}/preferences?token=${token}" style="color:${MUTED};">Change who you follow</a> · <a href="${siteUrl}/unsubscribe?token=${token}" style="color:${MUTED};">Unsubscribe</a><br>${escapeHtml(CONFIG.postalAddress)}
+  </td></tr></table></td></tr>
+</table></td></tr></table></body></html>`;
+}
+
+/** One digest per reader for new deals by sponsors they follow. Never throws; alerts are best effort. */
+// deno-lint-ignore no-explicit-any
+async function followDigest(supabase: any, resendKey: string): Promise<{ deals: number; sent: number; note?: string }> {
+  try {
+    const since = new Date(Date.now() - 36 * 3600 * 1000).toISOString();
+    const { data: fresh, error } = await supabase.from("deals").select("id, sponsor, target, deal_type, sector, platform, summary, source_url, below_radar")
+      .eq("hidden", false).is("firm_alerted_at", null).gte("created_at", since).limit(200);
+    if (error) return { deals: 0, sent: 0, note: error.message };
+    const deals = (fresh ?? []) as FollowDeal[];
+    if (!deals.length) return { deals: 0, sent: 0 };
+    const { data: subs } = await supabase.from("subscribers").select("id, email, unsubscribe_token, followed_firms").eq("status", "active").neq("followed_firms", "{}").limit(5000);
+    const emails: unknown[] = [];
+    const log: unknown[] = [];
+    for (const s of (subs ?? []) as { id: string; email: string; unsubscribe_token: string | null; followed_firms: string[] }[]) {
+      const items = deals.map((deal) => ({ deal, firms: followedIn(deal.sponsor, s.followed_firms ?? []) })).filter((x) => x.firms.length).slice(0, 12);
+      if (!items.length) continue;
+      const names = [...new Set(items.flatMap((x) => x.firms))];
+      emails.push({
+        from: CONFIG.from, to: [s.email], reply_to: CONFIG.replyTo,
+        subject: items.length === 1 ? `${names[0]}: ${items[0].deal.target}` : `${names.slice(0, 2).join(", ")}${names.length > 2 ? ` and ${names.length - 2} more` : ""}: ${items.length} new deals`,
+        html: renderFollowDigest(items, CONFIG.siteUrl, s.unsubscribe_token ?? ""),
+        headers: { "List-Unsubscribe": `<${CONFIG.siteUrl}/unsubscribe?token=${s.unsubscribe_token ?? ""}>`, "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" },
+        tags: [{ name: "kind", value: "follow_alert" }],
+      });
+      log.push({ event_type: "sent", email: s.email, subscriber_id: s.id, payload: { kind: "follow_alert", deals: items.map((x) => x.deal.id) } });
+    }
+    let sent = 0;
+    for (let i = 0; i < emails.length; i += 100) {
+      const r = await fetch("https://api.resend.com/emails/batch", { method: "POST", headers: { Authorization: `Bearer ${resendKey.trim()}`, "Content-Type": "application/json" }, body: JSON.stringify(emails.slice(i, i + 100)) });
+      if (r.ok) sent += emails.slice(i, i + 100).length; else console.error("follow digest batch failed", r.status, await r.text());
+    }
+    if (log.length && sent) await supabase.from("email_events").insert(log.slice(0, sent));
+    await supabase.from("deals").update({ firm_alerted_at: new Date().toISOString() }).in("id", deals.map((d) => d.id));
+    return { deals: deals.length, sent };
+  } catch (e) {
+    console.error("follow digest", e);
+    return { deals: 0, sent: 0, note: String(e) };
+  }
+}
+
 serve(async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   try {
@@ -87,8 +159,11 @@ serve(async (req: Request): Promise<Response> => {
       return json({ error: "newsletter_id or deal_id required" }, 400);
     }
 
+    // Sponsors readers follow: every new deal counts, disclosed terms or not.
+    const follow = body.newsletter_id ? await followDigest(supabase, resendKey) : { deals: 0, sent: 0 };
+
     deals = deals.filter((d) => d.sector && d.ev_ebitda_multiple);
-    if (!deals.length) return json({ message: "No un-alerted deals with disclosed multiples", sent: 0 });
+    if (!deals.length) return json({ message: `No un-alerted deals with disclosed multiples. Followed sponsors: ${follow.sent} digest${follow.sent === 1 ? "" : "s"} sent.`, sent: 0, follow });
 
     let totalSent = 0;
     const perDeal: Record<string, number> = {};
@@ -117,7 +192,7 @@ serve(async (req: Request): Promise<Response> => {
       perDeal[`${d.sponsor} → ${d.target}`] = sent;
       totalSent += sent;
     }
-    return json({ message: `${deals.length} alert${deals.length === 1 ? "" : "s"} sent to ${totalSent} subscriber${totalSent === 1 ? "" : "s"}`, sent: totalSent, per_deal: perDeal });
+    return json({ message: `${deals.length} alert${deals.length === 1 ? "" : "s"} sent to ${totalSent} subscriber${totalSent === 1 ? "" : "s"}`, sent: totalSent, per_deal: perDeal, follow });
   } catch (error) {
     console.error("send-deal-alerts", error);
     return json({ error: String(error) }, 500);

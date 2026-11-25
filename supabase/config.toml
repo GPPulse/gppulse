@@ -9,6 +9,9 @@ verify_jwt = false
 [functions.generate-newsletter]
 verify_jwt = false
 
+[functions.generate-weekend]
+verify_jwt = false
+
 [functions.send-newsletter]
 verify_jwt = false
 
@@ -50,3 +53,7 @@ verify_jwt = false
 
 [functions.inbound-email]
 verify_jwt = false
+
+[functions.social-x]
+verify_jwt = false
+

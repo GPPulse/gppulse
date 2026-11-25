@@ -68,18 +68,17 @@ function BelowRadar({ items }: { items?: RadarItem[] }) {
   if (!items?.length) return null;
   return (
     <section className="px-6 md:px-8">
-      <Label sub="no press release, no wire story — found by us">Below the radar</Label>
+      <Label sub="deals you won't read anywhere else">Below the radar</Label>
       <div className="divide-y divide-border/40">
         {items.map((r, i) => {
           const take = (r as RadarItem & { take?: string }).take;
           return (
             <div key={i} className="py-3.5 first:pt-0">
-              <div className="mb-1.5"><Chip dark>{r.found_via}</Chip>{!r.confirmed && <Chip>Unconfirmed</Chip>}</div>
-              <p className="text-[15.5px] leading-snug"><Ext href={r.source_url}>{r.headline}</Ext></p>
+              {!r.confirmed && <div className="mb-1.5"><Chip>Unconfirmed</Chip></div>}
+              <p className="text-[15.5px] leading-snug font-medium">{r.headline}</p>
               {r.body && <p className="text-sm text-foreground/80 leading-relaxed mt-1">{r.body}</p>}
               {take && <Take label="Our read">{take}</Take>}
               <File lines={r.file} />
-              <p className="font-mono text-[10px] text-muted-foreground mt-1.5">Found at: {r.source}</p>
             </div>
           );
         })}
@@ -97,7 +96,7 @@ function ScoreboardView({ sb, weekly }: { sb?: Scoreboard | null; weekly?: boole
     ...(weekly ? [{ title: "Sector pace: week vs 4-wk avg", rows: sb.sectors.filter((s) => s.this_week || s.weekly_avg).map((s) => ({ k: s.sector, v: <><b>{s.this_week}</b> vs {s.weekly_avg}</> })) }] : []),
   ].filter((c) => c.rows.length);
   if (!cols.length) return null;
-  const sub = sb.radar?.total ? `last ${sb.window_days} days · ${sb.radar.total} deals tracked · ${sb.radar.below} had no press release` : `last ${sb.window_days} days`;
+  const sub = sb.radar?.total ? `last ${sb.window_days} days · ${sb.radar.total} deals tracked · ${sb.radar.below} reported only here` : `last ${sb.window_days} days`;
   return (
     <section className="px-6 md:px-8">
       <Label sub={sub}>The scoreboard</Label>
@@ -195,7 +194,7 @@ function Deals({ deals, weekly }: { deals: DealRow[]; weekly?: boolean }) {
           const parties = [d.advisors ? `Advisors: ${d.advisors}` : "", d.lender ? `Debt: ${d.lender}` : ""].filter(Boolean).join("  ·  ");
           return (
             <div key={d.id ?? i} className="py-3.5 first:pt-0">
-              <div className="mb-1.5"><Chip dark={d.featured}>{DEAL_TYPE_LABEL[d.deal_type] ?? "Deal"}</Chip>{d.featured && <Chip dark>Deal of the day</Chip>}</div>
+              <div className="mb-1.5"><Chip dark={d.featured}>{DEAL_TYPE_LABEL[d.deal_type] ?? "Deal"}</Chip>{d.featured && <Chip dark>Deal of the day</Chip>}{d.first_seen && <Chip dark>First here {new Date(`${d.first_seen}T12:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" })}</Chip>}</div>
               <p className="text-[15px] leading-snug"><strong>{d.sponsor}</strong> {verb(d.deal_type)} <Ext href={d.source_url}>{d.target}</Ext>{d.platform && d.deal_type === "add-on" && <span className="text-muted-foreground"> via {d.platform}</span>}</p>
               <p className="font-mono text-[11px] text-muted-foreground mt-1">{facts.join("  ·  ")}</p>
               {d.summary && <p className="text-sm text-foreground/80 leading-relaxed mt-1">{d.summary}</p>}
@@ -316,6 +315,20 @@ export function IssueView({ content: c, issueNumber, date, className, compact }:
         <People items={c.people_moves} />
         <Headlines items={c.market_pulse} title="Macro & credit" takeLabel="For the LMM" />
         <Items title="Overheard" items={c.overheard} />
+        {(c.weekend_reads ?? []).length > 0 && (
+          <section className="px-6 md:px-8">
+            <Label sub="the week's best long reads, picked by the desk">Weekend reading</Label>
+            <ol className="divide-y divide-border/40">
+              {(c.weekend_reads ?? []).map((r, i) => (
+                <li key={r.url} className="py-4 first:pt-0">
+                  <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground mb-1">{String(i + 1).padStart(2, "0")} · {r.publisher}{r.minutes ? ` · ${r.minutes} min` : ""}</p>
+                  <p className="text-base leading-snug font-semibold"><Ext href={r.url}>{r.title}</Ext></p>
+                  <p className="font-serif text-[15px] leading-relaxed mt-1.5">{r.note}</p>
+                </li>
+              ))}
+            </ol>
+          </section>
+        )}
         {c.the_read && (
           <section className="px-6 md:px-8">
             <Label sub="one piece worth your time">The read</Label>
