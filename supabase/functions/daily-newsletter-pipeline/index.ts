@@ -90,6 +90,12 @@ serve(async (req: Request): Promise<Response> => {
       case "social-generate": return finish(await call(supabaseUrl, serviceKey, "social-x", { action: "generate" }));
       case "social-post": return finish(await call(supabaseUrl, serviceKey, "social-x", { action: "post", dry: Boolean(body.dry) }));
       case "generate-newsletter": return finish(await call(supabaseUrl, serviceKey, "generate-newsletter", { force: Boolean(body.force) }));
+      case "generate-weekend": {
+        // Saturday's Weekend Reading. Reports whether an issue was built so the caller knows whether to send.
+        const res = await call(supabaseUrl, serviceKey, "generate-weekend", { force: Boolean(body.force) });
+        const d = (res.data ?? {}) as { newsletter_id?: string; skipped?: boolean };
+        return finish(res, { newsletter_id: d.newsletter_id ?? null, skipped: Boolean(d.skipped) });
+      }
       case "generate-gp-index": {
         const dow = new Date().getDay();
         if (dow !== 4 && dow !== 5 && !body.force) { step.status = "skipped"; step.message = "weekly — runs Thu/Fri"; step.completedAt = new Date().toISOString(); return { step }; }

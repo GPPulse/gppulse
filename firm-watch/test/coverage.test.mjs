@@ -148,3 +148,33 @@ test('a JavaScript-only news page is found when rendering is on', async (t) => {
     assert.deepEqual(shown.pages, [{ url: `${o}/news`, items: 3, dated: 3, rendered: true }]);
   } finally { s.close(); await closeRenderer(); }
 });
+
+// ---------- platform companies and deal counsel ----------
+import { platformsDue, platformIn, platformQueries, roleOf } from '../src/crawl.mjs';
+
+test('platform sweep: every usable portfolio name comes round once in five days', () => {
+  const sponsor = { watchlist: true, name: 'Kinderhook Industries', portfolio_names: ['Ecowaste Solutions', 'Apex', 'Summit Group', "Bob's Towing & Recovery, LLC", 'Acme', 'Northfield Medical Holdings', 'Ecowaste Solutions'] };
+  const notOurs = { watchlist: false, name: 'A Bank', portfolio_names: ['Should Not Appear Co'] };
+  const days = [0, 1, 2, 3, 4].map((d) => platformsDue([sponsor, notOurs], d).map((p) => p.name));
+  const all = days.flat().sort();
+  assert.deepEqual(all, ["Bob's Towing & Recovery", 'Ecowaste Solutions', 'Northfield Medical Holdings']);
+  assert.equal(platformsDue([sponsor], 7).length, platformsDue([sponsor], 2).length);
+});
+
+test('platform sweep: a headline counts only with the exact name and a deal verb', () => {
+  const firm = { name: 'Kinderhook Industries' };
+  const group = [{ name: 'Ecowaste Solutions', firm }, { name: 'Northfield Medical Holdings', firm }];
+  assert.equal(platformIn('Ecowaste Solutions acquires Lone Star Disposal', group).name, 'Ecowaste Solutions');
+  assert.equal(platformIn('Ecowaste Solutions names new CFO', group), null);
+  assert.equal(platformIn('ecowaste solutions acquires a hauler', group), null);
+  assert.equal(platformIn('Lone Star Disposal acquired by NewEcowaste Solutionsgroup', group), null);
+  const qs = platformQueries(Array.from({ length: 25 }, (_, i) => ({ name: `Portfolio Company Number ${i}`, firm })));
+  assert.ok(qs.length >= 3 && qs.every((q) => q.q.length < 520 && q.q.includes('when:7d')));
+});
+
+test('a law firm is counsel on a deal, never the buyer', () => {
+  assert.match(roleOf({ source_kind: 'advisor', firm_type: 'Deal counsel' }).the, /counsel/);
+  assert.match(roleOf({ source_kind: 'advisor', firm_type: 'Diligence provider' }).a, /diligence/);
+  assert.equal(roleOf({ source_kind: 'lender' }).the, 'the lender');
+  assert.equal(roleOf({ source_kind: 'advisor' }).the, 'the advisor');
+});

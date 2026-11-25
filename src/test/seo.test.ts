@@ -90,7 +90,8 @@ describe("page HTML for search engines and AI assistants", () => {
     expect(html).toContain('<meta property="og:type" content="article">');
     expect(html).toContain('<meta property="og:title" content="Falfurrias\'s second deal &amp; a &quot;quiet&quot; one &lt;b&gt;">');
     expect(html).toContain("Falfurrias doubled up, and did it quietly");
-    expect(html).toContain("unconfirmed signal");
+    expect(html).toContain("(unconfirmed)");
+    expect(html).not.toContain("Portfolio page");
     expect(html).toContain("EV $120M, EBITDA $15M, 8.0x EV/EBITDA");
     expect(html).toContain("Three portfolio pages changed");
     expect(html).not.toContain("<script>alert(1)");

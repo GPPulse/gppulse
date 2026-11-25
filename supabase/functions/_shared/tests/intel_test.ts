@@ -6,7 +6,7 @@ const base = { tracker: [], platform_addons: [], tombstone_banks: [], tombstone_
 Deno.test("a deal we already had says when and how we first had it", () => {
   const prior = { announced_on: "2026-11-18", first_seen_on: "2026-11-18", found_via: "tombstone", source: "Infinity Capital Partners" };
   eq(fileLines({ sponsor: "Rosewood Private Investments", deal_type: "exit" }, { ...base, prior_report: prior }),
-    ["In our tracker since Nov 18, from a banker tombstone (Infinity Capital Partners)"], "file line");
+    ["In our tracker since Nov 18"], "file line gives the date and never the trail");
   eq(isCaughtUp("news", prior), true, "press caught up with a tombstone");
   eq(isCaughtUp("tombstone", prior), false, "a second tombstone is only a repeat");
   eq(isCaughtUp("news", { ...prior, found_via: "press_release" }), false, "a release we already ran is only a repeat");

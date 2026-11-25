@@ -17,10 +17,17 @@
 
 import { mayAutoConfirm, openConfirmLink } from "./confirm.ts";
 import { cleanSubject, findForwarded } from "./forwarded.ts";
+import { cleanUrl, extractReads, pageFacts, publisherFromHost, resolve } from "../_shared/reading.ts";
 
 const env = (k: string) => Deno.env.get(k) ?? "";
 const forwarders = (env("WATCH_FORWARDERS") || "cschlotman@littlejohncapital.com").toLowerCase().split(",").map((s) => s.trim()).filter(Boolean);
 const isForwarder = (addr: string) => forwarders.some((f) => (f.startsWith("@") ? addr.endsWith(f) : addr === f));
+// Weekend Reading: mail to this address is a digest of long reads. It is accepted from the editors
+// (a forward, by hand or by an inbox rule) and from the senders named in READING_SENDERS
+// (addresses or @domains of letters the reading address is itself subscribed to).
+const readingAddress = (env("READING_ADDRESS") || "reading@in.thegppulse.com").toLowerCase();
+const readingSenders = env("READING_SENDERS").toLowerCase().split(",").map((s) => s.trim()).filter(Boolean);
+const isReadingSender = (addr: string) => readingSenders.some((f) => (f.startsWith("@") ? addr.endsWith(f) : addr === f));
 
 async function verifySvix(req: Request, body: string): Promise<boolean> {
   const secret = env("RESEND_INBOUND_WEBHOOK_SECRET");
@@ -78,6 +85,29 @@ Deno.serve(async (req: Request): Promise<Response> => {
   const fullText: string = email.text ?? stripHtmlLines(html);
   let text: string = fullText.slice(0, 6000);
   const messageId: string = email.message_id ?? email.id;
+
+  // Weekend Reading intake. Only links are kept: resolved to the page they land on, with that
+  // page's own title and publisher. Nothing from the digest's text is stored.
+  const toList: string[] = [email.to, email.headers?.to, event.data?.to].flat().filter(Boolean).map((t: unknown) => String(t).toLowerCase());
+  if (toList.some((t) => t.includes(readingAddress))) {
+    const fwdRead = isForwarder(envelope) ? findForwarded(subject, fullText) : null;
+    const origin = fwdRead?.address ?? envelope;
+    if (!isForwarder(envelope) && !isReadingSender(envelope)) return new Response(JSON.stringify({ ok: true, reading: "ignored: sender not on the reading list" }), { headers: { "content-type": "application/json" } });
+    const found = extractReads(html).slice(0, 15);
+    // Opened together, 8 seconds at most, so the webhook answers before Resend retries.
+    const pages = await Promise.all(found.map((l) => resolve(l.url)));
+    const rows: { url: string; title: string | null; publisher: string | null; via: string }[] = [];
+    found.forEach((link, i) => {
+      const page = pages[i];
+      const url = page ? cleanUrl(page.url) : null;
+      if (!url || !page) return; // a link we cannot open is not one we can recommend
+      const facts = pageFacts(page.html);
+      if (rows.some((r) => r.url === url)) return;
+      rows.push({ url, title: (facts.title ?? link.text).slice(0, 300), publisher: facts.site ?? publisherFromHost(url), via: (fwdRead?.display || origin).slice(0, 120) });
+    });
+    if (rows.length) await db("reading_queue?on_conflict=url", { method: "POST", headers: { prefer: "resolution=ignore-duplicates,return=minimal" }, body: JSON.stringify(rows) });
+    return new Response(JSON.stringify({ ok: true, reading: rows.length }), { headers: { "content-type": "application/json" } });
+  }
 
   // A forward from an editor: use the original sender, subject and body.
   const fwd = isForwarder(envelope) ? findForwarded(subject, fullText) : null;

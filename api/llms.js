@@ -45,7 +45,7 @@ function issueText(n) {
   const arr = (k) => (Array.isArray(c[k]) ? c[k] : []);
   const out = [`### ${strip(n.subject)}`, `Issue #${n.issue_number}, ${longDate(n.sent_at)}. ${SITE.url}${issuePath(n)}`];
   if (c.editors_note) out.push(`The Lede: ${strip(c.editors_note.headline)}`, ...(c.editors_note.paragraphs ?? []).map(strip));
-  if (arr("below_radar").length) out.push("Below the Radar (not announced):", ...arr("below_radar").map((r) => `- ${strip(r.headline)} (${strip(r.found_via)}${r.confirmed === false ? ", unconfirmed signal" : ""}). ${strip(r.body)}`));
+  if (arr("below_radar").length) out.push("Below the Radar (reported only here):", ...arr("below_radar").map((r) => `- ${strip(r.headline)}${r.confirmed === false ? " (unconfirmed)" : ""}. ${strip(r.body)}`));
   if (arr("deal_tracker").length) out.push("Deal Tracker:", ...arr("deal_tracker").map((d) => `- ${strip(d.sponsor)} / ${strip(d.target)} (${DEAL_TYPE[d.deal_type] ?? "Deal"}${d.sector ? `, ${d.sector}` : ""}${d.enterprise_value_millions != null ? `, EV ${fmtMillions(d.enterprise_value_millions)}` : ""}${d.ev_ebitda_multiple != null ? `, ${fmtMultiple(d.ev_ebitda_multiple)}` : ""}). ${strip(d.summary)}`));
   if (arr("fund_tracker").length) out.push("Funds:", ...arr("fund_tracker").map((f) => `- ${strip(f.firm)}, ${strip(f.fund_name)}. ${strip(f.summary)}`));
   if (arr("people_moves").length) out.push("People:", ...arr("people_moves").map((a) => `- ${strip(a.title)}. ${strip(a.summary)}`));

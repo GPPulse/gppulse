@@ -132,6 +132,84 @@ async function googleNewsBatched(firms) {
   return out;
 }
 
+// How a non-sponsor source relates to the deals it posts.
+export const roleOf = (firm) => firm.source_kind === 'lender' ? { a: 'a middle-market lender', the: 'the lender' }
+  : /counsel/i.test(firm.firm_type || '') ? { a: 'a law firm that acts as deal counsel', the: 'legal counsel to one side' }
+  : /diligence/i.test(firm.firm_type || '') ? { a: 'an accounting and diligence firm', the: 'a diligence adviser to one side' }
+  : { a: 'an M&A advisor', the: 'the advisor' };
+
+// ---------- platform companies ----------
+// Add-ons are announced by the platform, on its own site or in its local paper, and almost never
+// by the sponsor. We already hold each sponsor's portfolio list, so every night a fifth of those
+// company names is searched for acquisition news. A company comes round once every five days and
+// the search looks back seven, so nothing falls between passes.
+const GENERIC_NAME = /^(the |a )?(group|holdings|partners|capital|solutions|services|systems|technologies|industries|company|enterprises|international|global|america|american|national|united|premier|summit|apex|pinnacle|alliance|legacy|heritage|frontier|horizon|vertex|catalyst|momentum|elevate|evergreen|keystone|cornerstone|benchmark|landmark)( (group|holdings|partners|solutions|services|systems|company|inc|llc|corp))*\.?$/i;
+const DEAL_VERB = /\b(acquir(es|ed|ing)|acquisition|merg(es|ed|er)|add-?on|tuck-?in|joins forces|purchas(es|ed)|buys|bought|expands (with|through)|welcomes)\b/i;
+const hash = (s) => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h; };
+
+/** The portfolio companies due for a search today: [{ name, firm }], firm being the sponsor. */
+export function platformsDue(firms, dayIndex, cycle = 5) {
+  const out = [];
+  const seen = new Set();
+  for (const f of firms) {
+    if (!f.watchlist || !Array.isArray(f.portfolio_names)) continue;
+    for (const raw of f.portfolio_names) {
+      const name = String(raw || '').replace(/\s+/g, ' ').replace(/[,.]? (inc|llc|l\.l\.c|corp|corporation|co|ltd|lp)\.?$/i, '').trim();
+      const key = name.toLowerCase();
+      // A short or one-common-word name matches half the internet; those are left to the sponsor's own news.
+      if (name.length < 6 || name.length > 60 || GENERIC_NAME.test(name) || !/[a-z]/i.test(name) || /["()]/.test(name)) continue;
+      if (name.split(' ').length === 1 && name.length < 9) continue;
+      if (seen.has(key) || hash(key) % cycle !== dayIndex % cycle) continue;
+      seen.add(key);
+      out.push({ name, firm: f });
+    }
+  }
+  return out;
+}
+
+/** Which of the searched companies a headline is about. Case-sensitive, whole name, with a deal verb. */
+export function platformIn(title, group) {
+  if (!DEAL_VERB.test(title)) return null;
+  const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return group.find((p) => new RegExp(`(^|[^A-Za-z0-9])${esc(p.name).replace(/\s+/g, '\\s+')}([^A-Za-z0-9]|$)`).test(title)) ?? null;
+}
+
+export function platformQueries(platforms, size = 10, maxLen = 430) {
+  const out = [];
+  let cur = [];
+  const q = (g) => `(${g.map((p) => `"${p.name}"`).join(' OR ')}) (acquires OR acquired OR acquisition OR merger OR "add-on") when:7d`;
+  for (const p of platforms) {
+    if (cur.length && (cur.length >= size || q([...cur, p]).length > maxLen)) { out.push({ q: q(cur), group: cur }); cur = []; }
+    cur.push(p);
+  }
+  if (cur.length) out.push({ q: q(cur), group: cur });
+  return out;
+}
+
+async function platformSweep(firms, { max = 320, cap = 150 } = {}) {
+  const due = platformsDue(firms, Math.floor(Date.now() / 864e5));
+  const queries = platformQueries(due).slice(0, max);
+  const out = [];
+  const statuses = {};
+  for (const { q, group } of queries) {
+    const res = await get(`https://news.google.com/rss/search?q=${encodeURIComponent(q)}&hl=en-US&gl=US&ceid=US:en`, { accept: 'application/rss+xml,application/xml,text/xml,*/*', gap: 0 });
+    statuses[res.status] = (statuses[res.status] || 0) + 1;
+    await sleep(900);
+    if (res.status === 429) { console.log('Platform sweep: rate limited, stopping for today'); break; }
+    if (!looksLikeFeed(res)) continue;
+    for (const it of parseFeed(res.body).slice(0, 20)) {
+      const title = it.title.replace(/\s+-\s+[^-]+$/, '');
+      if ((daysAgo(it.date) ?? 99) > 7) continue;
+      const hit = platformIn(title, group);
+      if (!hit) continue;
+      out.push({ ...it, title, kind: 'add_on', firm: hit.firm, platform: hit.name, via: `Google News — ${it.source || 'local press'}` });
+    }
+  }
+  console.log(`Platform sweep: ${due.length} portfolio companies due, ${queries.length} searches, HTTP ${JSON.stringify(statuses)}, ${out.length} hits`);
+  const seen = new Set();
+  return out.filter((i) => { const k = `${i.platform}|${i.title.toLowerCase().slice(0, 50)}`; if (seen.has(k)) return false; seen.add(k); return true; }).slice(0, cap);
+}
+
 // Phrases that only show up in lower-middle-market deal coverage. Local business journals,
 // small-town papers and trade sites write these up; the PE trade press mostly does not.
 export const SWEEP_QUERIES = [
@@ -275,6 +353,17 @@ async function main() {
     for (const it of news) if (fresh.has(it.url) && !have.has(`${it.firm.id}|${it.title.toLowerCase().slice(0, 50)}`)) { have.add(`${it.firm.id}|${it.title.toLowerCase().slice(0, 50)}`); queue.push(it); }
   }
 
+  // Portfolio companies: add-ons the platform announced and the sponsor did not.
+  if (!flag('no-gnews') && !flag('no-platforms')) {
+    const found = await platformSweep(firms);
+    const fresh = new Set();
+    for (const part of chunk([...new Set(found.map((i) => i.url))], 200)) (await api('check', { urls: part })).unknown.forEach((u) => fresh.add(u));
+    const have = new Set(queue.map((i) => i.title.toLowerCase().slice(0, 50)));
+    let n = 0;
+    for (const it of found) if (fresh.has(it.url) && !have.has(it.title.toLowerCase().slice(0, 50))) { have.add(it.title.toLowerCase().slice(0, 50)); queue.push(it); n++; }
+    console.log(`Platform sweep: ${n} new items`);
+  }
+
   // Full text for what is going to the classifier, so it has more than a headline to read.
   await pool(queue.filter((i) => i.via !== undefined && !i.via.startsWith('Google News') && !i.url.includes('#t-')), 6, async (it) => {
     if (!(await allowed(it.url))) return;
@@ -293,10 +382,10 @@ async function main() {
   const row = (i, seen_only) => ({
     firm_id: i.firm.id, url: i.url, title: i.title, seen_only,
     content: seen_only ? null : [i.content || i.summary || i.title, i.firm.watchlist
-      ? `\n[Watchlist firm: ${i.firm.name}. Found via ${i.via}.]`
+      ? `\n[Watchlist firm: ${i.firm.name}. Found via ${i.via}.${i.platform ? ` ${i.platform} is a portfolio company of ${i.firm.name}; if it is the buyer, this is an add-on with ${i.platform} as the platform and ${i.firm.name} as the sponsor.` : ''}]`
       : i.firm.source_kind === 'trade'
         ? `\n[Source: ${i.via?.startsWith('Google News') ? i.via.replace(/^Google News — /, '') : `${i.firm.name}, a trade publication covering ${i.firm.firm_type || 'one industry'}`}. Trade and local press cover lower-middle-market deals the PE press misses. Name the buyer and the target from the text; ${i.firm.name.startsWith('Google News') ? 'the search engine' : 'the publication'} is not a party to the deal. If no private equity firm, independent sponsor or PE-backed company is a party, this is not a PE deal.]`
-        : `\n[Source: ${i.firm.name}, ${i.firm.source_kind === 'lender' ? 'a middle-market lender' : 'an M&A advisor'}, from its own ${i.via === 'tombstone' ? 'list of closed transactions' : 'site'}. ${i.firm.name} is the ${i.firm.source_kind === 'lender' ? 'lender' : 'advisor'} on the deal, not the buyer.]`].join(''),
+        : `\n[Source: ${i.firm.name}, ${roleOf(i.firm).a}, from its own ${i.via === 'tombstone' ? 'list of closed transactions' : 'site'}. ${i.firm.name} is ${roleOf(i.firm).the} on the deal, not the buyer. Name the buyer, its private equity owner if any, and the target from the text.]`].join(''),
     published_at: i.date ? new Date(i.date.length === 10 ? i.date + 'T12:00:00Z' : i.date).toISOString() : null,
     source_name: i.firm.name, category_hint: HINT[i.kind] || null,
   });

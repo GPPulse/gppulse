@@ -111,6 +111,15 @@ export interface TheRead {
   take: string;
 }
 
+/** One pick in the Saturday Weekend Reading edition: the piece, where it ran, and our note on it. */
+export interface WeekendRead {
+  title: string;
+  publisher: string;
+  url: string;
+  note: string;
+  minutes?: number | null;
+}
+
 export interface NewsletterContentV2 {
   version: 2;
   edition: "daily" | "weekly" | "special";
@@ -127,6 +136,8 @@ export interface NewsletterContentV2 {
   overheard: EditorItem[];
   market_pulse: Article[];
   the_read: TheRead | null;
+  /** Saturday edition only. */
+  weekend_reads?: WeekendRead[];
   jobs: EditorItem[];
   closing_line: string | null;
   /** This week's one-click reader question (Tuesdays). */

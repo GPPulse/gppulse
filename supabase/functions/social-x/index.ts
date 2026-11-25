@@ -58,7 +58,7 @@ serve(async (req: Request): Promise<Response> => {
         `SUBJECT: ${issue.subject}`,
         c.editors_note ? `LEDE: ${c.editors_note.headline}\n${c.editors_note.paragraphs.join("\n")}` : "",
         c.by_the_numbers.length ? `NUMBERS:\n${c.by_the_numbers.map((s) => `- ${s.value}: ${s.label}. ${s.context ?? ""}`).join("\n")}` : "",
-        radar.length ? `BELOW THE RADAR (no press release found):\n${radar.map((r) => `- ${r.confirmed ? "" : "(UNCONFIRMED signal) "}${r.headline}. ${r.body ?? ""}`).join("\n")}` : "",
+        radar.length ? `BELOW THE RADAR (ours alone):\n${radar.map((r) => `- ${r.confirmed ? "" : "(UNCONFIRMED signal) "}${r.headline}. ${r.body ?? ""}`).join("\n")}` : "",
         c.deal_tracker.length ? `ANNOUNCED DEALS:\n${c.deal_tracker.slice(0, 10).map((d) => `- ${d.sponsor} / ${d.target} (${d.deal_type}${d.sector ? `, ${d.sector}` : ""}). ${d.editor_take ?? d.summary ?? ""}`).join("\n")}` : "",
         c.fund_tracker.length ? `FUNDS:\n${c.fund_tracker.slice(0, 4).map((f) => `- ${f.firm}, ${f.fund_name} (${f.status}). ${f.summary ?? ""}`).join("\n")}` : "",
       ].filter(Boolean).join("\n\n");
@@ -73,7 +73,7 @@ Write 4 posts from TODAY'S ISSUE below. JSON only:
 RULES
 - Each post stands alone and makes one point. 120 to 240 characters. Plain sentences. Numbers first where there is one.
 - Use only facts in the issue. No figure, name or claim that is not printed there. Never estimate.
-- An UNCONFIRMED signal is described as exactly that ("now listed on X's portfolio page; no announcement found"). Never say a deal closed on the strength of a signal.
+- An UNCONFIRMED item is worded as unconfirmed ("appears to have added", "not confirmed by either side"). Never say it closed. Never say how a deal was found.
 - No links, no @mentions, no emoji, no threads, no "1/". At most one hashtag in the whole set, and only if it reads naturally; none is better.
 - Do not mention lenders' filings, BDCs, stock indexes or rates. Do not give advice or predictions.
 - No teasers ("you won't believe", "here's why"). No rhetorical questions. Do not mention the newsletter or ask for follows; another post handles that.
@@ -97,7 +97,7 @@ ALSO write "linkedin": one LinkedIn post the editor will paste under his own nam
         const n = (c.below_radar ?? []).filter((r) => r.confirmed && r.found_via !== "SEC filing").length;
         const url = `${CONFIG.siteUrl}/?utm_source=x&utm_medium=social`;
         posts.push({ kind: "signup", text: n >= 2
-          ? `Today's issue had ${n} deals we found with no press release, plus the tracker and the people moves. Free, weekday mornings: ${url}`
+          ? `Today's issue had ${n} deals you won't read anywhere else, plus the tracker and the people moves. Free, weekday mornings: ${url}`
           : `The lower middle market, every weekday morning: the deals nobody announced, the funds in market, who moved where. Free: ${url}` });
       }
       const start = Date.now();

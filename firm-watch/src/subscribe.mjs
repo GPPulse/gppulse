@@ -148,6 +148,86 @@ export async function submit(plan, pageUrl, id = IDENTITY) {
   }
 }
 
+// ---------- forms that only exist once the page's script has run ----------
+// About a third of sign-up forms are drawn by script (Mailchimp pop-ins, HubSpot, Squarespace,
+// Wix), so there is nothing in the page source to post. With --browser those are filled in a
+// real headless browser, the way a person would: type the address, press the button. The rules
+// do not change: a page that carries a CAPTCHA is left alone, hidden fields stay empty, and a
+// form that asks for anything beyond name, company, title and email is skipped.
+let browser = null;
+export async function closeBrowser() { if (browser) { const b = await browser.catch(() => null); browser = null; await b?.close().catch(() => {}); } }
+
+export async function submitInBrowser(pageUrl, id = IDENTITY, { timeout = 25000 } = {}) {
+  let pw;
+  try { pw = await import('playwright'); } catch { return { status: 'needs_browser', note: 'no headless browser installed' }; }
+  try { browser ||= pw.chromium.launch(process.env.FW_CHROME_PATH ? { executablePath: process.env.FW_CHROME_PATH } : {}); await browser; } catch (err) { browser = null; return { status: 'needs_browser', note: `browser did not start: ${String(err?.message || err).slice(0, 60)}` }; }
+  const ctx = await (await browser).newContext({ userAgent: UA });
+  try {
+    const page = await ctx.newPage();
+    await page.route('**/*', (r) => (/^(image|media|font)$/.test(r.request().resourceType()) ? r.abort() : r.continue()));
+    await page.goto(pageUrl, { waitUntil: 'networkidle', timeout }).catch(() => null);
+    const html = await page.content();
+    if (CAPTCHA.test(html)) return { status: 'captcha', note: 'page carries a CAPTCHA; left alone' };
+
+    // Work out, inside the page, which email box belongs to a sign-up form and tag its parts.
+    const plan = await page.evaluate(({ signupSrc }) => {
+      const SIGNUP = new RegExp(signupSrc, 'i');
+      const visible = (el) => { const r = el.getBoundingClientRect(); const cs = getComputedStyle(el); return r.width > 2 && r.height > 2 && cs.visibility !== 'hidden' && cs.display !== 'none' && Number(cs.opacity) > 0.05 && r.left > -500; };
+      const describe = (el) => [el.type === 'email' ? 'email' : '', el.name, el.id, el.placeholder, el.getAttribute('aria-label'), el.id ? (document.querySelector(`label[for="${CSS.escape(el.id)}"]`)?.textContent ?? '') : '', el.closest('label')?.textContent ?? ''].join(' ');
+      for (const email of document.querySelectorAll('input[type="email"], input[name*="email" i], input[placeholder*="email" i]')) {
+        if (!visible(email)) continue;
+        let box = email.closest('form');
+        if (!box) { box = email.parentElement; for (let i = 0; i < 4 && box && !box.querySelector('button, input[type="submit"], [role="button"]'); i++) box = box.parentElement; }
+        if (!box || box.querySelector('input[type="password"], textarea')) continue;
+        const context = `${box.textContent} ${box.previousElementSibling?.textContent ?? ''} ${box.parentElement?.querySelector('h1,h2,h3,h4,h5')?.textContent ?? ''} ${box.id} ${box.className}`;
+        if (!SIGNUP.test(context)) continue;
+        const button = [...box.querySelectorAll('button, input[type="submit"], [role="button"]')].find((b) => visible(b) && !/search|close|cancel|dismiss/i.test(`${b.textContent} ${b.getAttribute('aria-label') ?? ''}`));
+        if (!button) continue;
+        const fields = [];
+        let asksFor = null;
+        box.querySelectorAll('input, select').forEach((el, n) => {
+          const type = (el.getAttribute('type') || (el.tagName === 'SELECT' ? 'select' : 'text')).toLowerCase();
+          if (['hidden', 'submit', 'button', 'image', 'reset', 'file'].includes(type) || !visible(el)) return; // hidden boxes are honeypots: never filled
+          el.setAttribute('data-gpp', String(n));
+          if (type === 'checkbox' || type === 'radio') { if (el.required && !el.checked) fields.push({ n, tick: true }); return; }
+          if (type === 'select') { if (el.required) asksFor = el.name || 'a choice'; return; }
+          fields.push({ n, desc: describe(el), required: el.required });
+        });
+        button.setAttribute('data-gpp-go', '1');
+        return { fields, asksFor };
+      }
+      return null;
+    }, { signupSrc: SIGNUP_TEXT.source });
+
+    if (!plan) return { status: 'skipped', note: 'no sign-up form on the rendered page' };
+    if (plan.asksFor) return { status: 'skipped', note: `asks for something we do not give (${plan.asksFor})` };
+    let gaveEmail = false;
+    for (const f of plan.fields) {
+      const el = page.locator(`[data-gpp="${f.n}"]`);
+      if (f.tick) { await el.check({ timeout: 3000 }).catch(() => {}); continue; }
+      const v = valueFor(f.desc, id);
+      if (v === null) { if (f.required) return { status: 'skipped', note: 'asks for something we do not give' }; continue; }
+      await el.fill(v, { timeout: 3000 });
+      if (v === id.email) gaveEmail = true;
+    }
+    if (!gaveEmail) return { status: 'skipped', note: 'no email field found' };
+    const before = (await page.locator('body').innerText().catch(() => '')).length;
+    await page.locator('[data-gpp-go="1"]').click({ timeout: 5000 });
+    await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
+    await page.waitForTimeout(1200);
+    const after = await page.content();
+    if (CAPTCHA.test(after) && /captcha/i.test(await page.locator('body').innerText().catch(() => ''))) return { status: 'captcha', note: 'CAPTCHA shown on submit; left alone' };
+    const text = (await page.locator('body').innerText().catch(() => '')).slice(0, 20000);
+    if (/thank(s| you)|subscribed|you'?re (in|on the list|signed up)|success|check your (inbox|email)|almost (there|done)|confirm your|please confirm|been added|welcome aboard/i.test(text)) return { status: 'subscribed', note: 'submitted in a browser; the page confirmed' };
+    if (/invalid|error|required|try again|something went wrong/i.test(text.slice(0, 20000)) && text.length - before < 400) return { status: 'failed', note: 'the form reported a problem' };
+    return { status: 'subscribed', note: 'submitted in a browser; no confirmation text shown' };
+  } catch (err) {
+    return { status: 'failed', note: `browser: ${String(err?.message || err).slice(0, 90)}` };
+  } finally {
+    await ctx.close().catch(() => {});
+  }
+}
+
 // Pages other than the home page where firms tend to put the newsletter form.
 const FORM_PATHS = ['/subscribe', '/newsletter', '/contact', '/contact-us', '/news', '/insights', '/connect', '/stay-connected'];
 const FORM_LINK = /subscribe|newsletter|sign[- ]?up|mailing list|email (alerts|updates)|stay (connected|informed|in touch)|insights|contact/i;
@@ -218,7 +298,8 @@ async function main() {
     for (const f of found) if (!f.signup_page) { const firm = firms.find((x) => x.id === f.id); if (firm) firm.signup_status = 'no_form'; }
   }
 
-  firms = firms.filter((f) => f.signup_page && !f.subscribed_at && (flag('retry') || !f.signup_status) && (!opt('kind') || f.source_kind === opt('kind')));
+  // With --browser, forms that earlier runs set aside as script-built get their one browser attempt.
+  firms = firms.filter((f) => f.signup_page && !f.subscribed_at && (flag('retry') || !f.signup_status || (flag('browser') && f.signup_status === 'needs_browser')) && (!opt('kind') || f.source_kind === opt('kind')));
   // Sponsors first, then advisors, lenders and trade press; best tiers first.
   const rank = { sponsor: 0, advisor: 1, lender: 2, trade: 3 };
   firms.sort((a, b) => (rank[a.source_kind] ?? 9) - (rank[b.source_kind] ?? 9) || (a.watch_tier ?? 9) - (b.watch_tier ?? 9));
@@ -231,7 +312,15 @@ async function main() {
     const page = await get(firm.signup_page);
     if (!page.ok) return done('failed', `page unreadable (HTTP ${page.status})`);
     const plan = planSignup(page.body, page.url);
-    if (plan.kind === 'skip') return done(plan.reason === 'captcha' ? 'captcha' : /script/.test(plan.reason) ? 'needs_browser' : 'skipped', plan.reason);
+    if (plan.kind === 'skip') {
+      const scripted = /script|no sign-up form recognised/.test(plan.reason);
+      if (scripted && flag('browser') && !flag('dry') && !CAPTCHA.test(page.body)) {
+        const r = await submitInBrowser(page.url);
+        // "browser:" in the note marks the attempt as made, so the firm is not tried this way twice.
+        return done(r.status, r.status === 'subscribed' ? r.note : `browser: ${r.note}`);
+      }
+      return done(plan.reason === 'captcha' ? 'captcha' : scripted ? 'needs_browser' : 'skipped', plan.reason);
+    }
     if (plan.kind === 'form' && !(await allowed(plan.url))) return done('skipped', 'robots.txt disallows the form address');
     if (flag('dry')) return done('dry', plan.kind === 'hubspot' ? `HubSpot form ${plan.formId}` : `${plan.method.toUpperCase()} ${plan.url} (${plan.fields.length} fields)`);
     await sleep(500);
@@ -239,6 +328,7 @@ async function main() {
     done(r.ok ? 'subscribed' : 'failed', r.note);
   });
 
+  await closeBrowser();
   const tally = results.reduce((m, r) => { m[r.status] = (m[r.status] ?? 0) + 1; return m; }, {});
   console.log(`Mailing lists: ${firms.length} firms tried. ${Object.entries(tally).map(([k, v]) => `${v} ${k}`).join(', ') || 'nothing to do'}.`);
   for (const r of results) console.log(`  [${r.status}] ${r.name}: ${r.note}`);

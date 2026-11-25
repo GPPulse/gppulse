@@ -3,7 +3,7 @@ import { SITE } from "@/lib/site";
 
 // Real deals from the Nov 19, 2026 draft. Swap these when a sharper set comes through.
 const RADAR = [
-  { type: "Add-on", text: <><strong>Linx Partners</strong> adds Palmetto State Transportation</>, meta: "Found on a banker tombstone · no press release" },
+  { type: "Add-on", text: <><strong>Linx Partners</strong> adds Palmetto State Transportation</>, meta: "Reported only here" },
   { type: "Recap", text: <><strong>Ridgemont Equity Partners</strong> recaps SRM</>, meta: "Found in local press" },
 ];
 const TRACKER = [

@@ -72,8 +72,8 @@ export function fileLines(d: { sponsor: string; deal_type: string; platform?: st
   const out: string[] = [];
   const pr = ctx.prior_report;
   if (pr) {
-    const how = pr.found_via && QUIET.has(pr.found_via) ? `, from ${HOW[pr.found_via]}${pr.source && pr.found_via === "tombstone" ? ` (${pr.source})` : ""}` : "";
-    out.push(`In our tracker since ${shortDate(pr.first_seen_on ?? pr.announced_on)}${how}`);
+    // The date, never the trail: readers are not told how a deal reached us.
+    out.push(`In our tracker since ${shortDate(pr.first_seen_on ?? pr.announced_on)}`);
   }
   const prior = ctx.tracker ?? [];
   if (prior.length) {
@@ -87,7 +87,7 @@ export function fileLines(d: { sponsor: string; deal_type: string; platform?: st
   }
   if (ctx.tombstone_total >= 2) {
     const banks = (ctx.tombstone_banks ?? []).slice(0, 3).map((b) => b.source_name).join(", ");
-    out.push(`Named on ${ctx.tombstone_total} banker tombstones in our archive (${banks})`);
+    out.push(`Banks on its closed deals in our archive: ${banks} (${ctx.tombstone_total} deals)`);
   }
   if (ctx.fund) {
     const f = ctx.fund;
@@ -98,7 +98,6 @@ export function fileLines(d: { sponsor: string; deal_type: string; platform?: st
 }
 
 const QUIET = new Set(["tombstone", "trade_press", "local_press", "portfolio_page", "sec_filing"]);
-const HOW: Record<string, string> = { tombstone: "a banker tombstone", trade_press: "the trade press", local_press: "local press", portfolio_page: "a portfolio page", sec_filing: "an SEC filing" };
 
 /** We had it quietly and today a release, a wire or the PE press reported it. */
 export function isCaughtUp(via: FoundVia, prior: NonNullable<DealContext["prior_report"]>): boolean {
@@ -130,7 +129,7 @@ export async function marketIntel(supabase: SupabaseClient, days = 30): Promise<
 export function intelText(m: MarketIntel | null): string {
   if (!m) return "";
   const lines: string[] = [];
-  if (m.radar?.total) lines.push(`Deals tracked last 30 days: ${m.radar.total}; ${m.radar.below} of them had no press release or wire story (found via banker tombstones, trade/local press, portfolio pages or filings).`);
+  if (m.radar?.total) lines.push(`Deals tracked last 30 days: ${m.radar.total}; ${m.radar.below} of them were ours alone (not covered in the PE press).`);
   if (m.sponsors?.length) lines.push(`Most active sponsors (30d): ${m.sponsors.map((s) => `${s.sponsor} ${s.n}`).join(", ")}`);
   if (m.banks?.length) lines.push(`Banks/lenders posting new closings (30d): ${m.banks.map((b) => `${b.name} ${b.n}`).join(", ")}`);
   if (m.platforms?.length) lines.push(`Platforms stacking add-ons: ${m.platforms.map((p) => `${p.platform} (${p.sponsor}) ${p.n}`).join(", ")}`);

@@ -3,7 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { aiConfigured, chat, HOUSE_STYLE, parseJSON } from "../_shared/ai.ts";
 import { getStaff, isInternalCall, unauthorized } from "../_shared/auth.ts";
 import { CONFIG } from "../_shared/config.ts";
-import { lintIssue } from "../_shared/lint.ts";
+import { lintIssue, lintStyle, tidy } from "../_shared/lint.ts";
 import { isFridayIssue, issueDateLabel, issueDay } from "../_shared/issue-day.ts";
 import { dealContext, DealContext, fileLines, FOUND_VIA_LABEL, FoundVia, intelText, isBelowRadar, isCaughtUp, marketIntel } from "../_shared/intel.ts";
 import { announcedOn, archiveIds, lenderAsSponsor, sameDeal } from "../_shared/tracker.ts";
@@ -205,10 +205,10 @@ async function editorialPass(
   const fmtArt = (list: DbArticle[]) => list.map((a, i) => `[${i + 1}] ${a.title}\n    ${a.summary ?? ""}\n    (${a.source})`).join("\n");
   const fmtFile = (f?: string[]) => (f?.length ? `\n    THE FILE: ${f.join(" | ")}` : "");
   const fmtDeals = input.deals
-    .map((d, i) => `[${i + 1}] ${d.first_seen ? `(FIRST HERE: in our tracker since ${d.first_seen}) ` : ""}${d.sponsor} → ${d.target}${d.platform ? ` (add-on to ${d.platform})` : ""} | ${d.deal_type} | ${d.sector ?? "sector n/d"}${d.hq_state ? ` | ${d.hq_state}` : ""}${d.seller_type ? ` | seller: ${d.seller_type}` : ""} | EV ${d.enterprise_value_millions ?? "n/d"}M | EBITDA ${d.ebitda_millions ?? "n/d"}M | ${d.ev_ebitda_multiple ?? "n/d"}x${d.advisors ? ` | advisors: ${d.advisors}` : ""}${d.lender ? ` | lender: ${d.lender}` : ""} | found via: ${d.found_via ?? "n/d"}\n    ${d.summary ?? ""}${fmtFile(d.file)}`)
+    .map((d, i) => `[${i + 1}] ${d.first_seen ? `(FIRST HERE: in our tracker since ${d.first_seen}) ` : ""}${d.sponsor} → ${d.target}${d.platform ? ` (add-on to ${d.platform})` : ""} | ${d.deal_type} | ${d.sector ?? "sector n/d"}${d.hq_state ? ` | ${d.hq_state}` : ""}${d.seller_type ? ` | seller: ${d.seller_type}` : ""} | EV ${d.enterprise_value_millions ?? "n/d"}M | EBITDA ${d.ebitda_millions ?? "n/d"}M | ${d.ev_ebitda_multiple ?? "n/d"}x${d.advisors ? ` | advisors: ${d.advisors}` : ""}${d.lender ? ` | lender: ${d.lender}` : ""}\n    ${d.summary ?? ""}${fmtFile(d.file)}`)
     .join("\n");
   const fmtRadar = input.radar
-    .map((r, i) => `[${i + 1}] (${r.found_via}${r.confirmed ? "" : ", UNCONFIRMED signal"}) ${r.headline}\n    ${r.body ?? ""}${fmtFile(r.file)}`)
+    .map((r, i) => `[${i + 1}] ${r.found_via === FOUND_VIA_LABEL.sec_filing ? "(LENDER LOAN) " : ""}${r.confirmed ? "" : "(UNCONFIRMED) "}${r.headline}\n    ${r.body ?? ""}${fmtFile(r.file)}`)
     .join("\n");
   const fmtFunds = input.funds
     .map((f, i) => `[${i + 1}] ${f.firm} — ${f.fund_name} | ${f.status} | target ${f.target_millions ?? "n/d"}M | raised ${f.raised_millions ?? "n/d"}M | ${f.strategy ?? ""} | source: ${f.source}`)
@@ -220,25 +220,27 @@ async function editorialPass(
 
 You are writing today's issue of The GP Pulse (${input.edition === "weekly" ? "Friday week-in-review edition" : "daily edition"}) for ${input.dateLabel}.
 
-WHAT THIS NEWSLETTER IS. The one place a lower-middle-market GP ($2–25M EBITDA deals, sub-$1B funds) sees the deals nobody announced and the context nobody else has. PE Hub, PitchBook News, Axios Pro and Mergers & Acquisitions already reprint press releases and markets. We do not compete on that. Our edge, in order:
-  1. BELOW THE RADAR: deals and signals we found with no press release (banker tombstones, trade and local press, portfolio pages, SEC filings).
+WHAT THIS NEWSLETTER IS. The one place a lower-middle-market GP ($2–25M EBITDA deals, sub-$1B funds) sees the deals nobody else is covering and the context nobody else has. PE Hub, PitchBook News, Axios Pro and Mergers & Acquisitions already reprint press releases and markets. We do not compete on that. Our edge, in order:
+  1. BELOW THE RADAR: deals the rest of the PE press has not covered. They are our reporting. Write them as plain deal news.
   2. THE FILE: what our archive says about each party — the sponsor's pace, the platform's add-on count, which banks keep closing with them, which fund they're investing from.
   3. PATTERNS across our own tracker: sponsors on a run, platforms stacking add-ons, sectors running hot vs. their own pace, banks with a busy month, founder vs. sponsor sellers.
 
 HARD RULES
 - The Lede is built on 1, 2 or 3 above. Never open on the stock market, rates or the ticker. Macro may appear in at most one sentence, and only if you tie it to a specific deal or lender in today's material. If public markets are the only thing you can say, you have the wrong story.
-- The subject line names a company, a sponsor, a platform or a count from our data. Never an index level, a yield, or "markets". Prefer a below-the-radar deal or a pattern. Bad: "Russell down 4.2%, 10Y at 5.1%, and deals still printed". Good: "Kinderhook's waste roll-up quietly added two more", "Three Midwest towing deals, none announced", "The banks that closed 9 LMM deals this week".
+- The subject line names a company, a sponsor, a platform or a count from our data. Never an index level, a yield, or "markets". Prefer a below-the-radar deal or a pattern. Bad: "Russell down 4.2%, 10Y at 5.1%, and deals still printed". Good: "Kinderhook's waste roll-up added two more", "Three Midwest towing deals in one week", "The banks that closed 9 LMM deals this week".
 - Never write filler about missing numbers ("terms undisclosed", "we can't tell what anyone paid", "pricing undisclosed so the arbitrage is unverifiable"). The reader knows LMM deals rarely disclose. Say something only when there is something to say.
 - Deal takes and radar takes must use a fact from THE FILE, the advisor/lender, the seller type, the geography, or the platform history. A take that would fit any deal ("deploying on pace", "classic add-on", "route density") is banned. If you have nothing specific, skip the deal — fewer takes is better.
-- UNCONFIRMED signals (new names on a portfolio page) are described as exactly that: "now listed on X's portfolio page; we found no announcement". Never state a deal closed on the strength of a signal.
+- UNCONFIRMED items are worded as unconfirmed: "appears to have added", "not confirmed by either side". Never state that an unconfirmed deal closed, and never build the subject or the Lede on one.
+- NEVER SAY HOW WE FOUND A DEAL. No tombstones, portfolio pages, websites, filings, 10-Qs, searches, or remarks that a press release does or does not exist. The reader gets the deal: buyer, target, seller, what the company does, and what our file adds.
 - Use only figures that appear in the material. Never estimate.
-- LENDER FILINGS. Items found via \"SEC filing\" are loans listed in a lender's quarterly schedule. Our readers are sponsors; they do not follow BDCs. Never build the subject, the Lede, a by_the_numbers entry or the closing line on a lender, a BDC or a list of its borrowers, and never name a BDC or lender in the subject. A filing item may get one radar take about the borrower and its pricing. If filings are the only below-the-radar material, lead with a pattern from the Scoreboard or the most instructive announced deal instead.
+- LENDER LOANS. Items marked LENDER LOAN are new loans to private companies. Our readers are sponsors; they do not follow BDCs. Never build the subject, the Lede, a by_the_numbers entry or the closing line on a lender, a BDC or a list of its borrowers, and never name a BDC or lender in the subject. A lender-loan item may get one radar take about the borrower and its pricing. If lender loans are the only below-the-radar material, lead with a pattern from the Scoreboard or the most instructive announced deal instead.
 - SIZE. This is a lower-middle-market letter. Do not lead with, feature, or build a number on a deal above $500M in enterprise value or one where the only sponsor is a large-cap firm.
 - PACE CLAIMS. Say a sponsor is on its "second", "third" or "Nth" deal, or "on a run", only when THE FILE for that deal says so in those words, and name the other deals it lists. Never count deals yourself from the lists below, and never treat two spellings of one company as two deals.
-- FIRST HERE. A deal marked FIRST HERE was in our tracker before anyone reported it. Say so plainly, once, with the date and how we found it. It is the proof of what this letter is for; do not gloat.
+- FIRST HERE. A deal marked FIRST HERE was in our tracker before anyone reported it. Say so plainly, once, with the date ("we had this on Nov 18"). Do not say how we had it, and do not gloat.
 - THE READ is a piece worth fifteen minutes: reporting, data or an argument. A press release, a promotional webcast or anything you would describe as having "no new data" is not. If no candidate qualifies, return null. An empty slot beats a weak pick.
 ${input.edition === "weekly" ? `
 FRIDAY RULES. The keeper issue. The Lede is 3–4 paragraphs on the PATTERN across the week from OUR DATA (the Scoreboard numbers below): who was busiest, which platforms stacked add-ons, which banks closed the most, which sectors ran above their own pace, how many deals were below the radar. Open with the single number that best summarizes the week. Subject reads as a weekly verdict built on our data.` : ""}
+- LENGTH. Takes are uneven on purpose. Across the issue: most are one sentence, some under twelve words; the one or two deals with a real story get three or four sentences; a deal with nothing specific to say gets no take at all. No two neighbouring takes the same shape.
 
 OUTPUT (JSON only, no prose outside it):
 {
@@ -246,22 +248,22 @@ OUTPUT (JSON only, no prose outside it):
   "preheader": "One sentence, max 90 chars, extending the subject without repeating it.",
   "editors_note": {
     "headline": "5–9 words. A claim, not a topic.",
-    "paragraphs": ["2–3 paragraphs, 50–90 words each. One story, explained by mechanism: what it says about sourcing, add-on strategy, seller behavior, lender appetite, or exits in the LMM. Use THE FILE facts and the scoreboard counts. End with a conviction-tagged call ('Our read: …' / 'High conviction: …' / 'Watch: …')."]
+    "paragraphs": ["2–3 paragraphs of different lengths (one may be two sentences; none over 100 words). One story, explained by mechanism: what it says about sourcing, add-on strategy, seller behavior, lender appetite, or exits in the LMM. Use THE FILE facts and the scoreboard counts. End with a conviction-tagged call ('Our read: …' / 'High conviction: …' / 'Watch: …')."]
   },
   "by_the_numbers": [ {"value":"7","label":"short label","context":"8–12 words"} ],  // exactly 3, from OUR data (scoreboard, tracker counts, disclosed figures) — not the ticker.
-  "headline_takes": [ {"index":1,"why_it_matters":"1–2 sentences for a $2–25M EBITDA investor."} ],
-  "radar_takes": [ {"index":1,"take":"1–2 sentences: why this deal or signal matters, using THE FILE."} ],
-  "deal_takes": [ {"index":1,"take":"1–2 sentences, specific, per the rules."} ],
+  "headline_takes": [ {"index":1,"why_it_matters":"For a $2–25M EBITDA investor. Length varies, see LENGTH."} ],
+  "radar_takes": [ {"index":1,"take":"Why this deal matters, using THE FILE. Length varies."} ],
+  "deal_takes": [ {"index":1,"take":"Specific, per the rules. Length varies."} ],
   "featured_deal_index": 1,  // most instructive deal in DEALS, or null
   "market_pulse_takes": [ {"index":1,"why_it_matters":"1 sentence in LMM terms."} ],
   "the_read": {"index": 1, "take": "2–3 sentences on why READ CANDIDATE [index] is worth 15 minutes. Describe THAT item, not another."} or null,
   "closing_line": "One dry, specific sign-off sentence. No platitudes, no markets jokes."
 }`;
 
-  const user = `BELOW THE RADAR (no press release found):
+  const user = `BELOW THE RADAR (ours alone; not in the PE press):
 ${fmtRadar || "(none today)"}
 
-DEALS (announced):
+DEALS:
 ${fmtDeals || "(none)"}
 
 SCOREBOARD (our tracker, last 30 days):
@@ -519,8 +521,8 @@ serve(async (req: Request): Promise<Response> => {
       if (company.split(/\s+/).length > 6 || /\b(leads?|acquires?|announces?|completes?|invests?|recapitali[sz]ation|acquisition|partners with)\b/i.test(company)) continue;
       signalIds.push(it.id);
       radar.push({
-        headline: `${company} is now on ${sponsor}'s portfolio page`,
-        body: `${sponsor} added ${company} to the portfolio list on its website. We found no press release, wire story or banker tombstone for it. Treat it as a signal until the firm confirms.`,
+        headline: `${sponsor} appears to have added ${company}`,
+        body: `${company} now shows up as a ${sponsor} portfolio company. Neither side has confirmed a deal.`,
         found_via: FOUND_VIA_LABEL.portfolio_page, source: sponsor, source_url: it.url, confirmed: false,
       });
     }
@@ -555,7 +557,7 @@ serve(async (req: Request): Promise<Response> => {
       const terms = [usd(top.fair_value) ? `${usd(top.fair_value)} at fair value` : null, `${Number(top.spread_pct).toFixed(2)}% over the base rate`, top.maturity ? `due ${top.maturity.slice(0, 4)}` : null].filter(Boolean).join(", ");
       filingRadar.push({
         headline: `${top.issuer} took a new first-lien loan`,
-        body: `${top.issuer} appears for the first time in a lender's quarterly schedule of investments (${lenders.join(", ")}, period ending ${top.period_end ?? "latest quarter"}): ${terms}. It was not in the prior quarter's filing, and the filing does not name a sponsor.`,
+        body: `${top.issuer} has a new first-lien loan from ${lenders.join(", ")}: ${terms}. No sponsor has been named.`,
         found_via: FOUND_VIA_LABEL.sec_filing, source: `${lenders.join(", ")} 10-Q`, source_url: top.source_url, confirmed: true,
       });
     }
@@ -646,11 +648,35 @@ serve(async (req: Request): Promise<Response> => {
     const check = (e: EditorialOutput | null): string[] => e
       ? lintIssue({ subject: e.subject, preheader: e.preheader, headline: e.editors_note?.headline, paragraphs: e.editors_note?.paragraphs, numbers: e.by_the_numbers, closing: e.closing_line, lenders: lenderNames })
       : ["The writing pass did not run, so the issue has no Lede or subject line of its own."];
+    // Desk voice: uneven takes, no generated-copy tells, no word of how a deal was found.
+    // These send the draft back once but never hold it; tidy() and scrub clean up what is left.
+    const style = (e: EditorialOutput | null): string[] => e
+      ? lintStyle({ subject: e.subject, headline: e.editors_note?.headline, paragraphs: e.editors_note?.paragraphs, closing: e.closing_line,
+          takes: [...(e.deal_takes ?? []).map((t) => t.take), ...(e.radar_takes ?? []).map((t) => t.take), ...(e.headline_takes ?? []).map((t) => t.why_it_matters), ...(e.market_pulse_takes ?? []).map((t) => t.why_it_matters), e.the_read?.take ?? ""] })
+      : [];
     let qualityFlags = check(editorial);
-    if (editorial && qualityFlags.length && aiKey) {
-      console.warn("issue failed its own check, rewriting once:", qualityFlags);
-      const second = await editorialPass({ ...editorialInput, feedback: qualityFlags }, aiKey);
-      if (second) { const again = check(second); if (again.length < qualityFlags.length) { editorial = second; qualityFlags = again; } }
+    let styleFlags = style(editorial);
+    if (editorial && (qualityFlags.length || styleFlags.length) && aiKey) {
+      console.warn("issue failed its own check, rewriting once:", qualityFlags, styleFlags);
+      const second = await editorialPass({ ...editorialInput, feedback: [...qualityFlags, ...styleFlags] }, aiKey);
+      if (second) {
+        const again = check(second), againStyle = style(second);
+        if (again.length < qualityFlags.length || (again.length === qualityFlags.length && againStyle.length < styleFlags.length)) { editorial = second; qualityFlags = again; styleFlags = againStyle; }
+      }
+    }
+    if (styleFlags.length) console.warn("style notes left after the rewrite:", styleFlags);
+    if (editorial) {
+      editorial.subject = tidy(editorial.subject); editorial.preheader = tidy(editorial.preheader);
+      editorial.editors_note.headline = tidy(editorial.editors_note.headline);
+      editorial.editors_note.paragraphs = editorial.editors_note.paragraphs.map((p) => tidy(p));
+      editorial.closing_line = tidy(editorial.closing_line);
+      // A take that still says how a deal was found is dropped; the deal runs without one.
+      const keep = <T extends { take?: string; why_it_matters?: string }>(list: T[] | undefined): T[] =>
+        (list ?? []).map((t) => ({ ...t, ...(t.take != null ? { take: tidy(t.take) } : {}), ...(t.why_it_matters != null ? { why_it_matters: tidy(t.why_it_matters) } : {}) }))
+          .filter((t) => !lintStyle({ takes: [t.take ?? t.why_it_matters ?? ""] }).some((p) => p.startsWith("Says how")));
+      editorial.deal_takes = keep(editorial.deal_takes); editorial.radar_takes = keep(editorial.radar_takes);
+      editorial.headline_takes = keep(editorial.headline_takes); editorial.market_pulse_takes = keep(editorial.market_pulse_takes);
+      if (editorial.the_read) editorial.the_read.take = tidy(editorial.the_read.take);
     }
 
     // Apply editorial layer
