@@ -96,10 +96,12 @@ Deno.serve(async (req: Request): Promise<Response> => {
   // Weekend Reading intake. Only links are kept: resolved to the page they land on, with that
   // page's own title and publisher. Nothing from the digest's text is stored.
   const toList: string[] = [email.to, email.headers?.to, event.data?.to].flat().filter(Boolean).map((t: unknown) => String(t).toLowerCase());
-  if (toList.some((t) => t.includes(readingAddress))) {
+  // Anything else sent there (Gmail's forwarding-verification code, a stranger) falls through
+  // to the ordinary log below, where the editor can see it.
+  const readingOk = isForwarder(envelope) || readingForwarders.includes(envelope) || isReadingSender(envelope) || Boolean(autoForwardedBy(email.headers));
+  if (readingOk && toList.some((t) => t.includes(readingAddress))) {
     const fwdRead = isForwarder(envelope) ? findForwarded(subject, fullText) : null;
     const origin = fwdRead?.address ?? envelope;
-    if (!isForwarder(envelope) && !readingForwarders.includes(envelope) && !isReadingSender(envelope) && !autoForwardedBy(email.headers)) return new Response(JSON.stringify({ ok: true, reading: "ignored: sender not on the reading list" }), { headers: { "content-type": "application/json" } });
     const found = extractReads(html).slice(0, 15);
     // Opened together, 8 seconds at most, so the webhook answers before Resend retries.
     const pages = await Promise.all(found.map((l) => resolve(l.url)));
